@@ -1,0 +1,7 @@
+{
+  "name": "CenaduriaSonic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
