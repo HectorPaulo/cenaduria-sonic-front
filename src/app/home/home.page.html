@@ -1,0 +1,61 @@
+<app-header titulo="Inicio"></app-header>
+
+<ion-content [fullscreen]="true">
+
+  <ion-grid>
+    <ion-row>
+
+      <ion-col>
+        <ion-card mode="ios" routerLink="/home/pedidos">
+          <ion-card-header>
+            <ion-card-title>Mis pedidos</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>Visualiza tus pedidos</p>
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card mode="ios" routerLink="/home/pedidos">
+          <ion-card-header>
+            <ion-card-title>Promociones</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>Consulta nuestras promociones</p>
+          </ion-card-content>
+        </ion-card>
+        
+        <ion-card mode="ios" routerLink="/home/menu">
+          <ion-card-header>
+            <ion-card-title>Menú</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>Consulta el menú</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <ion-col>
+
+        <ion-card mode="ios" routerLink="/home/pedidos">
+          <ion-card-header>
+            <ion-card-title>Perfil</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>Visualiza tus perfil</p>
+          </ion-card-content>
+        </ion-card>
+        
+        <ion-card mode="ios" routerLink="/home/menu">
+          <ion-card-header>
+            <ion-card-title>Preferencias</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>Consulta tus preferencias del sistema</p>
+          </ion-card-content>
+        </ion-card>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>

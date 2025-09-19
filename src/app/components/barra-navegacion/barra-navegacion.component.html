@@ -1,0 +1,40 @@
+<div
+  class="fixed bottom-0 left-0 w-full max-w-lg mx-auto bg-green-900 rounded-t-2xl shadow-lg flex justify-around items-center py-3 z-10"
+>
+  <div class="flex flex-col items-center text-zinc-300">
+    <ion-button
+      color="transparent"
+      (click)="navigateToHome()"
+      class="flex flex-col items-center text-zinc-300"
+    >
+      <div class="flex flex-col items-center text-white">
+        <ion-icon name="home"></ion-icon>
+        <span class="text-xs">Inicio</span>
+      </div>
+    </ion-button>
+  </div>
+  <div class="flex flex-col items-center text-white">
+    <ion-button (click)="navigateToPedidos()" color="transparent">
+      <div class="flex flex-col items-center text-white">
+        <ion-icon name="cart"></ion-icon>
+        <span class="text-xs">Mis pedidos</span>
+      </div>
+    </ion-button>
+  </div>
+  <div class="flex flex-col items-center text-white">
+    <ion-button color="transparent" (click)="navigateToMenu()">
+      <div class="flex flex-col items-center text-white">
+        <ion-icon name="menu"></ion-icon>
+        <span class="text-xs">Menú</span>
+      </div>
+    </ion-button>
+  </div>
+  <div class="flex flex-col items-center text-white">
+    <ion-button color="transparent" (click)="navigateToPerfil()">
+      <div class="flex flex-col items-center text-white">
+        <ion-icon name="person"></ion-icon>
+        <span class="text-xs">Perfil</span>
+      </div>
+    </ion-button>
+  </div>
+</div>
