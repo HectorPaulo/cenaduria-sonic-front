@@ -1,11 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonGrid, IonRow, IonTitle } from "@ionic/angular/standalone";
+import { IonHeader, IonToolbar, IonButtons, IonMenuButton, IonGrid, IonRow, IonTitle, IonText } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-header-wo-btn',
   templateUrl: './header-wo-btn.component.html',
   styleUrls: ['./header-wo-btn.component.scss'],
-  imports: [
+  imports: [IonText, 
     IonTitle,
     IonRow,
     IonGrid,

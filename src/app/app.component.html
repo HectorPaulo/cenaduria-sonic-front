@@ -1,21 +1,36 @@
 <ion-app>
+  <app-loading-screen
+    *ngIf="loading"
+    style="z-index: 9999; position: fixed; inset: 0"
+  ></app-loading-screen>
   <ion-split-pane contentId="main-content">
     <ion-menu contentId="main-content" type="overlay">
       <ion-content>
         <ion-list id="inbox-list">
           <ion-list-header class="text-6xl">
-<h1 class="">Cenaduría Sonic</h1>
+            <h1 class="">Cenaduría Sonic</h1>
           </ion-list-header>
           <ion-note>Hola&#64;PapuUsuario!</ion-note>
           <ion-note>Hora de dormir...</ion-note>
 
           @for (p of appPages; track p; let i = $index) {
-            <ion-menu-toggle auto-hide="false">
-              <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
-                <ion-icon aria-hidden="true" slot="start" [ios]="p.icon" [md]="p.icon"></ion-icon>
-                <ion-label>{{ p.title }}</ion-label>
-              </ion-item>
-            </ion-menu-toggle>
+          <ion-menu-toggle auto-hide="false">
+            <ion-item
+              routerDirection="root"
+              [routerLink]="[p.url]"
+              lines="none"
+              detail="false"
+              routerLinkActive="selected"
+            >
+              <ion-icon
+                aria-hidden="true"
+                slot="start"
+                [ios]="p.icon"
+                [md]="p.icon"
+              ></ion-icon>
+              <ion-label>{{ p.title }}</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
           }
         </ion-list>
 

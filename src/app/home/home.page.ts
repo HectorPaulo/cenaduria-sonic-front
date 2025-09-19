@@ -25,7 +25,7 @@ import { HeaderComponent } from "../components/header/header.component";
     CommonModule,
     FormsModule,
     IonMenuButton,
-    HeaderComponent
+    HeaderComponent,
 ],
 })
 export class HomePage implements OnInit {

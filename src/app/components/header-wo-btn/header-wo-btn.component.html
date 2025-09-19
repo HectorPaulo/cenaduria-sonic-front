@@ -1,24 +1,28 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-
     <ion-grid class="bg-green-900 text-white">
       <ion-row>
-        <ion-title>{{ titulo }}</ion-title>
+        <div class="flex flex-row spacing-20">
 
-        <!-- Perfil y saludo -->
+          <ion-title>{{ titulo }}</ion-title>
+          <!-- Perfil y saludo -->
         <div class="flex items-center gap-4 mr-6">
-          <div>
-            <div class="text-gray-300 text-lg font-semibold">Usuario</div>
-            <div class="text-zinc-400 text-xs">Tipo de Usuario</div>
+          <div class="justify-center text-right">
+            <ion-text>
+              <h1>Sonic the Hedgehog</h1>
+            </ion-text>
+            <ion-text>
+              <h6 class="text-zinc-400 text-xs">Acosador en potencia</h6>
+            </ion-text>
           </div>
           <img
-            src=""
+            src="assets/sonic.png"
             alt="Imagen de perfil"
             class="w-14 h-14 rounded-full bg-gray-200 object-cover"
           />
-
-
         </div>
+
+      </div>
 
       </ion-row>
     </ion-grid>

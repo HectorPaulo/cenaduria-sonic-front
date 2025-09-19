@@ -1,6 +1,144 @@
 <app-header-wo-btn titulo="Mis Pedidos"></app-header-wo-btn>
 
 <ion-content [fullscreen]="true">
-  
+  <div class="w-screen relative overflow-hidden">
+    <!-- Mejora visual completa usando TailwindCSS -->
+    <div class="max-w-md mx-auto mt-4 mb-32 px-2">
+      <!-- Título principal -->
+
+      <!-- Tabs de estado -->
+      <div class="flex justify-center gap-4 mb-6">
+        <ion-chip mode="ios" class="font-semibold">
+          <ion-label>En proceso</ion-label>
+        </ion-chip>
+
+        <ion-chip mode="ios" class="font-semibold" disabled="true">
+          <ion-label>Entregados</ion-label>
+        </ion-chip>
+
+      </div>
+
+      <!-- Lista de pedidos -->
+      <div class="space-y-6">
+        <!-- Pedido 1 -->
+        <ion-card mode="ios" class="ion-padding">
+          <ion-card-title>Comida 1</ion-card-title>
+
+          <ion-chip mode="ios">
+            <ion-avatar>
+              <img src="assets/sonic.png" />
+            </ion-avatar>
+            <ion-label>Están sabrosas</ion-label>
+          </ion-chip>
+
+          <ion-chip mode="ios">
+            <ion-avatar>
+              <img src="assets/goku.png" />
+            </ion-avatar>
+            <ion-label>ke rikas!</ion-label>
+          </ion-chip>
+
+          <img src="assets/comida.png" alt="" />
+
+          <ion-card-content class="ion-text-justify">
+            <ion-grid fixed>
+              <ion-row>
+                <ion-col size="9">
+                  <ion-text>
+                    <h4>Descripción de la comida con ingrediente 1, ingrediente 2 y un poco
+                  de ingrediente 3.</h4>
+                  </ion-text>
+                </ion-col>
+                <ion-col size="3">
+                  <ion-text>
+                    <h2 class="text-gray-200 ion-text-center ">$99</h2>
+                  </ion-text>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+        
+        <!-- Pedido 2 -->
+        <ion-card mode="ios" class="ion-padding">
+          <ion-card-title>Comida 2</ion-card-title>
+
+          <ion-chip mode="ios">
+            <ion-avatar>
+              <img src="assets/sonic.png" />
+            </ion-avatar>
+            <ion-label>Están sabrosas</ion-label>
+          </ion-chip>
+
+          <ion-chip mode="ios">
+            <ion-avatar>
+              <img src="assets/goku.png" />
+            </ion-avatar>
+            <ion-label>ke rikas!</ion-label>
+          </ion-chip>
+
+          <img src="assets/comida.png" alt="" />
+
+          <ion-card-content class="ion-text-justify">
+            <ion-grid fixed>
+              <ion-row>
+                <ion-col size="9">
+                  <ion-text>
+                    <h4>Descripción de la comida con ingrediente 1, ingrediente 2 y un poco
+                  de ingrediente 3.</h4>
+                  </ion-text>
+                </ion-col>
+                <ion-col size="3">
+                  <ion-text>
+                    <h2 class="text-gray-200 ion-text-center ">$99</h2>
+                  </ion-text>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Pedido 2 -->
+        <ion-card mode="ios" class="ion-padding">
+          <ion-card-title>Bebida 1</ion-card-title>
+
+          <ion-chip mode="ios">
+            <ion-avatar>
+              <img src="assets/sonic.png" />
+            </ion-avatar>
+            <ion-label>Están sabrosas</ion-label>
+          </ion-chip>
+
+          <ion-chip mode="ios">
+            <ion-avatar>
+              <img src="assets/goku.png" />
+            </ion-avatar>
+            <ion-label>ke rikas!</ion-label>
+          </ion-chip>
+
+          <img src="assets/comida.png" alt="" />
+
+          <ion-card-content class="ion-text-justify">
+            <ion-grid fixed>
+              <ion-row>
+                <ion-col size="9">
+                  <ion-text>
+                    <h4>Descripción de la comida con ingrediente 1, ingrediente 2 y un poco
+                  de ingrediente 3.</h4>
+                  </ion-text>
+                </ion-col>
+                <ion-col size="3">
+                  <ion-text>
+                    <h2 class="text-gray-200 ion-text-center ">$99</h2>
+                  </ion-text>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+
+      </div>
+    </div>
+  </div>
   <app-barra-navegacion></app-barra-navegacion>
 </ion-content>
