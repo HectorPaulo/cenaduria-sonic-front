@@ -50,12 +50,34 @@ import { LoadingScreenComponent } from "./components/loading-screen/loading-scre
 ],
 })
 export class AppComponent {
+
   public appPages = [
-    { title: 'Menu', url: '/menu', icon: 'document' },
-    { title: 'Mis pedidos', url: '/pedidos', icon: 'cart' },
-    { title: 'Perfil', url: '/perfil', icon: 'person' },
+    { 
+      title: 'Menu', 
+      url: '/menu', 
+      icon: 'document' 
+    },
+    { 
+      title: 'Mis pedidos', 
+      url: '/pedidos', 
+      icon: 'cart' 
+    },
+    { 
+      title: 'Perfil', 
+      url: '/perfil', 
+      icon: 'person' 
+    },
   ];
-  public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
+
+  public labels = [
+    'Family', 
+    'Friends', 
+    'Notes', 
+    'Work', 
+    'Travel', 
+    'Reminders'
+  ];
+
   public loading = false;
   constructor(private router: Router) {
     addIcons({ document, cart, person });
@@ -70,7 +92,7 @@ export class AppComponent {
       ) {
         setTimeout(() => {
           this.loading = false;
-        }, 400); // pequeño delay para UX
+        }, 400); 
       }
     });
   }

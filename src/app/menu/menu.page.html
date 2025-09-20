@@ -1,107 +1,163 @@
-<app-header-wo-btn titulo="Menú"></app-header-wo-btn>
+<app-header titulo="Menú"></app-header>
 
 <ion-content [fullscreen]="true" class="bg-white">
+  <ion-refresher
+    slot="fixed"
+    (ionRefresh)="doRefresh($event)"
+    pullFactor="0.8"
+    pullMin="60"
+    pullMax="120"
+  >
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <div class="max-w-lg mx-auto p-4">
-
-    <!-- Categorías -->
-    <div class="flex gap-3 mb-6">
-      <div class="flex flex-col items-center flex-1">
-        <div
-          class="w-12 h-12 flex items-center justify-center bg-green-100 rounded-2xl text-2xl"
-        >
-          🍔
-        </div>
-        <span class="text-xs mt-1">Hamburguesas</span>
-      </div>
-      <div class="flex flex-col items-center flex-1">
-        <div
-          class="w-12 h-12 flex items-center justify-center bg-green-100 rounded-2xl text-2xl"
-        >
-          🌮
-        </div>
-        <span class="text-xs mt-1">Tacos</span>
-      </div>
-      <div class="flex flex-col items-center flex-1">
-        <div
-          class="w-12 h-12 flex items-center justify-center bg-green-100 rounded-2xl text-2xl"
-        >
-          🍕
-        </div>
-        <span class="text-xs mt-1">Pizza</span>
-      </div>
-    </div>
-
+    
     <!-- Sección Comida -->
     <h2 class="text-2xl font-bold text-gray-300 mb-2">Comida</h2>
+    <!-- Categorías -->
+    <div class="flex gap-3 mb-6">
+      <ion-grid fixed>
+        <ion-row>
+          @for (recomendacion of recomendaciones; track $index) {
+          <ion-col>
+            <div class="flex flex-col gap-2 items-center">
+              <ion-button
+                class="rounded-2xl w-1/2 bg-green-100"
+                shape="round"
+                color="transparent"
+              >
+              <p class="py-2 text-3xl">{{recomendacion.icon}}</p>
+              </ion-button>
+              <ion-text color="dark" class="text-sm">
+                <h1>{{recomendacion.name}}</h1>
+              </ion-text>
+            </div>
+          </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    </div>
     <div class="grid gap-4 mb-6">
-      <div class="bg-green-50 rounded-xl p-4 flex items-center shadow-sm">
-        <div
-          class="w-16 h-16 flex items-center justify-center bg-white rounded-lg text-3xl mr-4"
-        >
-          🍔
-        </div>
-        <div class="flex-1">
-          <div class="text-lg font-semibold text-green-900">Comida 1</div>
-          <div class="text-sm text-zinc-700">
-            Descripción de la comida con ingrediente 1, ingrediente 2 y un poco
-            de ingrediente 3
-          </div>
-        </div>
-        <div class="text-lg font-bold text-green-900 ml-4">$99.99</div>
-      </div>
-      <div class="bg-green-50 rounded-xl p-4 flex items-center shadow-sm">
-        <div
-          class="w-16 h-16 flex items-center justify-center bg-white rounded-lg text-3xl mr-4"
-        >
-          🍟
-        </div>
-        <div class="flex-1">
-          <div class="text-lg font-semibold text-green-900">Comida 2</div>
-          <div class="text-sm text-zinc-700">
-            Descripción de la comida con ingrediente 1, ingrediente 2 y un poco
-            de ingrediente 3
-          </div>
-        </div>
-        <div class="text-lg font-bold text-green-900 ml-4">$99.99</div>
-      </div>
+      <ion-grid fixed>
+        @for (comida of comidas; track $index) {
+
+        <ion-row>
+          <ion-card color="dark" class="p-1" mode="ios">
+            <img [src]="comida.image" [alt]="comida.name" class="rounded-md" />
+            <ion-card-header>
+              <ion-card-title class="text-lg font-bold">
+                <p class="text-gray-800 font-semibold">{{ comida.name }}</p>
+              </ion-card-title>
+            </ion-card-header>
+            <ion-card-content class="text-sm">
+              <p class="text-gray-600">{{ comida.description }}</p>
+              <p class="font-bold text-green-700">
+                ${{ comida.price | number: '1.2-2' }}
+              </p>
+
+              <ion-button
+                (click)="addToCart(comida)"
+                color="light"
+                class="-ml-2 mt-2"
+              >
+                <ion-icon color="dark" slot="start" name="cart"></ion-icon>
+                <ion-label color="dark">Ordenar</ion-label>
+              </ion-button>
+
+              <ion-button
+                (click)="addToList(comida)"
+                shape="round"
+                color="light"
+                size="small"
+                class="float-right mt-5"
+              >
+                <ion-icon slot="icon-only" name="add"></ion-icon>
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-row>
+
+        }
+      </ion-grid>
     </div>
 
     <!-- Sección Bebidas -->
     <h2 class="text-2xl font-bold text-gray-300 mb-2">Bebidas</h2>
+    <!-- Categorías -->
+    <div class="flex gap-3 mb-6">
+      <ion-grid fixed>
+        <ion-row>
+          @for (recomendacion of recomendaciones; track $index) {
+          <ion-col>
+            <div class="flex flex-col gap-2 items-center">
+              <ion-button
+                class="rounded-2xl w-1/2 bg-green-100"
+                shape="round"
+                color="transparent"
+              >
+              <p class="py-2 text-3xl">{{recomendacion.icon}}</p>
+              </ion-button>
+              <ion-text color="dark" class="text-sm">
+                <h1>{{recomendacion.name}}</h1>
+              </ion-text>
+            </div>
+          </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    </div>
+
     <div class="grid gap-4 mb-6">
-      <div class="bg-orange-50 rounded-xl p-4 flex items-center shadow-sm">
-        <div
-          class="w-16 h-16 flex items-center justify-center bg-white rounded-lg text-3xl mr-4"
-        >
-          🥤
-        </div>
-        <div class="flex-1">
-          <div class="text-lg font-semibold text-green-700">Bebida 1</div>
-          <div class="text-sm text-zinc-700">
-            Descripción de la bebida con ingrediente 1, ingrediente 2 y un poco
-            de ingrediente 3
-          </div>
-        </div>
-        <div class="text-lg font-bold text-orange-800 ml-4">$99.99</div>
-      </div>
-      <div class="bg-orange-50 rounded-xl p-4 flex items-center shadow-sm">
-        <div
-          class="w-16 h-16 flex items-center justify-center bg-white rounded-lg text-3xl mr-4"
-        >
-          🧃
-        </div>
-        <div class="flex-1">
-          <div class="text-lg font-semibold text-green-700">Bebida 2</div>
-          <div class="text-sm text-zinc-700">
-            Descripción de la bebida con ingrediente 1, ingrediente 2 y un poco
-            de ingrediente 3
-          </div>
-        </div>
-        <div class="text-lg font-bold text-orange-800 ml-4">$99.99</div>
-      </div>
+      <ion-grid fixed>
+        @for (bebida of bebidas; track $index) {
+
+        <ion-row>
+          <ion-card color="dark" class="bg-orange-50 rounded-xl p-4 flex items-center shadow-sm" mode="ios">
+            <div class="w-16 h-16 flex items-center justify-center bg-white rounded-lg text-3xl mr-4">
+              {{ bebida.icon }}
+            </div>
+            <div class="flex-1">
+
+            <ion-card-header>
+              <ion-card-title class="text-lg font-semibold text-green-700">
+                <p class="text-gray-800 font-semibold">{{ bebida.name }}</p>
+              </ion-card-title>
+            </ion-card-header>
+            <ion-card-content class="text-sm text-zinc-700">
+              <div class="text-gray-600">{{ bebida.description }}</div>
+              <div class="font-bold text-green-700">
+                ${{ bebida.price | number: '1.2-2' }}
+              </div>
+
+              <ion-button
+                (click)="addToCart(bebida)"
+                color="light"
+                class="-ml-2 mt-2"
+              >
+                <ion-icon color="dark" slot="start" name="cart"></ion-icon>
+                <ion-label color="dark">Ordenar</ion-label>
+              </ion-button>
+
+              <ion-button
+                (click)="addToList(bebida)"
+                shape="round"
+                color="light"
+                size="small"
+                class="float-right mt-5"
+              >
+                <ion-icon slot="icon-only" name="add"></ion-icon>
+              </ion-button>
+            </ion-card-content>
+            </div>
+
+          </ion-card>
+        </ion-row>
+
+        }
+      </ion-grid>
+
     </div>
   </div>
-
-  <app-barra-navegacion></app-barra-navegacion>
 
 </ion-content>
