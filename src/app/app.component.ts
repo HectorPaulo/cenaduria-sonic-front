@@ -24,7 +24,6 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { person, cart, document } from 'ionicons/icons';
-import { LoadingScreenComponent } from "./components/loading-screen/loading-screen.component";
 
 @Component({
   selector: 'app-root',
@@ -45,8 +44,7 @@ import { LoadingScreenComponent } from "./components/loading-screen/loading-scre
     IonIcon,
     IonLabel,
     IonRouterLink,
-    IonRouterOutlet,
-    LoadingScreenComponent
+    IonRouterOutlet
 ],
 })
 export class AppComponent {

@@ -3,19 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
-  IonIcon,
-  IonItem,
-  IonList,
   IonGrid,
   IonRow,
-  IonCol,
   IonCard,
   IonCardContent,
   IonCardTitle,
   IonCardHeader,
   IonChip,
   IonLabel,
-  IonButton,
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
 import { Router, RouterLink } from '@angular/router';
@@ -28,7 +23,6 @@ import MenuDestacado from '../Types/MenuDestacado';
   styleUrls: ['./home.page.scss'],
   standalone: true,
   imports: [
-    IonButton,
     IonLabel,
     IonChip,
     IonCardHeader,
@@ -41,8 +35,8 @@ import MenuDestacado from '../Types/MenuDestacado';
     CommonModule,
     FormsModule,
     HeaderComponent,
-    RouterLink,
-  ],
+    RouterLink
+],
 })
 export class HomePage implements OnInit {
 navigateToTop() {

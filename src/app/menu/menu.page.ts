@@ -23,10 +23,9 @@ import { addIcons } from 'ionicons';
 import { add, cart, search } from 'ionicons/icons';
 import Pedido from '../Types/Pedido';
 import Lista from '../Types/Lista';
-import { HeaderWoBtnComponent } from '../components/header-wo-btn/header-wo-btn.component';
 import Bebida from '../Types/Bebida';
 import Recomendacion from '../Types/Recomendacion';
-import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
+import { RefresherCustomEvent } from '@ionic/core';
 import { HeaderComponent } from "../components/header/header.component";
 
 @Component({
@@ -51,8 +50,6 @@ import { HeaderComponent } from "../components/header/header.component";
     IonContent,
     CommonModule,
     FormsModule,
-    BarraNavegacionComponent,
-    HeaderWoBtnComponent,
     HeaderComponent
 ],
 })

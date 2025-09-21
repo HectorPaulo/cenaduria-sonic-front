@@ -1,144 +1,159 @@
 <app-header titulo="Mis Pedidos"></app-header>
 
-<ion-content [fullscreen]="true">
-  <div class="w-screen relative overflow-hidden">
-    <!-- Mejora visual completa usando TailwindCSS -->
-    <div class="max-w-md mx-auto mt-4 mb-32 px-2">
-      <!-- Título principal -->
+<ion-content [fullscreen]="true" class="bg-white">
+  <div class="max-w-lg mx-auto p-4">
+    <!-- Tabs de estado -->
+    <div class="flex justify-center gap-4 mb-6">
+      <ion-chip mode="ios" class="font-semibold bg-green-100 text-green-900">
+        <ion-label>En proceso</ion-label>
+      </ion-chip>
 
-      <!-- Tabs de estado -->
-      <div class="flex justify-center gap-4 mb-6">
-        <ion-chip mode="ios" class="font-semibold">
-          <ion-label>En proceso</ion-label>
-        </ion-chip>
+      <ion-chip
+        mode="ios"
+        class="font-semibold bg-gray-100 text-gray-500"
+        disabled="true"
+      >
+        <ion-label>Entregados</ion-label>
+      </ion-chip>
+    </div>
 
-        <ion-chip mode="ios" class="font-semibold" disabled="true">
-          <ion-label>Entregados</ion-label>
-        </ion-chip>
-
-      </div>
-
-      <!-- Lista de pedidos -->
-      <div class="space-y-6">
+    <!-- Lista de pedidos -->
+    <div class="grid gap-4 mb-6">
+      <ion-grid fixed>
         <!-- Pedido 1 -->
-        <ion-card mode="ios" class="ion-padding">
-          <ion-card-title>Comida 1</ion-card-title>
+        <ion-row>
+          <ion-card color="light" class="p-1 w-full" mode="ios">
+            <img
+              src="assets/comida.png"
+              alt="Comida 1"
+              class="rounded-md w-full h-32 object-cover"
+            />
+            <ion-card-header>
+              <ion-card-title class="text-lg font-bold">
+                <p class="text-gray-800 font-semibold">Comida 1</p>
+              </ion-card-title>
+            </ion-card-header>
+            <ion-card-content class="text-sm">
+              <!-- Chips de reseñas -->
+              <div class="flex gap-2 mb-3">
+                <ion-chip mode="ios" class="bg-blue-100">
+                  <ion-avatar>
+                    <img src="assets/sonic.png" />
+                  </ion-avatar>
+                  <ion-label class="text-xs">Están sabrosas</ion-label>
+                </ion-chip>
 
-          <ion-chip mode="ios">
-            <ion-avatar>
-              <img src="assets/sonic.png" />
-            </ion-avatar>
-            <ion-label>Están sabrosas</ion-label>
-          </ion-chip>
+                <ion-chip mode="ios" class="bg-purple-100">
+                  <ion-avatar>
+                    <img src="assets/goku.png" />
+                  </ion-avatar>
+                  <ion-label class="text-xs">ke rikas!</ion-label>
+                </ion-chip>
+              </div>
 
-          <ion-chip mode="ios">
-            <ion-avatar>
-              <img src="assets/goku.png" />
-            </ion-avatar>
-            <ion-label>ke rikas!</ion-label>
-          </ion-chip>
-
-          <img src="assets/comida.png" alt="" />
-
-          <ion-card-content class="ion-text-justify">
-            <ion-grid fixed>
-              <ion-row>
-                <ion-col size="9">
-                  <ion-text>
-                    <h4>Descripción de la comida con ingrediente 1, ingrediente 2 y un poco
-                  de ingrediente 3.</h4>
-                  </ion-text>
-                </ion-col>
-                <ion-col size="3">
-                  <ion-text>
-                    <h2 class="text-gray-200 ion-text-center ">$99</h2>
-                  </ion-text>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </ion-card-content>
-        </ion-card>
-        
-        <!-- Pedido 2 -->
-        <ion-card mode="ios" class="ion-padding">
-          <ion-card-title>Comida 2</ion-card-title>
-
-          <ion-chip mode="ios">
-            <ion-avatar>
-              <img src="assets/sonic.png" />
-            </ion-avatar>
-            <ion-label>Están sabrosas</ion-label>
-          </ion-chip>
-
-          <ion-chip mode="ios">
-            <ion-avatar>
-              <img src="assets/goku.png" />
-            </ion-avatar>
-            <ion-label>ke rikas!</ion-label>
-          </ion-chip>
-
-          <img src="assets/comida.png" alt="" />
-
-          <ion-card-content class="ion-text-justify">
-            <ion-grid fixed>
-              <ion-row>
-                <ion-col size="9">
-                  <ion-text>
-                    <h4>Descripción de la comida con ingrediente 1, ingrediente 2 y un poco
-                  de ingrediente 3.</h4>
-                  </ion-text>
-                </ion-col>
-                <ion-col size="3">
-                  <ion-text>
-                    <h2 class="text-gray-200 ion-text-center ">$99</h2>
-                  </ion-text>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </ion-card-content>
-        </ion-card>
+              <p class="text-gray-600 mb-2">
+                Descripción de la comida con ingrediente 1, ingrediente 2 y un
+                poco de ingrediente 3.
+              </p>
+              <div class="flex justify-between items-center">
+                <p class="font-bold text-green-700 text-lg">$99.00</p>
+                <ion-chip class="bg-green-100 text-green-800">
+                  <ion-label>En preparación</ion-label>
+                </ion-chip>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-row>
 
         <!-- Pedido 2 -->
-        <ion-card mode="ios" class="ion-padding">
-          <ion-card-title>Bebida 1</ion-card-title>
+        <ion-row>
+          <ion-card color="light" class="p-1 w-full" mode="ios">
+            <img
+              src="assets/comida.png"
+              alt="Comida 2"
+              class="rounded-md w-full h-32 object-cover"
+            />
+            <ion-card-header>
+              <ion-card-title class="text-lg font-bold">
+                <p class="text-gray-800 font-semibold">Comida 2</p>
+              </ion-card-title>
+            </ion-card-header>
+            <ion-card-content class="text-sm">
+              <!-- Chips de reseñas -->
+              <div class="flex gap-2 mb-3">
+                <ion-chip mode="ios" class="bg-blue-100">
+                  <ion-avatar>
+                    <img src="assets/sonic.png" />
+                  </ion-avatar>
+                  <ion-label class="text-xs">Están sabrosas</ion-label>
+                </ion-chip>
 
-          <ion-chip mode="ios">
-            <ion-avatar>
-              <img src="assets/sonic.png" />
-            </ion-avatar>
-            <ion-label>Están sabrosas</ion-label>
-          </ion-chip>
+                <ion-chip mode="ios" class="bg-purple-100">
+                  <ion-avatar>
+                    <img src="assets/goku.png" />
+                  </ion-avatar>
+                  <ion-label class="text-xs">ke rikas!</ion-label>
+                </ion-chip>
+              </div>
 
-          <ion-chip mode="ios">
-            <ion-avatar>
-              <img src="assets/goku.png" />
-            </ion-avatar>
-            <ion-label>ke rikas!</ion-label>
-          </ion-chip>
+              <p class="text-gray-600 mb-2">
+                Descripción de la comida con ingrediente 1, ingrediente 2 y un
+                poco de ingrediente 3.
+              </p>
+              <div class="flex justify-between items-center">
+                <p class="font-bold text-green-700 text-lg">$99.00</p>
+                <ion-chip class="bg-yellow-100 text-yellow-800">
+                  <ion-label>Listo</ion-label>
+                </ion-chip>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-row>
 
-          <img src="assets/comida.png" alt="" />
+        <!-- Pedido 3 (Bebida) -->
+        <ion-row>
+          <ion-card color="light" class="p-1 w-full" mode="ios">
+            <img
+              src="assets/bebida.png"
+              alt="Bebida 1"
+              class="rounded-md w-full h-32 object-cover"
+            />
+            <ion-card-header>
+              <ion-card-title class="text-lg font-bold">
+                <p class="text-gray-800 font-semibold">Bebida 1</p>
+              </ion-card-title>
+            </ion-card-header>
+            <ion-card-content class="text-sm">
+              <!-- Chips de reseñas -->
+              <div class="flex gap-2 mb-3">
+                <ion-chip mode="ios" class="bg-blue-100">
+                  <ion-avatar>
+                    <img src="assets/sonic.png" />
+                  </ion-avatar>
+                  <ion-label class="text-xs">Refrescante</ion-label>
+                </ion-chip>
 
-          <ion-card-content class="ion-text-justify">
-            <ion-grid fixed>
-              <ion-row>
-                <ion-col size="9">
-                  <ion-text>
-                    <h4>Descripción de la comida con ingrediente 1, ingrediente 2 y un poco
-                  de ingrediente 3.</h4>
-                  </ion-text>
-                </ion-col>
-                <ion-col size="3">
-                  <ion-text>
-                    <h2 class="text-gray-200 ion-text-center ">$99</h2>
-                  </ion-text>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </ion-card-content>
-        </ion-card>
+                <ion-chip mode="ios" class="bg-purple-100">
+                  <ion-avatar>
+                    <img src="assets/goku.png" />
+                  </ion-avatar>
+                  <ion-label class="text-xs">¡Perfecta!</ion-label>
+                </ion-chip>
+              </div>
 
-      </div>
+              <p class="text-gray-600 mb-2">
+                Bebida refrescante perfecta para acompañar tu comida.
+              </p>
+              <div class="flex justify-between items-center">
+                <p class="font-bold text-green-700 text-lg">$25.00</p>
+                <ion-chip class="bg-blue-100 text-blue-800">
+                  <ion-label>Entregado</ion-label>
+                </ion-chip>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-row>
+      </ion-grid>
     </div>
   </div>
-  <app-barra-navegacion></app-barra-navegacion>
 </ion-content>
