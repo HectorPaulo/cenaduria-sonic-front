@@ -27,6 +27,7 @@ import Bebida from '../Types/Bebida';
 import Recomendacion from '../Types/Recomendacion';
 import { RefresherCustomEvent } from '@ionic/core';
 import { HeaderComponent } from "../components/header/header.component";
+import { FabbtnComponent } from "../components/fabbtn/fabbtn.component";
 
 @Component({
   selector: 'app-menu',
@@ -50,7 +51,8 @@ import { HeaderComponent } from "../components/header/header.component";
     IonContent,
     CommonModule,
     FormsModule,
-    HeaderComponent
+    HeaderComponent,
+    FabbtnComponent
 ],
 })
 export class MenuPage implements OnInit {

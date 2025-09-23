@@ -60,13 +60,12 @@
       <h2 class="text-xl font-semibold mb-2">Promociones</h2>
       <ion-grid fixed>
         @if (promociones.length === 0) {
-          <p class="text-center text-gray-400">No hay promociones en este momento.</p>
+        <p class="text-center text-gray-400">
+          No hay promociones en este momento.
+        </p>
         } @else { @for (promocion of promociones; track $index) {
         <ion-row>
-          <ion-card
-            class="p-1"
-            mode="ios"
-          >
+          <ion-card class="p-1" mode="ios">
             <img
               [src]="promocion.image"
               [alt]="promocion.name"
@@ -91,12 +90,12 @@
       <h2 class="text-xl font-semibold mb-2">Menú Destacado</h2>
       <div class="grid gap-3">
         @if (menuDestacado.length === 0) {
-          <p class="text-center text-gray-400">No hay elementos destacados en el menú en este momento.</p>
-        } @else {
-
-          @for (item of menuDestacado; track $index) {
-            <ion-card mode="ios" class="shadow-sm">
-              <div class="flex items-center p-4">
+        <p class="text-center text-gray-400">
+          No hay elementos destacados en el menú en este momento.
+        </p>
+        } @else { @for (item of menuDestacado; track $index) {
+        <ion-card mode="ios" class="shadow-sm">
+          <div class="flex items-center p-4">
             <div
               class="w-16 h-16 flex items-center justify-center bg-green-50 rounded-lg text-3xl mr-4"
             >
@@ -109,9 +108,10 @@
             <div class="text-lg font-bold ml-4">${{ item.price }}</div>
           </div>
         </ion-card>
-        }
-      }
+        } }
       </div>
     </div>
   </div>
+
+<app-fabbtn></app-fabbtn>
 </ion-content>

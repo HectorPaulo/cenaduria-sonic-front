@@ -16,6 +16,7 @@ import {
   IonLoading,
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
+import { FabbtnComponent } from "../components/fabbtn/fabbtn.component";
 
 interface Review {
   avatar: string;
@@ -57,6 +58,7 @@ interface Pedido {
     CommonModule,
     FormsModule,
     HeaderComponent,
+    FabbtnComponent
 ],
 })
 export class PedidosPage implements OnInit {

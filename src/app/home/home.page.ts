@@ -15,13 +15,31 @@ import {
   IonLoading,
   IonRefresher,
   IonRefresherContent,
-RefresherEventDetail,
+  IonFab,
+  IonFabButton,
+  IonIcon,
+  IonFabList,
+  IonItem,
+  IonToggle,
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
 import { Router, RouterLink } from '@angular/router';
 import Promocion from '../Types/Promocion';
 import MenuDestacado from '../Types/MenuDestacado';
-import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
+import { addIcons } from 'ionicons';
+import { RefresherCustomEvent } from '@ionic/core/components';
+import {
+  chevronUpCircle,
+  person,
+  colorPalette,
+  chevronDownCircle,
+  chevronForwardCircle,
+  globe,
+  moon,
+  sunny,
+} from 'ionicons/icons';
+import { ThemeService } from '../services/theme.service';
+import { FabbtnComponent } from "../components/fabbtn/fabbtn.component";
 
 @Component({
   selector: 'app-home',
@@ -29,6 +47,12 @@ import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
   styleUrls: ['./home.page.scss'],
   standalone: true,
   imports: [
+    IonToggle,
+    IonItem,
+    IonFabList,
+    IonIcon,
+    IonFabButton,
+    IonFab,
     IonRefresherContent,
     IonRefresher,
     IonLoading,
@@ -46,15 +70,16 @@ import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
     FormsModule,
     HeaderComponent,
     RouterLink,
-  ],
+    FabbtnComponent
+],
 })
 export class HomePage implements OnInit {
-doRefresh(event: RefresherCustomEvent) {
-  setTimeout(() => {
-    // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
-    event.target.complete();
-  }, 2000);
-}
+  doRefresh(event: RefresherCustomEvent) {
+    setTimeout(() => {
+      // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
+      event.target.complete();
+    }, 2000);
+  }
   navigateToTop() {
     this.content.scrollToTop(500);
   }
@@ -92,9 +117,6 @@ doRefresh(event: RefresherCustomEvent) {
     },
   ];
 
-  private router = inject(Router);
-
-  constructor() {}
-
+  constructor() { }
   ngOnInit() {}
 }
