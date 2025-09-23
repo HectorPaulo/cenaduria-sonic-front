@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -23,22 +23,10 @@ import {
   IonToggle,
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import Promocion from '../Types/Promocion';
 import MenuDestacado from '../Types/MenuDestacado';
-import { addIcons } from 'ionicons';
 import { RefresherCustomEvent } from '@ionic/core/components';
-import {
-  chevronUpCircle,
-  person,
-  colorPalette,
-  chevronDownCircle,
-  chevronForwardCircle,
-  globe,
-  moon,
-  sunny,
-} from 'ionicons/icons';
-import { ThemeService } from '../services/theme.service';
 import { FabbtnComponent } from "../components/fabbtn/fabbtn.component";
 
 @Component({
@@ -47,16 +35,8 @@ import { FabbtnComponent } from "../components/fabbtn/fabbtn.component";
   styleUrls: ['./home.page.scss'],
   standalone: true,
   imports: [
-    IonToggle,
-    IonItem,
-    IonFabList,
-    IonIcon,
-    IonFabButton,
-    IonFab,
     IonRefresherContent,
     IonRefresher,
-    IonLoading,
-    IonButton,
     IonLabel,
     IonChip,
     IonCardHeader,

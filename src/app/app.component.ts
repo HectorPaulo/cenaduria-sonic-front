@@ -72,6 +72,11 @@ export class AppComponent implements OnInit {
       url: '/perfil',
       icon: 'person',
     },
+    {
+      title: 'Carrito',
+      url: '/carrito',
+      icon: 'cart',
+    },
   ];
 
   public loading = false;
