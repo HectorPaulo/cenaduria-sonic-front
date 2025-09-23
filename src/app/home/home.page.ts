@@ -11,11 +11,17 @@ import {
   IonCardHeader,
   IonChip,
   IonLabel,
+  IonButton,
+  IonLoading,
+  IonRefresher,
+  IonRefresherContent,
+RefresherEventDetail,
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
 import { Router, RouterLink } from '@angular/router';
 import Promocion from '../Types/Promocion';
 import MenuDestacado from '../Types/MenuDestacado';
+import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
 
 @Component({
   selector: 'app-home',
@@ -23,6 +29,10 @@ import MenuDestacado from '../Types/MenuDestacado';
   styleUrls: ['./home.page.scss'],
   standalone: true,
   imports: [
+    IonRefresherContent,
+    IonRefresher,
+    IonLoading,
+    IonButton,
     IonLabel,
     IonChip,
     IonCardHeader,
@@ -35,17 +45,23 @@ import MenuDestacado from '../Types/MenuDestacado';
     CommonModule,
     FormsModule,
     HeaderComponent,
-    RouterLink
-],
+    RouterLink,
+  ],
 })
 export class HomePage implements OnInit {
-navigateToTop() {
-  this.content.scrollToTop(500);
+doRefresh(event: RefresherCustomEvent) {
+  setTimeout(() => {
+    // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
+    event.target.complete();
+  }, 2000);
 }
+  navigateToTop() {
+    this.content.scrollToTop(500);
+  }
 
-navigateToBottom() {
-  this.content.scrollToBottom(500);
-}
+  navigateToBottom() {
+    this.content.scrollToBottom(500);
+  }
 
   @ViewChild(IonContent) content!: IonContent;
 
@@ -68,13 +84,11 @@ navigateToBottom() {
       name: '2x1 en Tacos',
       description: 'Solo hoy de 6pm a 9pm',
       image: 'assets/tacos.png',
-      cardColor: 'bg-orange-100',
     },
     {
       name: 'Combo Familiar',
       description: '4 hamburguesas + 4 papas + 4 refrescos por $150',
       image: 'assets/burgers.png',
-      cardColor: 'bg-blue-100',
     },
   ];
 

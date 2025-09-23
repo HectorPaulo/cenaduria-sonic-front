@@ -1,0 +1,14 @@
+<ion-item>
+  <ion-icon
+    [name]="themeService.isDarkMode() ? 'moon' : 'sunny'"
+    slot="start"
+    [color]="themeService.isDarkMode() ? 'light' : 'dark'"
+  ></ion-icon>
+  <ion-label>Cambiar tema</ion-label>
+  <ion-toggle
+    slot="end"
+    [checked]="themeService.isDarkMode()"
+    (ionChange)="onThemeToggle($event)"
+  >
+  </ion-toggle>
+</ion-item>

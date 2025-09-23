@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   Router,
   NavigationStart,
@@ -23,7 +23,9 @@ import {
   IonRouterLink,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { person, cart, document } from 'ionicons/icons';
+import { person, cart, document, home } from 'ionicons/icons';
+import { ThemeToggleComponent } from './components/theme-toggle/theme-toggle.component';
+import { ThemeService } from './services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -44,41 +46,38 @@ import { person, cart, document } from 'ionicons/icons';
     IonIcon,
     IonLabel,
     IonRouterLink,
-    IonRouterOutlet
-],
+    IonRouterOutlet,
+    ThemeToggleComponent,
+  ],
 })
-export class AppComponent {
-
+export class AppComponent implements OnInit {
   public appPages = [
-    { 
-      title: 'Menu', 
-      url: '/menu', 
-      icon: 'document' 
+    {
+      title: 'Inicio',
+      url: '/home',
+      icon: 'home',
     },
-    { 
-      title: 'Mis pedidos', 
-      url: '/pedidos', 
-      icon: 'cart' 
+    {
+      title: 'Menu',
+      url: '/menu',
+      icon: 'document',
     },
-    { 
-      title: 'Perfil', 
-      url: '/perfil', 
-      icon: 'person' 
+    {
+      title: 'Mis pedidos',
+      url: '/pedidos',
+      icon: 'cart',
     },
-  ];
-
-  public labels = [
-    'Family', 
-    'Friends', 
-    'Notes', 
-    'Work', 
-    'Travel', 
-    'Reminders'
+    {
+      title: 'Perfil',
+      url: '/perfil',
+      icon: 'person',
+    },
   ];
 
   public loading = false;
-  constructor(private router: Router) {
-    addIcons({ document, cart, person });
+
+  constructor(private router: Router, private themeService: ThemeService) {
+    addIcons({ document, cart, person, home });
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
         this.loading = true;
@@ -90,8 +89,10 @@ export class AppComponent {
       ) {
         setTimeout(() => {
           this.loading = false;
-        }, 400); 
+        }, 400);
       }
     });
   }
+
+  ngOnInit() { }
 }

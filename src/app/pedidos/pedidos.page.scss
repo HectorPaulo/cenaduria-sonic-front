@@ -1,0 +1,11 @@
+.cola {
+  --pathlength: 1384;
+  width: 45px;
+  fill: transparent;
+  stroke: rgb(255, 255, 115);
+  stroke-linecap: round;
+  stroke-width: 15px;
+  stroke-dashoffset: var(--pathlength);
+  stroke-dasharray: 0 var(--pathlength);
+  animation: loader 8s cubic-bezier(.5,.1,.5,1) infinite both;
+}

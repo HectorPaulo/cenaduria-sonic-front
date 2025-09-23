@@ -1,21 +1,46 @@
 <app-header titulo="Inicio"></app-header>
 <ion-content class="bg-white">
+  <ion-refresher
+    slot="fixed"
+    (ionRefresh)="doRefresh($event)"
+    pullFactor="0.8"
+    pullMin="60"
+    pullMax="120"
+  >
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <div class="max-w-lg mx-auto p-4">
-        <!-- Acceso rápido -->
+    <!-- Acceso rápido -->
     <div class="fixed left-0 right-0 flex justify-center gap-2 z-10">
-      <ion-chip class="bg-gray-100/80"  routerLink="/menu" color="success" mode="md">
+      <ion-chip
+        class="bg-green-100 text-green-900 font-semibold"
+        routerLink="/menu"
+        mode="ios"
+      >
         <ion-label class="ion-text-center">menú</ion-label>
       </ion-chip>
 
-      <ion-chip class="bg-gray-100/80" routerLink="/pedidos" color="warning" mode="md">
+      <ion-chip
+        class="bg-yellow-100 text-yellow-900 font-semibold"
+        routerLink="/pedidos"
+        mode="ios"
+      >
         <ion-label class="ion-text-center">pedidos</ion-label>
       </ion-chip>
 
-      <ion-chip class="bg-gray-100/80" (click)="navigateToTop()" color="primary" mode="md">
+      <ion-chip
+        class="bg-blue-100 text-blue-900 font-semibold"
+        (click)="navigateToTop()"
+        mode="ios"
+      >
         <ion-label class="ion-text-center">Promos</ion-label>
       </ion-chip>
 
-      <ion-chip class="bg-gray-100/80" (click)="navigateToBottom()" color="secondary" mode="md">
+      <ion-chip
+        class="bg-purple-100 text-purple-900 font-semibold"
+        (click)="navigateToBottom()"
+        mode="ios"
+      >
         <ion-label>Destacados</ion-label>
       </ion-chip>
     </div>
@@ -34,11 +59,11 @@
     <div class="mb-6">
       <h2 class="text-xl font-semibold mb-2">Promociones</h2>
       <ion-grid fixed>
-        @for (promocion of promociones; track $index) {
+        @if (promociones.length === 0) {
+          <p class="text-center text-gray-400">No hay promociones en este momento.</p>
+        } @else { @for (promocion of promociones; track $index) {
         <ion-row>
           <ion-card
-            [color]="promocion.cardColor"
-            [ngClass]="promocion.cardColor"
             class="p-1"
             mode="ios"
           >
@@ -57,7 +82,7 @@
             </ion-card-content>
           </ion-card>
         </ion-row>
-        }
+        } }
       </ion-grid>
     </div>
 
@@ -65,9 +90,13 @@
     <div class="mb-6">
       <h2 class="text-xl font-semibold mb-2">Menú Destacado</h2>
       <div class="grid gap-3">
-        @for (item of menuDestacado; track $index) {
-        <ion-card mode="ios" class="shadow-sm">
-          <div class="flex items-center p-4">
+        @if (menuDestacado.length === 0) {
+          <p class="text-center text-gray-400">No hay elementos destacados en el menú en este momento.</p>
+        } @else {
+
+          @for (item of menuDestacado; track $index) {
+            <ion-card mode="ios" class="shadow-sm">
+              <div class="flex items-center p-4">
             <div
               class="w-16 h-16 flex items-center justify-center bg-green-50 rounded-lg text-3xl mr-4"
             >
@@ -81,8 +110,8 @@
           </div>
         </ion-card>
         }
+      }
       </div>
     </div>
-
   </div>
 </ion-content>
