@@ -1,0 +1,37 @@
+// Estilos para mantener el fab button fijo durante el scroll
+:host {
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 20px !important;
+  z-index: 1000 !important;
+  pointer-events: none;
+}
+
+ion-fab {
+  position: relative !important;
+  pointer-events: all;
+}
+
+// Asegurar que el fab button se mantenga visible
+ion-fab-button {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease !important;
+}
+
+ion-fab-button:hover {
+  transform: scale(1.05) !important;
+}
+
+// Estilos para la lista de fab buttons
+ion-fab-list {
+  ion-fab-button {
+    margin-bottom: 8px !important;
+  }
+}
+
+// Tema oscuro
+body.dark {
+  ion-fab-button {
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1) !important;
+  }
+}

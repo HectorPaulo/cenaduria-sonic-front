@@ -4,7 +4,7 @@ export default interface User {
     email: string;
     telefono?: string;
     direccion?: string;
-    avatar: string;
+    avatar?: string;
     fechaRegistro: string;
     totalPedidos: number;
     puntos: number;

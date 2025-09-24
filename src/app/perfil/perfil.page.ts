@@ -25,7 +25,8 @@ import {
   logOutOutline,
 } from 'ionicons/icons';
 import User from '../Types/User';
-
+import { Capacitor } from '@capacitor/core';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Component({
   selector: 'app-perfil',
@@ -42,13 +43,11 @@ import User from '../Types/User';
     IonButton,
     CommonModule,
     FormsModule,
-    BarraNavegacionComponent,
     HeaderComponent,
     ThemeToggleComponent,
   ],
 })
 export class PerfilPage implements OnInit {
-
   usuario: User = {
     nombre: 'Sonic el erizo',
     email: 'sonic.erizo@email.com',
@@ -95,15 +94,13 @@ export class PerfilPage implements OnInit {
         {
           text: 'Cámara',
           handler: () => {
-            console.log('Abrir cámara');
-            // TODO: Implementar funcionalidad de cámara
+            this.tomarFotoConCamara();
           },
         },
         {
           text: 'Galería',
           handler: () => {
-            console.log('Abrir galería');
-            // TODO: Implementar funcionalidad de galería
+            this.seleccionarDeGaleria();
           },
         },
         {
@@ -113,6 +110,68 @@ export class PerfilPage implements OnInit {
       ],
     });
     await alert.present();
+  }
+
+  async tomarFotoConCamara() {
+    try {
+      // Verificar si estamos en un dispositivo con cámara
+      if (!Capacitor.isPluginAvailable('Camera')) {
+        this.mostrarError('La cámara no está disponible en este dispositivo');
+        return;
+      }
+
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: true,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+        width: 300,
+        height: 300,
+      });
+
+      if (image.dataUrl) {
+        // Actualizar la foto del usuario
+        this.usuario.avatar = image.dataUrl;
+
+        // Aquí guardarías la imagen en el servidor
+        console.log('Nueva foto capturada y establecida');
+        this.mostrarExito('Foto de perfil actualizada correctamente');
+      }
+    } catch (error) {
+      console.error('Error al tomar foto:', error);
+      this.mostrarError('Error al acceder a la cámara');
+    }
+  }
+
+  async seleccionarDeGaleria() {
+    try {
+      // Verificar si estamos en un dispositivo con galería
+      if (!Capacitor.isPluginAvailable('Camera')) {
+        this.mostrarError('La galería no está disponible en este dispositivo');
+        return;
+      }
+
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: true,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Photos,
+        width: 300,
+        height: 300,
+      });
+
+      if (image.dataUrl) {
+        // Actualizar la foto del usuario
+        this.usuario.avatar = image.dataUrl;
+
+        // Aquí guardarías la imagen en el servidor
+        console.log('Nueva foto seleccionada de galería');
+        this.mostrarExito('Foto de perfil actualizada correctamente');
+      }
+    } catch (error) {
+      console.error('Error al seleccionar foto:', error);
+      this.mostrarError('Error al acceder a la galería');
+    }
   }
 
   async editarNombre() {
@@ -286,10 +345,19 @@ export class PerfilPage implements OnInit {
     await alert.present();
   }
 
-  // * Método auxiliar para mostrar errores
+  // * Métodos auxiliares para mostrar mensajes
   private async mostrarError(mensaje: string) {
     const alert = await this.alertController.create({
       header: 'Error',
+      message: mensaje,
+      buttons: ['OK'],
+    });
+    await alert.present();
+  }
+
+  private async mostrarExito(mensaje: string) {
+    const alert = await this.alertController.create({
+      header: 'Éxito',
       message: mensaje,
       buttons: ['OK'],
     });

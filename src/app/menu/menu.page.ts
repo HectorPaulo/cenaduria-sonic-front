@@ -17,7 +17,6 @@ import {
   IonRefresher,
   IonRefresherContent,
 } from '@ionic/angular/standalone';
-import { BarraNavegacionComponent } from '../components/barra-navegacion/barra-navegacion.component';
 import Comida from '../Types/Comida';
 import { addIcons } from 'ionicons';
 import { add, cart, search } from 'ionicons/icons';
