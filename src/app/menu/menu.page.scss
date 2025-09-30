@@ -1,0 +1,32 @@
+.categoria-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  scroll-behavior: smooth;
+}
+
+// Animaciones para botones de categoría
+.categoria-btn {
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &.active {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+}
+
+// Estilos responsivos
+@media (max-width: 768px) {
+  .categoria-scroll {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

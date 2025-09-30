@@ -12,35 +12,56 @@
   </ion-refresher>
 
   <div class="max-w-lg mx-auto p-4">
-    
-    <!-- Sección Comida -->
-    <h2 class="text-2xl font-bold text-gray-300 mb-2">Comida</h2>
-    <!-- Categorías -->
-    <div class="flex gap-3 mb-6">
-      <ion-grid fixed>
-        <ion-row>
-          @for (recomendacion of recomendaciones; track $index) {
-          <ion-col>
-            <div class="flex flex-col gap-2 items-center">
-              <ion-button
-                class="rounded-2xl w-1/2 bg-green-100"
-                shape="round"
-                color="transparent"
-              >
-              <p class="py-2 text-3xl">{{recomendacion.icon}}</p>
-              </ion-button>
-              <ion-text  class="text-sm">
-                <h1>{{recomendacion.name}}</h1>
-              </ion-text>
-            </div>
-          </ion-col>
-          }
-        </ion-row>
-      </ion-grid>
+    <!-- Filtro activo -->
+    @if (filtroActivo) {
+    <div class="mb-4">
+      <div class="flex items-center gap-2">
+        <h3 class="text-lg font-semibold text-gray-700">
+          Filtrando por: {{ filtroActivo }}
+        </h3>
+        <ion-button
+          size="small"
+          fill="clear"
+          color="danger"
+          (click)="resetearFiltros()"
+        >
+          <ion-icon name="close" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
     </div>
+    }
+
+    <!-- Categorías Horizontales Desplazables -->
+    <h2 class="text-2xl font-bold text-gray-300 mb-2">Categorías</h2>
+    <div class="categoria-scroll overflow-x-auto pb-4 mb-6">
+      <div class="flex gap-3 min-w-max px-2">
+        @for (categoria of todasCategorias; track $index) {
+        <div class="flex flex-col items-center min-w-[70px]">
+          <ion-button
+            class="categoria-btn rounded-full w-14 h-14 text-xl mb-1"
+            [class]="filtroActivo === categoria.name ? 'active bg-blue-500 text-white shadow-lg' : 'bg-gray-100 text-gray-700'"
+            fill="clear"
+            (click)="filtrarPorCategoria(categoria.name)"
+          >
+            {{ categoria.icon }}
+          </ion-button>
+          <span
+            class="text-xs text-center font-medium max-w-[70px] leading-tight truncate"
+            [class]="filtroActivo === categoria.name ? 'text-blue-600 font-bold' : 'text-gray-600'"
+          >
+            {{ categoria.name }}
+          </span>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Sección Comida -->
+    @if (comidasFiltradas.length > 0) {
+    <h2 class="text-2xl font-bold text-gray-300 mb-2">Comida</h2>
     <div class="grid gap-4 mb-6">
       <ion-grid fixed>
-        @for (comida of comidas; track $index) {
+        @for (comida of comidasFiltradas; track $index) {
 
         <ion-row>
           <ion-card color="dark" class="p-1" mode="ios">
@@ -81,83 +102,82 @@
         }
       </ion-grid>
     </div>
+    }
 
     <!-- Sección Bebidas -->
+    @if (bebidasFiltradas.length > 0) {
     <h2 class="text-2xl font-bold text-gray-300 mb-2">Bebidas</h2>
-    <!-- Categorías -->
-    <div class="flex gap-3 mb-6">
-      <ion-grid fixed>
-        <ion-row>
-          @for (recomendacion of recomendaciones; track $index) {
-          <ion-col>
-            <div class="flex flex-col gap-2 items-center">
-              <ion-button
-                class="rounded-2xl w-1/2 bg-green-100"
-                shape="round"
-                color="transparent"
-              >
-              <p class="py-2 text-3xl">{{recomendacion.icon}}</p>
-              </ion-button>
-              <ion-text color="dark" class="text-sm">
-                <h1>{{recomendacion.name}}</h1>
-              </ion-text>
-            </div>
-          </ion-col>
-          }
-        </ion-row>
-      </ion-grid>
-    </div>
 
     <div class="grid gap-4 mb-6">
       <ion-grid fixed>
-        @for (bebida of bebidas; track $index) {
+        @for (bebida of bebidasFiltradas; track $index) {
 
         <ion-row>
-          <ion-card  color="dark" class="rounded-xl p-4 flex items-center shadow-sm" mode="ios">
-            <div class="w-16 h-16 flex items-center justify-center bg-white rounded-lg text-3xl mr-4">
+          <ion-card
+            color="dark"
+            class="rounded-xl p-4 flex items-center shadow-sm"
+            mode="ios"
+          >
+            <div
+              class="w-16 h-16 flex items-center justify-center bg-white rounded-lg text-3xl mr-4"
+            >
               {{ bebida.icon }}
             </div>
             <div class="flex-1">
+              <ion-card-header>
+                <ion-card-title class="text-lg font-semibold text-green-700">
+                  <p class="text-gray-800 font-semibold">{{ bebida.name }}</p>
+                </ion-card-title>
+              </ion-card-header>
+              <ion-card-content class="text-sm text-zinc-700">
+                <div class="text-gray-600">{{ bebida.description }}</div>
+                <div class="font-bold text-green-700">
+                  ${{ bebida.price | number: '1.2-2' }}
+                </div>
 
-            <ion-card-header>
-              <ion-card-title class="text-lg font-semibold text-green-700">
-                <p class="text-gray-800 font-semibold">{{ bebida.name }}</p>
-              </ion-card-title>
-            </ion-card-header>
-            <ion-card-content class="text-sm text-zinc-700">
-              <div class="text-gray-600">{{ bebida.description }}</div>
-              <div class="font-bold text-green-700">
-                ${{ bebida.price | number: '1.2-2' }}
-              </div>
+                <ion-button
+                  (click)="addToCart(bebida)"
+                  color="light"
+                  class="-ml-2 mt-2"
+                >
+                  <ion-icon color="dark" slot="start" name="cart"></ion-icon>
+                  <ion-label color="dark">Ordenar</ion-label>
+                </ion-button>
 
-              <ion-button
-                (click)="addToCart(bebida)"
-                color="light"
-                class="-ml-2 mt-2"
-              >
-                <ion-icon color="dark" slot="start" name="cart"></ion-icon>
-                <ion-label color="dark">Ordenar</ion-label>
-              </ion-button>
-
-              <ion-button
-                (click)="addToList(bebida)"
-                shape="round"
-                color="light"
-                size="small"
-                class="float-right mt-5"
-              >
-                <ion-icon slot="icon-only" name="add"></ion-icon>
-              </ion-button>
-            </ion-card-content>
+                <ion-button
+                  (click)="addToList(bebida)"
+                  shape="round"
+                  color="light"
+                  size="small"
+                  class="float-right mt-5"
+                >
+                  <ion-icon slot="icon-only" name="add"></ion-icon>
+                </ion-button>
+              </ion-card-content>
             </div>
-
           </ion-card>
         </ion-row>
 
         }
       </ion-grid>
-
     </div>
+    }
+
+    <!-- Mensaje cuando no hay resultados -->
+    @if (filtroActivo && !hayElementosFiltrados()) {
+    <div class="text-center py-8">
+      <ion-icon name="search" class="text-6xl text-gray-400 mb-4"></ion-icon>
+      <h3 class="text-xl font-semibold text-gray-600 mb-2">
+        No se encontraron resultados
+      </h3>
+      <p class="text-gray-500 mb-4">
+        No hay elementos disponibles para la categoría "{{ filtroActivo }}"
+      </p>
+      <ion-button fill="outline" color="primary" (click)="resetearFiltros()">
+        Ver todos los productos
+      </ion-button>
+    </div>
+    }
   </div>
-<app-fabbtn></app-fabbtn>
+  <app-fabbtn></app-fabbtn>
 </ion-content>
