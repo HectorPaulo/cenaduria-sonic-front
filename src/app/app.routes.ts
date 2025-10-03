@@ -1,30 +1,147 @@
 import { Routes } from '@angular/router';
+import { RoleGuard } from './guards/role.guard';
+import { UserRole } from './services/auth.service';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'login',
     pathMatch: 'full',
   },
   {
+    path: 'login',
+    loadComponent: () => import('./login/login.page').then((m) => m.LoginPage),
+  },
+
+  // Rutas para CLIENTES
+  {
+    path: 'cliente',
+    canActivate: [RoleGuard],
+    data: { roles: [UserRole.CLIENTE, UserRole.SYSADMIN] },
+    children: [
+      {
+        path: 'home',
+        loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
+      },
+      {
+        path: 'menu',
+        loadComponent: () => import('./menu/menu.page').then((m) => m.MenuPage),
+      },
+      {
+        path: 'carrito',
+        loadComponent: () =>
+          import('./carrito/carrito.page').then((m) => m.CarritoPage),
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./perfil/perfil.page').then((m) => m.PerfilPage),
+      },
+      {
+        path: 'pedidos',
+        loadComponent: () =>
+          import('./pedidos/pedidos.page').then((m) => m.PedidosPage),
+      },
+    ],
+  },
+
+  // Rutas para EMPLEADOS
+  {
+    path: 'empleado',
+    canActivate: [RoleGuard],
+    data: { roles: [UserRole.EMPLEADO, UserRole.SYSADMIN] },
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./empleado/dashboard/dashboard.page').then(
+            (m) => m.DashboardPage
+          ),
+      },
+      {
+        path: 'pedidos',
+        loadComponent: () =>
+          import('./empleado/pedidos/pedidos.page').then(
+            (m) => m.PedidosEmpleadoPage
+          ),
+      },
+      {
+        path: 'inventario',
+        loadComponent: () =>
+          import('./empleado/inventario/inventario.page').then(
+            (m) => m.InventarioPage
+          ),
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./perfil/perfil.page').then((m) => m.PerfilPage),
+      },
+    ],
+  },
+
+  // Rutas para SYSADMIN
+  {
+    path: 'admin',
+    canActivate: [RoleGuard],
+    data: { roles: [UserRole.SYSADMIN] },
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./admin/dashboard/dashboard.page').then(
+            (m) => m.AdminDashboardPage
+          ),
+      },
+      {
+        path: 'usuarios',
+        loadComponent: () =>
+          import('./admin/usuarios/usuarios.page').then((m) => m.UsuariosPage),
+      },
+      {
+        path: 'reportes',
+        loadComponent: () =>
+          import('./admin/reportes/reportes.page').then((m) => m.ReportesPage),
+      },
+      {
+        path: 'configuracion',
+        loadComponent: () =>
+          import('./admin/configuracion/configuracion.page').then(
+            (m) => m.ConfiguracionPage
+          ),
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./perfil/perfil.page').then((m) => m.PerfilPage),
+      },
+    ],
+  },
+
+  // Rutas de compatibilidad (redirigen según el rol)
+  {
     path: 'home',
-    loadComponent: () => import('./home/home.page').then( m => m.HomePage)
+    redirectTo: 'cliente/home',
+    pathMatch: 'full',
   },
   {
     path: 'menu',
-    loadComponent: () => import('./menu/menu.page').then( m => m.MenuPage)
+    redirectTo: 'cliente/menu',
+    pathMatch: 'full',
   },
   {
     path: 'pedidos',
-    loadComponent: () => import('./pedidos/pedidos.page').then( m => m.PedidosPage)
+    redirectTo: 'cliente/pedidos',
+    pathMatch: 'full',
   },
   {
     path: 'perfil',
-    loadComponent: () => import('./perfil/perfil.page').then( m => m.PerfilPage)
+    redirectTo: 'cliente/perfil',
+    pathMatch: 'full',
   },
   {
     path: 'carrito',
-    loadComponent: () => import('./carrito/carrito.page').then( m => m.CarritoPage)
+    redirectTo: 'cliente/carrito',
+    pathMatch: 'full',
   },
-
 ];

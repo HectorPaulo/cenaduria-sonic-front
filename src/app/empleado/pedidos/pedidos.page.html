@@ -1,0 +1,54 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Gestión de Pedidos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="pedidos-header">
+    <h2>Pedidos Activos</h2>
+    <p>Gestiona el estado de los pedidos en tiempo real</p>
+  </div>
+
+  <ion-list>
+    <ion-item *ngFor="let pedido of pedidos" class="pedido-item">
+      <ion-label>
+        <div class="pedido-header">
+          <h3>{{ pedido.id }} - {{ pedido.cliente }}</h3>
+          <ion-badge [color]="getEstadoColor(pedido.estado)">
+            <ion-icon [name]="getEstadoIcon(pedido.estado)"></ion-icon>
+            {{ getEstadoTexto(pedido.estado) }}
+          </ion-badge>
+        </div>
+
+        <div class="pedido-details">
+          <p><strong>Items:</strong> {{ pedido.items.join(', ') }}</p>
+          <p><strong>Total:</strong> ${{ pedido.total }}</p>
+          <p><strong>Hora:</strong> {{ pedido.tiempo }}</p>
+        </div>
+
+        <div class="pedido-actions" *ngIf="pedido.estado !== 'listo'">
+          <ion-button
+            *ngIf="pedido.estado === 'pendiente'"
+            size="small"
+            color="primary"
+            (click)="cambiarEstado(pedido, 'preparando')"
+          >
+            <ion-icon name="restaurant" slot="start"></ion-icon>
+            Iniciar Preparación
+          </ion-button>
+
+          <ion-button
+            *ngIf="pedido.estado === 'preparando'"
+            size="small"
+            color="success"
+            (click)="cambiarEstado(pedido, 'listo')"
+          >
+            <ion-icon name="checkmark" slot="start"></ion-icon>
+            Marcar Listo
+          </ion-button>
+        </div>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

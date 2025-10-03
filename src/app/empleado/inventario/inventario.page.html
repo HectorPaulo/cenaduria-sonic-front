@@ -1,0 +1,89 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Inventario</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="inventario-header">
+    <h2>Control de Inventario</h2>
+    <p>Monitorea el stock de productos disponibles</p>
+  </div>
+
+  <!-- Alertas de stock -->
+  <div
+    class="alertas-section"
+    *ngIf="itemsCriticos.length > 0 || itemsBajos.length > 0"
+  >
+    <ion-card color="danger" *ngIf="itemsCriticos.length > 0">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="alert"></ion-icon>
+          Stock Crítico
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p *ngFor="let item of itemsCriticos">
+          <strong>{{ item.nombre }}:</strong> Solo {{ item.cantidad }} unidades
+        </p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card color="warning" *ngIf="itemsBajos.length > 0">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="warning"></ion-icon>
+          Stock Bajo
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p *ngFor="let item of itemsBajos">
+          <strong>{{ item.nombre }}:</strong> {{ item.cantidad }} unidades
+          (mínimo: {{ item.minimo }})
+        </p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Lista completa de inventario -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Inventario Completo</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let item of inventario" class="inventario-item">
+          <ion-label>
+            <div class="item-header">
+              <h3>{{ item.nombre }}</h3>
+              <ion-badge [color]="getEstadoColor(item.cantidad, item.minimo)">
+                <ion-icon
+                  [name]="getEstadoIcon(item.cantidad, item.minimo)"
+                ></ion-icon>
+                {{ getEstadoTexto(item.cantidad, item.minimo) }}
+              </ion-badge>
+            </div>
+
+            <div class="item-details">
+              <p>
+                <strong>Cantidad actual:</strong> {{ item.cantidad }} unidades
+              </p>
+              <p>
+                <strong>Mínimo requerido:</strong> {{ item.minimo }} unidades
+              </p>
+              <p><strong>Categoría:</strong> {{ item.categoria }}</p>
+            </div>
+
+            <div class="stock-bar">
+              <div
+                class="stock-progress"
+                [style.width.%]="(item.cantidad / (item.minimo * 2)) * 100"
+                [class]="'progress-' + getEstadoInventario(item.cantidad, item.minimo)"
+              ></div>
+            </div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

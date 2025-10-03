@@ -1,0 +1,97 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 20px;
+}
+
+.logo-section {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--ion-color-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 1.1rem;
+    color: var(--ion-color-medium);
+  }
+}
+
+.user-types {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.user-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  ion-card-header {
+    text-align: center;
+    padding-bottom: 8px;
+
+    ion-icon {
+      margin-bottom: 8px;
+      color: var(--card-icon-color);
+    }
+
+    ion-card-title {
+      font-weight: 600;
+      color: var(--card-title-color);
+    }
+  }
+
+  ion-card-content {
+    text-align: center;
+
+    ion-text {
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+  }
+}
+
+.client-card {
+  --card-icon-color: var(--ion-color-success);
+  --card-title-color: var(--ion-color-success);
+  border-left: 4px solid var(--ion-color-success);
+}
+
+.employee-card {
+  --card-icon-color: var(--ion-color-warning);
+  --card-title-color: var(--ion-color-warning);
+  border-left: 4px solid var(--ion-color-warning);
+}
+
+.admin-card {
+  --card-icon-color: var(--ion-color-danger);
+  --card-title-color: var(--ion-color-danger);
+  border-left: 4px solid var(--ion-color-danger);
+}
+
+@media (min-width: 768px) {
+  .user-types {
+    flex-direction: row;
+    max-width: 900px;
+
+    .user-card {
+      flex: 1;
+    }
+  }
+}

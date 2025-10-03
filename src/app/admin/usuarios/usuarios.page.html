@@ -1,0 +1,26 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Gestión de Usuarios</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Usuarios del Sistema</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let usuario of usuarios">
+          <ion-label>
+            <h3>{{ usuario.nombre }}</h3>
+            <p>{{ usuario.email }}</p>
+          </ion-label>
+          <ion-badge slot="end" [color]="getRoleColor(usuario.role)">
+            {{ getRoleText(usuario.role) }}
+          </ion-badge>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

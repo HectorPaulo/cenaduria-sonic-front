@@ -1,0 +1,123 @@
+.inventario-header {
+  margin-bottom: 1.5rem;
+
+  h2 {
+    color: var(--ion-color-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    font-size: 0.9rem;
+  }
+}
+
+.alertas-section {
+  margin-bottom: 1.5rem;
+
+  ion-card {
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+
+      ion-icon {
+        font-size: 1.2rem;
+      }
+    }
+
+    ion-card-content {
+      p {
+        margin: 0.25rem 0;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+.inventario-item {
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+
+  ion-label {
+    margin: 1rem 0;
+  }
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+
+  h3 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+  }
+
+  ion-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+
+    ion-icon {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.item-details {
+  margin-bottom: 0.75rem;
+
+  p {
+    margin: 0.25rem 0;
+    font-size: 0.85rem;
+
+    strong {
+      color: var(--ion-color-dark);
+    }
+  }
+}
+
+.stock-bar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--ion-color-light);
+  border-radius: 3px;
+  overflow: hidden;
+
+  .stock-progress {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+
+    &.progress-normal {
+      background-color: var(--ion-color-success);
+    }
+
+    &.progress-bajo {
+      background-color: var(--ion-color-warning);
+    }
+
+    &.progress-critico {
+      background-color: var(--ion-color-danger);
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .alertas-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  ion-list {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}

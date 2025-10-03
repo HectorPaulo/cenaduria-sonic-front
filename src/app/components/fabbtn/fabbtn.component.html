@@ -1,22 +1,32 @@
-  <ion-fab slot="fixed" vertical="bottom" horizontal="start">
-    <ion-fab-button color="tertiary">
-      <ion-icon name="chevron-up-circle"></ion-icon>
+<ion-fab slot="fixed" vertical="bottom" horizontal="start" *ngIf="currentUser">
+  <ion-fab-button color="tertiary">
+    <ion-icon name="chevron-up-circle"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-list side="top">
+    <!-- Botón de inicio -->
+    <ion-fab-button (click)="navigateToHome()" color="success">
+      <ion-icon name="home"></ion-icon>
     </ion-fab-button>
-    <ion-fab-list side="top">
-      <ion-fab-button (click)="navigateToPerfil()" color="primary">
-        <ion-icon name="person"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-button color="secondary">
-        <ion-icon name="color-palette"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-button
-        (click)="onThemeToggle()"
-        [color]="themeService.isDarkMode() ? 'dark' : 'warning'"
-      >
-        <ion-icon
-          size="small"
-          [name]="themeService.isDarkMode() ? 'moon' : 'sunny'"
-        ></ion-icon>
-      </ion-fab-button>
-    </ion-fab-list>
-  </ion-fab>
+
+    <!-- Botón de perfil -->
+    <ion-fab-button (click)="navigateToPerfil()" color="primary">
+      <ion-icon name="person"></ion-icon>
+    </ion-fab-button>
+
+    <!-- Botón de tema -->
+    <ion-fab-button
+      (click)="onThemeToggle()"
+      [color]="themeService.isDarkMode() ? 'dark' : 'warning'"
+    >
+      <ion-icon
+        size="small"
+        [name]="themeService.isDarkMode() ? 'moon' : 'sunny'"
+      ></ion-icon>
+    </ion-fab-button>
+
+    <!-- Botón de logout -->
+    <ion-fab-button (click)="logout()" color="danger">
+      <ion-icon name="log-out"></ion-icon>
+    </ion-fab-button>
+  </ion-fab-list>
+</ion-fab>

@@ -1,0 +1,63 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>CenaduriaSonic - Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="login-container">
+    <div class="logo-section">
+      <h1>🍔 CenaduriaSonic</h1>
+      <p>Selecciona tu tipo de usuario</p>
+    </div>
+
+    <div class="user-types">
+      <!-- Cliente -->
+      <ion-card
+        button
+        (click)="loginAs(UserRole.CLIENTE)"
+        class="user-card client-card"
+      >
+        <ion-card-header>
+          <ion-icon name="person" size="large"></ion-icon>
+          <ion-card-title>Cliente</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-text> Haz pedidos, ve el menú y gestiona tu perfil </ion-text>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Empleado -->
+      <ion-card
+        button
+        (click)="loginAs(UserRole.EMPLEADO)"
+        class="user-card employee-card"
+      >
+        <ion-card-header>
+          <ion-icon name="briefcase" size="large"></ion-icon>
+          <ion-card-title>Empleado</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-text>
+            Gestiona pedidos, inventario y atiende a clientes
+          </ion-text>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Sysadmin -->
+      <ion-card
+        button
+        (click)="loginAs(UserRole.SYSADMIN)"
+        class="user-card admin-card"
+      >
+        <ion-card-header>
+          <ion-icon name="settings" size="large"></ion-icon>
+          <ion-card-title>Administrador</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-text> Control total del sistema, usuarios y reportes </ion-text>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>
