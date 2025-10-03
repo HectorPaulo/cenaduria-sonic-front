@@ -36,8 +36,6 @@ import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
   imports: [
     IonRefresherContent,
     IonRefresher,
-    IonText,
-    IonCol,
     IonLabel,
     IonIcon,
     IonButton,

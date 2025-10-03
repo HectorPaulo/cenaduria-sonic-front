@@ -143,5 +143,9 @@ export const routes: Routes = [
     path: 'carrito',
     redirectTo: 'cliente/carrito',
     pathMatch: 'full',
+  },  {
+    path: 'registro',
+    loadComponent: () => import('./registro/registro.page').then( m => m.RegistroPage)
   },
+
 ];
