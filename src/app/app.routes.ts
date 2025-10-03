@@ -144,4 +144,8 @@ export const routes: Routes = [
     redirectTo: 'cliente/carrito',
     pathMatch: 'full',
   },
+  {
+    path: 'login-2',
+    loadComponent: () => import('./login-2/login-2.page').then( m => m.Login2Page)
+  },
 ];

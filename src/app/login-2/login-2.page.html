@@ -1,0 +1,85 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>CenaduriaSonic - Iniciar Sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="registro-container">
+    <div class="logo-section">
+      <h1>🍔 CenaduriaSonic</h1>
+      <p>Inicia sesión en tu cuenta</p>
+    </div>
+
+    <div class="form-section">
+      <ion-card class="registro-card">
+        <ion-card-header>
+          <ion-card-title>Iniciar Sesión</ion-card-title>
+          <ion-card-subtitle>Ingresa tus credenciales para acceder</ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <form [formGroup]="loginForm">
+            <ion-item [class.error-item]="isFieldInvalid('email')">
+              <ion-icon name="mail" slot="start" color="primary"></ion-icon>
+              <ion-input
+                formControlName="email"
+                label="Correo electrónico"
+                labelPlacement="floating"
+                placeholder="ejemplo@correo.com"
+                type="email"
+              ></ion-input>
+            </ion-item>
+            <ion-text color="danger" class="error-text" *ngIf="isFieldInvalid('email')">
+              {{ getEmailErrorMessage() }}
+            </ion-text>
+
+            <ion-item [class.error-item]="isFieldInvalid('password')">
+              <ion-icon name="key" slot="start" color="primary"></ion-icon>
+              <ion-input
+                formControlName="password"
+                label="Contraseña"
+                labelPlacement="floating"
+                placeholder="Tu contraseña"
+                type="password"
+              ></ion-input>
+            </ion-item>
+            <ion-text color="danger" class="error-text" *ngIf="isFieldInvalid('password')">
+              {{ getPasswordErrorMessage() }}
+            </ion-text>
+
+            <div style="text-align: right; margin: 10px 0;">
+              <ion-button fill="clear" size="small" (click)="onForgotPassword()">
+                ¿Olvidaste tu contraseña?
+              </ion-button>
+            </div>
+
+            <div class="button-section">
+              <ion-button
+                expand="block"
+                type="submit"
+                class="registro-button"
+                [disabled]="!isFormValid()"
+              >
+                <ion-icon name="log-in" slot="start"></ion-icon>
+                Iniciar Sesión
+              </ion-button>
+
+              <ion-button
+                expand="block"
+                fill="outline"
+                color="medium"
+                class="login-button"
+                type="button"
+                (click)="goToRegister()"
+              >
+                <ion-icon name="person-add" slot="start"></ion-icon>
+                Crear cuenta nueva
+              </ion-button>
+            </div>
+          </form>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>
