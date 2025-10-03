@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   IonContent,
   IonHeader,
@@ -20,6 +21,7 @@ import { checkmark, time, restaurant } from 'ionicons/icons';
   styleUrls: ['./pedidos.page.scss'],
   standalone: true,
   imports: [
+    CommonModule,
     IonContent,
     IonHeader,
     IonTitle,

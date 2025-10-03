@@ -15,7 +15,6 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonText,
   IonBadge,
   IonItem,
   IonLabel,

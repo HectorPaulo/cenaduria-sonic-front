@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   IonContent,
   IonHeader,
@@ -24,6 +25,7 @@ import { warning, checkmark, alert } from 'ionicons/icons';
   styleUrls: ['./inventario.page.scss'],
   standalone: true,
   imports: [
+    CommonModule,
     IonContent,
     IonHeader,
     IonTitle,
@@ -32,7 +34,6 @@ import { warning, checkmark, alert } from 'ionicons/icons';
     IonItem,
     IonLabel,
     IonBadge,
-    IonButton,
     IonIcon,
     IonCard,
     IonCardContent,
