@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   Router,
   NavigationStart,
@@ -23,15 +24,30 @@ import {
   IonRouterLink,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { person, cart, document, home } from 'ionicons/icons';
+import {
+  person,
+  cart,
+  document,
+  home,
+  people,
+  statsChart,
+  settings,
+  clipboard,
+  cube,
+  logOut,
+  speedometer,
+  restaurant,
+} from 'ionicons/icons';
 import { ThemeToggleComponent } from './components/theme-toggle/theme-toggle.component';
 import { ThemeService } from './services/theme.service';
+import { AuthService, UserRole } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
   imports: [
+    CommonModule,
     RouterLink,
     RouterLinkActive,
     IonApp,
@@ -51,38 +67,108 @@ import { ThemeService } from './services/theme.service';
   ],
 })
 export class AppComponent implements OnInit {
-  public appPages = [
+  private authService = inject(AuthService);
+
+  public loading = false;
+  public currentUser: any = null;
+  public currentRole: UserRole | null = null;
+
+  // Menús por rol
+  public clientePages = [
     {
       title: 'Inicio',
-      url: '/home',
+      url: '/cliente/home',
       icon: 'home',
     },
     {
-      title: 'Menu',
-      url: '/menu',
-      icon: 'document',
+      title: 'Menú',
+      url: '/cliente/menu',
+      icon: 'restaurant',
     },
     {
-      title: 'Mis pedidos',
-      url: '/pedidos',
+      title: 'Mis Pedidos',
+      url: '/cliente/pedidos',
+      icon: 'clipboard',
+    },
+    {
+      title: 'Carrito',
+      url: '/cliente/carrito',
       icon: 'cart',
     },
     {
       title: 'Perfil',
-      url: '/perfil',
+      url: '/cliente/perfil',
       icon: 'person',
-    },
-    {
-      title: 'Carrito',
-      url: '/carrito',
-      icon: 'cart',
     },
   ];
 
-  public loading = false;
+  public empleadoPages = [
+    {
+      title: 'Dashboard',
+      url: '/empleado/dashboard',
+      icon: 'speedometer',
+    },
+    {
+      title: 'Pedidos Pendientes',
+      url: '/empleado/pedidos',
+      icon: 'clipboard',
+    },
+    {
+      title: 'Inventario',
+      url: '/empleado/inventario',
+      icon: 'cube',
+    },
+    {
+      title: 'Perfil',
+      url: '/empleado/perfil',
+      icon: 'person',
+    },
+  ];
+
+  public adminPages = [
+    {
+      title: 'Dashboard',
+      url: '/admin/dashboard',
+      icon: 'speedometer',
+    },
+    {
+      title: 'Usuarios',
+      url: '/admin/usuarios',
+      icon: 'people',
+    },
+    {
+      title: 'Reportes',
+      url: '/admin/reportes',
+      icon: 'statsChart',
+    },
+    {
+      title: 'Configuración',
+      url: '/admin/configuracion',
+      icon: 'settings',
+    },
+    {
+      title: 'Perfil',
+      url: '/admin/perfil',
+      icon: 'person',
+    },
+  ];
 
   constructor(private router: Router, private themeService: ThemeService) {
-    addIcons({ document, cart, person, home });
+    addIcons({
+      document,
+      cart,
+      person,
+      home,
+      people,
+      statsChart,
+      settings,
+      clipboard,
+      cube,
+      logOut,
+      speedometer,
+      restaurant,
+    });
+
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
         this.loading = true;
@@ -99,5 +185,50 @@ export class AppComponent implements OnInit {
     });
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    // Suscribirse a cambios en el estado de autenticación
+    this.authService.currentUser$.subscribe((user) => {
+      this.currentUser = user;
+      this.currentRole = user ? user.role : null;
+    });
+  }
+
+  // Obtener las páginas del menú según el rol actual
+  get currentMenuPages() {
+    switch (this.currentRole) {
+      case UserRole.CLIENTE:
+        return this.clientePages;
+      case UserRole.EMPLEADO:
+        return this.empleadoPages;
+      case UserRole.SYSADMIN:
+        return this.adminPages;
+      default:
+        return [];
+    }
+  }
+
+  // Obtener el nombre del rol para mostrar
+  get roleName() {
+    switch (this.currentRole) {
+      case UserRole.CLIENTE:
+        return 'Cliente';
+      case UserRole.EMPLEADO:
+        return 'Empleado';
+      case UserRole.SYSADMIN:
+        return 'Administrador';
+      default:
+        return 'Invitado';
+    }
+  }
+
+  // Método para cerrar sesión
+  async logout() {
+    await this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  // Verificar si el usuario está logueado
+  get isLoggedIn() {
+    return this.currentUser !== null;
+  }
 }

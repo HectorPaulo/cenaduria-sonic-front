@@ -1,33 +1,63 @@
 <ion-app>
   <ion-split-pane contentId="main-content">
-    <ion-menu contentId="main-content" type="overlay">
+    <ion-menu contentId="main-content" type="overlay" [disabled]="!isLoggedIn">
       <ion-content>
         <ion-list id="inbox-list">
           <ion-list-header class="text-6xl">
             <h1 class="">Cenaduría Sonic</h1>
           </ion-list-header>
-          <ion-note>Hola&#64;PapuUsuario!</ion-note>
-          <ion-note>Hora de dormir...</ion-note>
 
-          @for (p of appPages; track p; let i = $index) {
-          <ion-menu-toggle auto-hide="false">
-            <ion-item
-              routerDirection="root"
-              [routerLink]="[p.url]"
-              lines="none"
-              detail="false"
-              routerLinkActive="selected"
-            >
-              <ion-icon
-                aria-hidden="true"
-                slot="start"
-                [ios]="p.icon"
-                [md]="p.icon"
-              ></ion-icon>
-              <ion-label>{{ p.title }}</ion-label>
-            </ion-item>
-          </ion-menu-toggle>
-          }
+          <!-- Mostrar información del usuario solo si está logueado -->
+          <div *ngIf="isLoggedIn && currentUser">
+            <ion-note>Hola {{ currentUser.nombre }}!</ion-note>
+            <ion-note>Rol: {{ roleName }}</ion-note>
+          </div>
+          <div *ngIf="!isLoggedIn">
+            <ion-note>¡Bienvenido a Cenaduría Sonic!</ion-note>
+            <ion-note>Inicia sesión para continuar</ion-note>
+          </div>
+
+          <!-- Mostrar menús solo si el usuario está logueado -->
+          <div *ngIf="isLoggedIn">
+            @for (p of currentMenuPages; track p; let i = $index) {
+            <ion-menu-toggle auto-hide="false">
+              <ion-item
+                routerDirection="root"
+                [routerLink]="[p.url]"
+                lines="none"
+                detail="false"
+                routerLinkActive="selected"
+              >
+                <ion-icon
+                  aria-hidden="true"
+                  slot="start"
+                  [ios]="p.icon"
+                  [md]="p.icon"
+                ></ion-icon>
+                <ion-label>{{ p.title }}</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+            }
+
+            <!-- Botón de cerrar sesión -->
+            <ion-menu-toggle auto-hide="false">
+              <ion-item
+                button
+                (click)="logout()"
+                lines="none"
+                detail="false"
+                class="logout-item"
+              >
+                <ion-icon
+                  aria-hidden="true"
+                  slot="start"
+                  ios="log-out"
+                  md="log-out"
+                ></ion-icon>
+                <ion-label color="danger">Cerrar Sesión</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          </div>
         </ion-list>
 
         <!-- * Configuración de tema -->
@@ -37,7 +67,6 @@
           </ion-list-header>
           <app-theme-toggle></app-theme-toggle>
         </ion-list>
-
       </ion-content>
     </ion-menu>
     <ion-router-outlet id="main-content"></ion-router-outlet>

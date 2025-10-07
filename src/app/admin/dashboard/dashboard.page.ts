@@ -33,6 +33,7 @@ import {
 } from 'ionicons/icons';
 import { HeaderComponent } from "src/app/components/header/header.component";
 import { FabbtnComponent } from "src/app/components/fabbtn/fabbtn.component";
+import { RefresherCustomEvent } from '@ionic/core';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -103,6 +104,13 @@ export class AdminDashboardPage implements OnInit {
       this.router.navigate(['/login']);
     }
   }
+
+  doRefresh(event: RefresherCustomEvent) {
+      setTimeout(() => {
+        // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
+        event.target.complete();
+      }, 2000);
+    }
 
   navigateTo(route: string) {
     this.router.navigate([`/admin/${route}`]);

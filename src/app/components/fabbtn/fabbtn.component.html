@@ -1,5 +1,6 @@
-<ion-fab slot="fixed" vertical="bottom" horizontal="start" *ngIf="currentUser">
-  <ion-fab-button color="tertiary">
+@if (currentUser) {
+  <ion-fab slot="fixed" vertical="bottom" horizontal="start">
+    <ion-fab-button color="tertiary">
     <ion-icon name="chevron-up-circle"></ion-icon>
   </ion-fab-button>
   <ion-fab-list side="top">
@@ -30,3 +31,4 @@
     </ion-fab-button>
   </ion-fab-list>
 </ion-fab>
+}

@@ -11,10 +11,14 @@ import {
   IonBadge,
   IonButton,
   IonIcon,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { checkmark, time, restaurant } from 'ionicons/icons';
-import { HeaderComponent } from "src/app/components/header/header.component";
+import { HeaderComponent } from 'src/app/components/header/header.component';
+import { RefresherCustomEvent } from '@ionic/core';
+import { FabbtnComponent } from "src/app/components/fabbtn/fabbtn.component";
 
 @Component({
   selector: 'app-pedidos-empleado',
@@ -22,6 +26,8 @@ import { HeaderComponent } from "src/app/components/header/header.component";
   styleUrls: ['./pedidos.page.scss'],
   standalone: true,
   imports: [
+    IonRefresherContent,
+    IonRefresher,
     CommonModule,
     IonContent,
     IonHeader,
@@ -33,7 +39,8 @@ import { HeaderComponent } from "src/app/components/header/header.component";
     IonBadge,
     IonButton,
     IonIcon,
-    HeaderComponent
+    HeaderComponent,
+    FabbtnComponent
 ],
 })
 export class PedidosEmpleadoPage {
@@ -104,6 +111,13 @@ export class PedidosEmpleadoPage {
       default:
         return 'Desconocido';
     }
+  }
+
+  doRefresh(event: RefresherCustomEvent) {
+    setTimeout(() => {
+      // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
+      event.target.complete();
+    }, 2000);
   }
 
   getEstadoIcon(estado: string): string {

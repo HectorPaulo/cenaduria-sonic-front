@@ -6,6 +6,25 @@
     </div>
 
     <div class="form-section">
+      <!-- Card informativo con credenciales de prueba -->
+      <ion-card class="info-card" color="light">
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="information-circle" color="primary"></ion-icon>
+            Credenciales de Prueba
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="credentials-info">
+            <p><strong>Cliente:</strong> cliente@cenaduria.com | Cliente123!</p>
+            <p>
+              <strong>Empleado:</strong> empleado@cenaduria.com | Empleado123!
+            </p>
+            <p><strong>Admin:</strong> admin@cenaduria.com | Admin123!</p>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
       <ion-card class="registro-card">
         <ion-card-header>
           <ion-card-title>Iniciar Sesión</ion-card-title>
@@ -15,7 +34,7 @@
         </ion-card-header>
 
         <ion-card-content>
-          <form [formGroup]="loginForm">
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
             <ion-item [class.error-item]="isFieldInvalid('email')">
               <ion-icon name="mail" slot="start" color="primary"></ion-icon>
               <ion-input
@@ -41,7 +60,7 @@
                 label="Contraseña"
                 labelPlacement="floating"
                 placeholder="Tu contraseña"
-                type="password"
+                type="text"
               ></ion-input>
             </ion-item>
             <ion-text

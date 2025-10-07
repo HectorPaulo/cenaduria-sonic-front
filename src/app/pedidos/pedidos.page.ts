@@ -13,10 +13,11 @@ import {
   IonGrid,
   IonRow,
   IonButton,
-  IonLoading,
-} from '@ionic/angular/standalone';
+  IonLoading, IonRefresher, IonRefresherContent, 
+RefresherEventDetail} from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
 import { FabbtnComponent } from "../components/fabbtn/fabbtn.component";
+import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
 
 interface Review {
   avatar: string;
@@ -43,6 +44,8 @@ interface Pedido {
   styleUrls: ['./pedidos.page.scss'],
   standalone: true,
   imports: [
+    IonRefresherContent,
+    IonRefresher,
     IonLoading,
     IonContent,
     IonChip,
@@ -58,10 +61,16 @@ interface Pedido {
     CommonModule,
     FormsModule,
     HeaderComponent,
-    FabbtnComponent
-],
+    FabbtnComponent,
+  ],
 })
 export class PedidosPage implements OnInit {
+  doRefresh(event: RefresherCustomEvent) {
+    setTimeout(() => {
+      // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
+      event.target.complete();
+    }, 2000);
+  }
   pedidosActivos: Pedido[] = [
     {
       id: '#1023',
@@ -144,5 +153,4 @@ export class PedidosPage implements OnInit {
   getStars(calificacion: number): string {
     return '★'.repeat(calificacion) + '☆'.repeat(5 - calificacion);
   }
-
 }

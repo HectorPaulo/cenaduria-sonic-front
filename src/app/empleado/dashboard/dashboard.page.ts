@@ -17,8 +17,8 @@ import {
   IonCol,
   IonBadge,
   IonItem,
-  IonLabel,
-} from '@ionic/angular/standalone';
+  IonLabel, IonCardSubtitle, IonRefresher, IonRefresherContent, 
+RefresherEventDetail} from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth.service';
 import { addIcons } from 'ionicons';
 import {
@@ -29,13 +29,16 @@ import {
   logOut,
   notifications,
 } from 'ionicons/icons';
+import { HeaderComponent } from "src/app/components/header/header.component";
+import { IonRefresherCustomEvent } from '@ionic/core';
+import { FabbtnComponent } from "src/app/components/fabbtn/fabbtn.component";
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonRefresherContent, IonRefresher, IonCardSubtitle,
     CommonModule,
     IonContent,
     IonHeader,
@@ -53,9 +56,12 @@ import {
     IonBadge,
     IonItem,
     IonLabel,
-  ],
+    HeaderComponent, FabbtnComponent],
 })
 export class DashboardPage implements OnInit {
+doRefresh($event: IonRefresherCustomEvent<RefresherEventDetail>) {
+throw new Error('Method not implemented.');
+}
   private authService = inject(AuthService);
   private router = inject(Router);
 
@@ -70,14 +76,15 @@ export class DashboardPage implements OnInit {
   };
 
   pedidosRecientes = [
-    { id: '#001', cliente: 'Juan Pérez', estado: 'Pendiente', total: 125.5 },
+    { id: '001', cliente: 'Juan Pérez', estado: 'Pendiente', total: 125.5 },
     {
-      id: '#002',
+      id: '002',
       cliente: 'María García',
       estado: 'En preparación',
       total: 89.0,
     },
-    { id: '#003', cliente: 'Carlos López', estado: 'Listo', total: 156.75 },
+    { id: '003', cliente: 'Carlos López', estado: 'Listo', total: 156.75 },
+    { id: '004', cliente: 'Daniel Santiago', estado: 'Listo', total: 125.5 },
   ];
 
   constructor() {

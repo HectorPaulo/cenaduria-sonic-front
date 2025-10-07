@@ -117,3 +117,23 @@ ion-note {
 ion-item.selected {
   --color: var(--ion-color-primary);
 }
+
+// Estilos para el botón de logout
+.logout-item {
+  margin-top: 20px;
+  border-top: 1px solid var(--ion-background-color-step-150, #d7d8da);
+  padding-top: 10px;
+
+  ion-label {
+    font-weight: 500;
+  }
+
+  ion-icon {
+    color: var(--ion-color-danger);
+  }
+
+  &:hover {
+    --background: var(--ion-color-danger-tint);
+    --color: var(--ion-color-danger-contrast);
+  }
+}

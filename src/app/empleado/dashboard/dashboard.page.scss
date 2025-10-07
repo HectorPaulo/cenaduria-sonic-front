@@ -53,38 +53,20 @@
   }
 
   &.pending {
-    background: linear-gradient(135deg, #ffc107 10%, #ffeb3b 100%);
+    background: #ffc107;
     color: #000;
 
     ion-icon {
-      color: #ff6f00;
+      color: #000;
     }
   }
 
   &.completed {
-    background: linear-gradient(135deg, #4caf50 10%, #8bc34a 100%);
+    background: #4caf50;
     color: white;
 
     ion-icon {
       color: #c8e6c9;
-    }
-  }
-
-  &.inventory {
-    background: linear-gradient(135deg, #f44336 10%, #e57373 100%);
-    color: white;
-
-    ion-icon {
-      color: #ffcdd2;
-    }
-  }
-
-  &.sales {
-    background: linear-gradient(135deg, #2196f3 10%, #64b5f6 100%);
-    color: white;
-
-    ion-icon {
-      color: #bbdefb;
     }
   }
 }

@@ -9,8 +9,8 @@ import {
   IonCardContent,
   IonIcon,
   IonButton,
-  AlertController,
-} from '@ionic/angular/standalone';
+  AlertController, IonRefresher, IonRefresherContent, 
+RefresherEventDetail} from '@ionic/angular/standalone';
 import { BarraNavegacionComponent } from '../components/barra-navegacion/barra-navegacion.component';
 import { HeaderComponent } from '../components/header/header.component';
 import { ThemeToggleComponent } from '../components/theme-toggle/theme-toggle.component';
@@ -27,6 +27,8 @@ import {
 import User from '../Types/User';
 import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
+import { FabbtnComponent } from "../components/fabbtn/fabbtn.component";
 
 @Component({
   selector: 'app-perfil',
@@ -34,6 +36,8 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
   styleUrls: ['./perfil.page.scss'],
   standalone: true,
   imports: [
+    IonRefresherContent,
+    IonRefresher,
     IonContent,
     IonCard,
     IonCardHeader,
@@ -45,9 +49,16 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
     FormsModule,
     HeaderComponent,
     ThemeToggleComponent,
-  ],
+    FabbtnComponent
+],
 })
 export class PerfilPage implements OnInit {
+  doRefresh(event: RefresherCustomEvent) {
+    setTimeout(() => {
+      // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
+      event.target.complete();
+    }, 2000);
+  }
   usuario: User = {
     nombre: 'Sonic el erizo',
     email: 'sonic.erizo@email.com',

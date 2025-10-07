@@ -1,8 +1,11 @@
 <app-header titulo="Pedidos"></app-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)" pullFactor="0.8" pullMin="60" pullMax="120">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <app-fabbtn></app-fabbtn>
   <div class="pedidos-header">
-    <h2>Pedidos Activos</h2>
     <p>Gestiona el estado de los pedidos en tiempo real</p>
   </div>
 

@@ -1,22 +1,25 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Dashboard Empleado</ion-title>
-    <ion-button slot="end" fill="clear" (click)="logout()">
-      <ion-icon name="log-out"></ion-icon>
-    </ion-button>
-  </ion-toolbar>
-</ion-header>
+<app-header titulo="Inicio"></app-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <div class="welcome-section">
-    <h2 className="text-lg font-semibold">¡Hola, {{ user?.nombre }}!</h2>
+  <ion-refresher
+    slot="fixed"
+    (ionRefresh)="doRefresh($event)"
+    pullFactor="0.8"
+    pullMin="60"
+    pullMax="120"
+  >
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <app-fabbtn></app-fabbtn>
+  <div class="welcome-section flex justify-center items-center mb-4">
+    <p class="!text-lg !font-black !text-blue-700">Hola, {{ user?.nombre }}</p>
   </div>
 
   <!-- Estadísticas rápidas -->
   <ion-grid class="stats-grid">
     <ion-row>
       <ion-col size="6">
-        <ion-card class="stat-card pending">
+        <ion-card class="stat-card pending" mode="ios">
           <ion-card-content>
             <div class="stat-content">
               <ion-icon name="receipt"></ion-icon>
@@ -30,7 +33,7 @@
       </ion-col>
 
       <ion-col size="6">
-        <ion-card class="stat-card completed">
+        <ion-card class="stat-card completed" mode="ios">
           <ion-card-content>
             <div class="stat-content">
               <ion-icon name="stats-chart"></ion-icon>
@@ -43,62 +46,24 @@
         </ion-card>
       </ion-col>
     </ion-row>
-
-    <ion-row>
-      <ion-col size="6">
-        <ion-card class="stat-card inventory">
-          <ion-card-content>
-            <div class="stat-content">
-              <ion-icon name="cube"></ion-icon>
-              <div>
-                <h3>{{ stats.inventarioBajo }}</h3>
-                <p>Stock Bajo</p>
-              </div>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="6">
-        <ion-card class="stat-card sales">
-          <ion-card-content>
-            <div class="stat-content">
-              <ion-icon name="notifications"></ion-icon>
-              <div>
-                <h3>${{ stats.ventasHoy }}</h3>
-                <p>Ventas Hoy</p>
-              </div>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
   </ion-grid>
 
   <!-- Acciones rápidas -->
-  <ion-card>
+  <ion-card mode="ios">
     <ion-card-header>
-      <ion-card-title>Acciones Rápidas</ion-card-title>
+      <ion-card-subtitle>Acciones Rápidas</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
       <ion-grid>
         <ion-row>
           <ion-col size="6">
-            <ion-button
-              expand="block"
-              color="primary"
-              (click)="navigateTo('pedidos')"
-            >
+            <ion-button (click)="navigateTo('pedidos')" color="tertiary">
               <ion-icon name="receipt" slot="start"></ion-icon>
               Gestionar Pedidos
             </ion-button>
           </ion-col>
           <ion-col size="6">
-            <ion-button
-              expand="block"
-              color="warning"
-              (click)="navigateTo('inventario')"
-            >
+            <ion-button color="warning" (click)="navigateTo('inventario')">
               <ion-icon name="cube" slot="start"></ion-icon>
               Ver Inventario
             </ion-button>
@@ -109,13 +74,14 @@
   </ion-card>
 
   <!-- Pedidos recientes -->
-  <ion-card>
+  <ion-card mode="ios">
     <ion-card-header>
-      <ion-card-title>Pedidos Recientes</ion-card-title>
+      <ion-card-subtitle>Pedidos Recientes</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
       <div class="recent-orders">
-        <ion-item *ngFor="let pedido of pedidosRecientes" button>
+        @for (pedido of pedidosRecientes; track $index) {
+        <ion-item button>
           <ion-label>
             <h3>{{ pedido.id }} - {{ pedido.cliente }}</h3>
             <p>Total: ${{ pedido.total }}</p>
@@ -124,6 +90,7 @@
             {{ pedido.estado }}
           </ion-badge>
         </ion-item>
+        }
       </div>
     </ion-card-content>
   </ion-card>

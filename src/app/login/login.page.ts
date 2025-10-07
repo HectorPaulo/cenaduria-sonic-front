@@ -31,6 +31,7 @@ import {
   mail,
   key,
   personAdd,
+  informationCircle,
 } from 'ionicons/icons';
 import { IonRefresherCustomEvent } from '@ionic/core';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
@@ -83,7 +84,16 @@ export class LoginPage {
     private toastController: ToastController,
     private loadingController: LoadingController
   ) {
-    addIcons({ mail, key, logIn, personAdd, person, briefcase, settings });
+    addIcons({
+      mail,
+      key,
+      logIn,
+      personAdd,
+      person,
+      briefcase,
+      settings,
+      informationCircle,
+    });
 
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -141,21 +151,106 @@ export class LoginPage {
     toast.present();
   }
 
+  // Credenciales temporales para testing
+  private validCredentials = {
+    // Cliente
+    'cliente@cenaduria.com': {
+      password: 'Cliente123!',
+      role: UserRole.CLIENTE,
+    },
+    'customer@sonic.com': { password: 'Customer1!', role: UserRole.CLIENTE },
+
+    // Empleado
+    'empleado@cenaduria.com': {
+      password: 'Empleado123!',
+      role: UserRole.EMPLEADO,
+    },
+    'worker@sonic.com': { password: 'Worker123!', role: UserRole.EMPLEADO },
+
+    // Administrador
+    'admin@cenaduria.com': { password: 'Admin123!', role: UserRole.SYSADMIN },
+    'sysadmin@sonic.com': { password: 'SysAdmin1!', role: UserRole.SYSADMIN },
+  };
+
+  // Método para iniciar sesión con credenciales del formulario
+  async onLogin() {
+    if (!this.loginForm.valid) {
+      await this.showToast(
+        'Por favor, completa todos los campos correctamente',
+        'danger'
+      );
+      return;
+    }
+
+    const email = this.loginForm.get('email')?.value;
+    const password = this.loginForm.get('password')?.value;
+
+    // Mostrar loading
+    const loading = await this.loadingController.create({
+      message: 'Iniciando sesión...',
+      duration: 1500,
+    });
+    await loading.present();
+
+    // Simular delay de red
+    setTimeout(async () => {
+      await loading.dismiss();
+
+      // Verificar credenciales
+      const validUser =
+        this.validCredentials[email as keyof typeof this.validCredentials];
+
+      if (validUser && validUser.password === password) {
+        await this.showToast(
+          `¡Bienvenido! Iniciando sesión como ${this.getRoleName(
+            validUser.role
+          )}`,
+          'success'
+        );
+        await this.authService.login(validUser.role);
+        this.navigateToRole(validUser.role);
+      } else {
+        await this.showToast(
+          'Credenciales incorrectas. Verifica tu email y contraseña.',
+          'danger'
+        );
+      }
+    }, 1000);
+  }
+
+  // Método auxiliar para obtener el nombre del rol
+  private getRoleName(role: UserRole): string {
+    switch (role) {
+      case UserRole.CLIENTE:
+        return 'Cliente';
+      case UserRole.EMPLEADO:
+        return 'Empleado';
+      case UserRole.SYSADMIN:
+        return 'Administrador';
+      default:
+        return 'Usuario';
+    }
+  }
+
+  // Método auxiliar para navegar según el rol
+  private navigateToRole(role: UserRole) {
+    switch (role) {
+      case UserRole.CLIENTE:
+        this.router.navigate(['/cliente/home']);
+        break;
+      case UserRole.EMPLEADO:
+        this.router.navigate(['/empleado/dashboard']);
+        break;
+      case UserRole.SYSADMIN:
+        this.router.navigate(['/admin/dashboard']);
+        break;
+    }
+  }
+
   async loginAs(role: UserRole) {
     try {
       await this.authService.login(role);
-
-      switch (role) {
-        case UserRole.CLIENTE:
-          this.router.navigate(['/cliente/home']);
-          break;
-        case UserRole.EMPLEADO:
-          this.router.navigate(['/empleado/dashboard']);
-          break;
-        case UserRole.SYSADMIN:
-          this.router.navigate(['/admin/dashboard']);
-          break;
-      }
+      this.navigateToRole(role);
     } catch (error) {
       console.error('Error during login:', error);
     }
