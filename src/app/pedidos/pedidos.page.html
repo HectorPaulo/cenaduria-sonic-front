@@ -33,7 +33,7 @@
       <ion-grid fixed>
         @for (pedido of pedidosActivos; track pedido.id) {
         <ion-row>
-          <ion-card color="dark">
+          <ion-card>
             <img
               [src]="pedido.imagen"
               [alt]="pedido.nombre"
@@ -111,7 +111,7 @@
       <ion-grid fixed>
         @for (pedido of pedidosHistorial; track pedido.id) {
         <ion-row>
-          <ion-card color="dark" class="p-1 w-full">
+          <ion-card class="p-1 w-full">
             <img
               [src]="pedido.imagen"
               [alt]="pedido.nombre"

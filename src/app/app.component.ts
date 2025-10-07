@@ -30,17 +30,19 @@ import {
   document,
   home,
   people,
-  statsChart,
+  pieChart,
   settings,
   clipboard,
   cube,
   logOut,
   speedometer,
   restaurant,
+  documentOutline,
 } from 'ionicons/icons';
 import { ThemeToggleComponent } from './components/theme-toggle/theme-toggle.component';
 import { ThemeService } from './services/theme.service';
 import { AuthService, UserRole } from './services/auth.service';
+import { Icon } from 'ionicons/dist/types/components/icon/icon';
 
 @Component({
   selector: 'app-root',
@@ -139,12 +141,7 @@ export class AppComponent implements OnInit {
     {
       title: 'Reportes',
       url: '/admin/reportes',
-      icon: 'statsChart',
-    },
-    {
-      title: 'Configuración',
-      url: '/admin/configuracion',
-      icon: 'settings',
+      icon: 'pieChart'
     },
     {
       title: 'Perfil',
@@ -160,7 +157,7 @@ export class AppComponent implements OnInit {
       person,
       home,
       people,
-      statsChart,
+      pieChart,
       settings,
       clipboard,
       cube,

@@ -109,13 +109,6 @@ export const routes: Routes = [
           import('./admin/reportes/reportes.page').then((m) => m.ReportesPage),
       },
       {
-        path: 'configuracion',
-        loadComponent: () =>
-          import('./admin/configuracion/configuracion.page').then(
-            (m) => m.ConfiguracionPage
-          ),
-      },
-      {
         path: 'perfil',
         loadComponent: () =>
           import('./perfil/perfil.page').then((m) => m.PerfilPage),

@@ -12,15 +12,18 @@ import {
   IonCard,
   IonCardContent,
   IonCardHeader,
-  IonCardTitle,
-} from '@ionic/angular/standalone';
+  IonCardTitle, IonRefresher, IonRefresherContent, 
+RefresherEventDetail, IonCardSubtitle } from '@ionic/angular/standalone';
+import { HeaderComponent } from "src/app/components/header/header.component";
+import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
+import { FabbtnComponent } from "src/app/components/fabbtn/fabbtn.component";
 
 @Component({
   selector: 'app-usuarios',
   templateUrl: './usuarios.page.html',
   styleUrls: ['./usuarios.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonCardSubtitle, IonRefresherContent, IonRefresher,
     CommonModule,
     IonContent,
     IonHeader,
@@ -34,9 +37,15 @@ import {
     IonCardContent,
     IonCardHeader,
     IonCardTitle,
-  ],
+    HeaderComponent, FabbtnComponent],
 })
 export class UsuariosPage {
+doRefresh(event: RefresherCustomEvent) {
+    setTimeout(() => {
+      // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
+      event.target.complete();
+    }, 2000);
+  }
   usuarios = [
     {
       id: 1,

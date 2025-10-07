@@ -1,10 +1,17 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Reportes</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header titulo="Reportes"></app-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
+  <ion-refresher
+    slot="fixed"
+    (ionRefresh)="doRefresh($event)"
+    pullFactor="0.8"
+    pullMin="60"
+    pullMax="120"
+  >
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <app-fabbtn></app-fabbtn>
   <ion-card>
     <ion-card-header>
       <ion-card-title>Reportes del Sistema</ion-card-title>

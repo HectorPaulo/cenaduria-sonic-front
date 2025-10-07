@@ -2,7 +2,7 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <div class="welcome-section">
-    <h2>¡Bienvenido, {{ user?.nombre }}!</h2>
+    <h2 class="text-lg font-black">¡Bienvenido, {{ user?.nombre }}!</h2>
     <p>Panel de control administrativo - CenaduriaSonic</p>
   </div>
 
@@ -10,7 +10,7 @@
   <ion-grid class="stats-grid">
     <ion-row>
       <ion-col size="6" size-md="3">
-        <ion-card class="stat-card users">
+        <ion-card mode="ios" class="stat-card users">
           <ion-card-content>
             <div class="stat-content">
               <ion-icon name="people"></ion-icon>
@@ -24,7 +24,7 @@
       </ion-col>
 
       <ion-col size="6" size-md="3">
-        <ion-card class="stat-card orders">
+        <ion-card class="stat-card orders" mode="ios">
           <ion-card-content>
             <div class="stat-content">
               <ion-icon name="receipt"></ion-icon>
@@ -38,7 +38,7 @@
       </ion-col>
 
       <ion-col size="6" size-md="3">
-        <ion-card class="stat-card sales">
+        <ion-card class="stat-card sales" mode="ios">
           <ion-card-content>
             <div class="stat-content">
               <ion-icon name="cash"></ion-icon>
@@ -52,7 +52,7 @@
       </ion-col>
 
       <ion-col size="6" size-md="3">
-        <ion-card class="stat-card inventory">
+        <ion-card class="stat-card inventory" mode="ios">
           <ion-card-content>
             <div class="stat-content">
               <ion-icon name="cube"></ion-icon>
@@ -114,7 +114,7 @@
               Reportes
             </ion-button>
           </ion-col>
-          <ion-col size="6" size-md="3">
+          <!-- <ion-col size="6" size-md="3">
             <ion-button
               expand="block"
               color="warning"
@@ -123,7 +123,7 @@
               <ion-icon name="settings" slot="start"></ion-icon>
               Configuración
             </ion-button>
-          </ion-col>
+          </ion-col> -->
           <ion-col size="6" size-md="3">
             <ion-button
               expand="block"
@@ -155,7 +155,7 @@
         <ion-card class="info-card">
           <ion-card-content>
             <h4>Clientes Nuevos</h4>
-            <div class="info-number">+{{ stats.clientesNuevos }}</div>
+            <div class="info-number">{{ stats.clientesNuevos }}</div>
             <p>Registrados esta semana</p>
           </ion-card-content>
         </ion-card>

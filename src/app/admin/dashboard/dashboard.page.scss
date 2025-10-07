@@ -19,7 +19,6 @@
 
 .stat-card {
   margin: 0;
-  border-radius: 12px;
 
   ion-card-content {
     padding: 1rem;
@@ -46,14 +45,14 @@
       p {
         margin: 0;
         font-size: 0.75rem;
-        color: var(--ion-color-medium);
+        color: whitesmoke;
         line-height: 1.2;
       }
     }
   }
 
   &.users {
-    background: linear-gradient(135deg, #2196f3 10%, #64b5f6 100%);
+    background: #2196f3;
     color: white;
 
     ion-icon {
@@ -62,7 +61,7 @@
   }
 
   &.orders {
-    background: linear-gradient(135deg, #ff9800 10%, #ffb74d 100%);
+    background: #ff9800;
     color: white;
 
     ion-icon {
@@ -71,7 +70,7 @@
   }
 
   &.sales {
-    background: linear-gradient(135deg, #4caf50 10%, #81c784 100%);
+    background: #4caf50;
     color: white;
 
     ion-icon {
@@ -80,7 +79,7 @@
   }
 
   &.inventory {
-    background: linear-gradient(135deg, #f44336 10%, #e57373 100%);
+    background: #f44336;
     color: white;
 
     ion-icon {
