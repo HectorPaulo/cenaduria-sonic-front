@@ -14,6 +14,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { checkmark, time, restaurant } from 'ionicons/icons';
+import { HeaderComponent } from "src/app/components/header/header.component";
 
 @Component({
   selector: 'app-pedidos-empleado',
@@ -32,7 +33,8 @@ import { checkmark, time, restaurant } from 'ionicons/icons';
     IonBadge,
     IonButton,
     IonIcon,
-  ],
+    HeaderComponent
+],
 })
 export class PedidosEmpleadoPage {
   pedidos = [

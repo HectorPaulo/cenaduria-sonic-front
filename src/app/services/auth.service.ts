@@ -46,7 +46,7 @@ export class AuthService {
         case UserRole.EMPLEADO:
           user = {
             id: '2',
-            nombre: 'María',
+            nombre: 'Papu Gómez',
             email: 'empleado@example.com',
             role: UserRole.EMPLEADO,
             avatar: 'assets/avatars/empleado.png',

@@ -18,6 +18,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { warning, checkmark, alert } from 'ionicons/icons';
+import { HeaderComponent } from "src/app/components/header/header.component";
 
 @Component({
   selector: 'app-inventario',
@@ -39,7 +40,8 @@ import { warning, checkmark, alert } from 'ionicons/icons';
     IonCardContent,
     IonCardHeader,
     IonCardTitle,
-  ],
+    HeaderComponent
+],
 })
 export class InventarioPage {
   inventario = [

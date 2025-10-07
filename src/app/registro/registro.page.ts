@@ -1,9 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonItem, IonCardContent, IonIcon, IonInput, IonButton, IonText } from '@ionic/angular/standalone';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import { Router } from '@angular/router';
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
+  IonItem,
+  IonCardContent,
+  IonIcon,
+  IonInput,
+  IonButton,
+  IonText,
+  ToastController,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { person, mail, key, personAdd, logIn} from 'ionicons/icons';
+import { person, mail, key, personAdd, logIn } from 'ionicons/icons';
+import { PasswordValidator } from '../validators/password.validator';
 
 @Component({
   selector: 'app-registro',
@@ -26,37 +49,33 @@ import { person, mail, key, personAdd, logIn} from 'ionicons/icons';
     IonTitle,
     IonToolbar,
     CommonModule,
-    ReactiveFormsModule
-  ]
+    ReactiveFormsModule,
+  ],
 })
 export class RegistroPage implements OnInit {
   registroForm: FormGroup;
+  private router = inject(Router);
 
-  constructor(private formBuilder: FormBuilder) {
-    addIcons({person, mail, key, personAdd, logIn});
-    
+  constructor(
+    private formBuilder: FormBuilder,
+    private toastController: ToastController
+  ) {
+    addIcons({ person, mail, key, personAdd, logIn });
+
     this.registroForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordMatchValidator });
+      password: ['', [Validators.required, PasswordValidator.strongPassword()]],
+      confirmPassword: [
+        '',
+        [
+          Validators.required,
+          PasswordValidator.passwordsMatch('password', 'confirmPassword'),
+        ],
+      ],
+    });
   }
 
-  ngOnInit() {
-  }
-
-  // Validador personalizado para confirmar que las contraseñas coincidan
-  passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    
-    if (password && confirmPassword && password !== confirmPassword) {
-      form.get('confirmPassword')?.setErrors({ passwordMismatch: true });
-      return { passwordMismatch: true };
-    }
-    
-    return null;
-  }
+  ngOnInit() {}
 
   // Método para obtener mensaje de error del email
   getEmailErrorMessage(): string {
@@ -76,8 +95,14 @@ export class RegistroPage implements OnInit {
     if (passwordControl?.hasError('required')) {
       return 'La contraseña es obligatoria';
     }
-    if (passwordControl?.hasError('minlength')) {
+    if (passwordControl?.hasError('minLength')) {
       return 'La contraseña debe tener al menos 8 caracteres';
+    }
+    if (passwordControl?.hasError('requiresUppercase')) {
+      return 'La contraseña debe contener al menos una letra mayúscula';
+    }
+    if (passwordControl?.hasError('requiresSpecialChar')) {
+      return 'La contraseña debe contener al menos un carácter especial (!@#$%^&*...)';
     }
     return '';
   }
@@ -105,16 +130,38 @@ export class RegistroPage implements OnInit {
     return this.registroForm.valid;
   }
 
+  // Método para navegar al login
+  goToLogin() {
+    this.router.navigate(['/login']);
+  }
+
+  // Método para mostrar toast
+  private async showToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 3000,
+      color: color,
+      position: 'top',
+    });
+    toast.present();
+  }
+
   // Método para manejar el envío del formulario
-  onSubmit() {
+  async onSubmit() {
     if (this.registroForm.valid) {
       console.log('Formulario válido:', this.registroForm.value);
-      // Aquí implementarías la lógica de registro
+      await this.showToast('¡Cuenta creada exitosamente!', 'success');
+      // Redirigir al login después del registro exitoso
+      this.router.navigate(['/login']);
     } else {
       // Marcar todos los campos como tocados para mostrar errores
-      Object.keys(this.registroForm.controls).forEach(key => {
+      Object.keys(this.registroForm.controls).forEach((key) => {
         this.registroForm.get(key)?.markAsTouched();
       });
+      await this.showToast(
+        'Por favor, corrige los errores en el formulario',
+        'danger'
+      );
     }
   }
 }

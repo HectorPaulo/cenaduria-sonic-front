@@ -91,12 +91,12 @@ export class PerfilPage implements OnInit {
       header: 'Cambiar foto',
       message: 'Selecciona una opción para cambiar tu foto de perfil',
       buttons: [
-        {
-          text: 'Cámara',
-          handler: () => {
-            this.tomarFotoConCamara();
-          },
-        },
+        // {
+        //   text: 'Cámara',
+        //   handler: () => {
+        //     this.tomarFotoConCamara();
+        //   },
+        // },
         {
           text: 'Galería',
           handler: () => {
@@ -112,36 +112,38 @@ export class PerfilPage implements OnInit {
     await alert.present();
   }
 
-  async tomarFotoConCamara() {
-    try {
-      // Verificar si estamos en un dispositivo con cámara
-      if (!Capacitor.isPluginAvailable('Camera')) {
-        this.mostrarError('La cámara no está disponible en este dispositivo');
-        return;
-      }
+  // TODO: Desimplementar la funcionalidad para abrir la camara.
+  // Da problemas con el emulador
+  // async tomarFotoConCamara() {
+  //   try {
+  //     // Verificar si estamos en un dispositivo con cámara
+  //     if (!Capacitor.isPluginAvailable('Camera')) {
+  //       this.mostrarError('La cámara no está disponible en este dispositivo');
+  //       return;
+  //     }
 
-      const image = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: true,
-        resultType: CameraResultType.DataUrl,
-        source: CameraSource.Camera,
-        width: 300,
-        height: 300,
-      });
+  //     const image = await Camera.getPhoto({
+  //       quality: 90,
+  //       allowEditing: true,
+  //       resultType: CameraResultType.DataUrl,
+  //       source: CameraSource.Camera,
+  //       width: 300,
+  //       height: 300,
+  //     });
 
-      if (image.dataUrl) {
-        // Actualizar la foto del usuario
-        this.usuario.avatar = image.dataUrl;
+  //     if (image.dataUrl) {
+  //       // Actualizar la foto del usuario
+  //       this.usuario.avatar = image.dataUrl;
 
-        // Aquí guardarías la imagen en el servidor
-        console.log('Nueva foto capturada y establecida');
-        this.mostrarExito('Foto de perfil actualizada correctamente');
-      }
-    } catch (error) {
-      console.error('Error al tomar foto:', error);
-      this.mostrarError('Error al acceder a la cámara');
-    }
-  }
+  //       // Aquí guardarías la imagen en el servidor
+  //       console.log('Nueva foto capturada y establecida');
+  //       this.mostrarExito('Foto de perfil actualizada correctamente');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error al tomar foto:', error);
+  //     this.mostrarError('Error al acceder a la cámara');
+  //   }
+  // }
 
   async seleccionarDeGaleria() {
     try {

@@ -79,7 +79,7 @@ export class PedidosPage implements OnInit {
         },
         {
           avatar: 'assets/goku.png',
-          comment: '¡Qué tetas!',
+          comment: '¡Trikitrákatelas!',
           bgColor: 'bg-purple-100',
         },
       ],

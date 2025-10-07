@@ -12,8 +12,13 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./login/login.page').then((m) => m.LoginPage),
   },
+  {
+    path: 'registro',
+    loadComponent: () =>
+      import('./registro/registro.page').then((m) => m.RegistroPage),
+  },
 
-  // Rutas para CLIENTES
+  // ? Rutas para CLIENTES
   {
     path: 'cliente',
     canActivate: [RoleGuard],
@@ -45,7 +50,7 @@ export const routes: Routes = [
     ],
   },
 
-  // Rutas para EMPLEADOS
+  // ? Rutas para EMPLEADOS
   {
     path: 'empleado',
     canActivate: [RoleGuard],
@@ -80,7 +85,7 @@ export const routes: Routes = [
     ],
   },
 
-  // Rutas para SYSADMIN
+  // ! Rutas para SYSADMIN
   {
     path: 'admin',
     canActivate: [RoleGuard],
@@ -143,9 +148,10 @@ export const routes: Routes = [
     path: 'carrito',
     redirectTo: 'cliente/carrito',
     pathMatch: 'full',
-  },  {
-    path: 'registro',
-    loadComponent: () => import('./registro/registro.page').then( m => m.RegistroPage)
   },
-
+  {
+    path: 'registro',
+    loadComponent: () =>
+      import('./registro/registro.page').then((m) => m.RegistroPage),
+  },
 ];

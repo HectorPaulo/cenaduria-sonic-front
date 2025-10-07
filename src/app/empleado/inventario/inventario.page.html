@@ -1,21 +1,17 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Inventario</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header titulo="Inventario"></app-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <div class="inventario-header">
-    <h2>Control de Inventario</h2>
     <p>Monitorea el stock de productos disponibles</p>
   </div>
 
   <!-- Alertas de stock -->
+  @if (itemsCriticos.length > 0 || itemsBajos.length > 0) {
   <div
     class="alertas-section"
-    *ngIf="itemsCriticos.length > 0 || itemsBajos.length > 0"
   >
-    <ion-card color="danger" *ngIf="itemsCriticos.length > 0">
+  @if (itemsCriticos.length > 0) {
+    <ion-card color="danger">
       <ion-card-header>
         <ion-card-title>
           <ion-icon name="alert"></ion-icon>
@@ -23,13 +19,18 @@
         </ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <p *ngFor="let item of itemsCriticos">
-          <strong>{{ item.nombre }}:</strong> Solo {{ item.cantidad }} unidades
-        </p>
+        @for (item of itemsCriticos; track $index) {
+          <p>
+            <strong>{{ item.nombre }}:</strong> Solo {{ item.cantidad }} unidades
+          </p>
+        }
       </ion-card-content>
     </ion-card>
+  }
 
-    <ion-card color="warning" *ngIf="itemsBajos.length > 0">
+  @if (itemsBajos.length > 0) {
+
+    <ion-card color="warning">
       <ion-card-header>
         <ion-card-title>
           <ion-icon name="warning"></ion-icon>
@@ -37,14 +38,17 @@
         </ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <p *ngFor="let item of itemsBajos">
-          <strong>{{ item.nombre }}:</strong> {{ item.cantidad }} unidades
-          (mínimo: {{ item.minimo }})
-        </p>
+        @for (item of itemsBajos; track $index) {
+          <p>
+            <strong>{{ item.nombre }}:</strong> {{ item.cantidad }} unidades
+            (mínimo: {{ item.minimo }})
+          </p>
+        }
       </ion-card-content>
     </ion-card>
+  }
   </div>
-
+  }
   <!-- Lista completa de inventario -->
   <ion-card>
     <ion-card-header>
@@ -52,13 +56,15 @@
     </ion-card-header>
     <ion-card-content>
       <ion-list>
-        <ion-item *ngFor="let item of inventario" class="inventario-item">
-          <ion-label>
-            <div class="item-header">
-              <h3>{{ item.nombre }}</h3>
+        @for (item of inventario; track $index) {
+
+          <ion-item class="inventario-item">
+            <ion-label>
+              <div class="item-header">
+                <h3>{{ item.nombre }}</h3>
               <ion-badge [color]="getEstadoColor(item.cantidad, item.minimo)">
                 <ion-icon
-                  [name]="getEstadoIcon(item.cantidad, item.minimo)"
+                [name]="getEstadoIcon(item.cantidad, item.minimo)"
                 ></ion-icon>
                 {{ getEstadoTexto(item.cantidad, item.minimo) }}
               </ion-badge>
@@ -83,6 +89,7 @@
             </div>
           </ion-label>
         </ion-item>
+      }
       </ion-list>
     </ion-card-content>
   </ion-card>

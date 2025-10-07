@@ -31,6 +31,8 @@ import {
   cash,
   person,
 } from 'ionicons/icons';
+import { HeaderComponent } from "src/app/components/header/header.component";
+import { FabbtnComponent } from "src/app/components/fabbtn/fabbtn.component";
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -52,7 +54,9 @@ import {
     IonGrid,
     IonRow,
     IonCol,
-  ],
+    HeaderComponent,
+    FabbtnComponent
+],
 })
 export class AdminDashboardPage implements OnInit {
   private authService = inject(AuthService);

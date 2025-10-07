@@ -1,13 +1,7 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>CenaduriaSonic - Registro</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true" class="ion-padding">
   <div class="registro-container">
     <div class="logo-section">
-      <h1>🍔 CenaduriaSonic</h1>
+      <h1>CenaduriaSonic</h1>
       <p>Crea tu cuenta</p>
     </div>
 
@@ -15,7 +9,9 @@
       <ion-card class="registro-card">
         <ion-card-header>
           <ion-card-title>Registro de Usuario</ion-card-title>
-          <ion-card-subtitle>Completa tus datos para crear una cuenta</ion-card-subtitle>
+          <ion-card-subtitle
+            >Completa tus datos para crear una cuenta</ion-card-subtitle
+          >
         </ion-card-header>
 
         <ion-card-content>
@@ -31,7 +27,11 @@
                 type="email"
               ></ion-input>
             </ion-item>
-            <ion-text color="danger" class="error-text" *ngIf="isFieldInvalid('email')">
+            <ion-text
+              color="danger"
+              class="error-text"
+              *ngIf="isFieldInvalid('email')"
+            >
               {{ getEmailErrorMessage() }}
             </ion-text>
 
@@ -46,7 +46,11 @@
                 type="password"
               ></ion-input>
             </ion-item>
-            <ion-text color="danger" class="error-text" *ngIf="isFieldInvalid('password')">
+            <ion-text
+              color="danger"
+              class="error-text"
+              *ngIf="isFieldInvalid('password')"
+            >
               {{ getPasswordErrorMessage() }}
             </ion-text>
 
@@ -61,7 +65,11 @@
                 type="password"
               ></ion-input>
             </ion-item>
-            <ion-text color="danger" class="error-text" *ngIf="isFieldInvalid('confirmPassword')">
+            <ion-text
+              color="danger"
+              class="error-text"
+              *ngIf="isFieldInvalid('confirmPassword')"
+            >
               {{ getConfirmPasswordErrorMessage() }}
             </ion-text>
 
@@ -83,6 +91,7 @@
                 color="medium"
                 class="login-button"
                 type="button"
+                (click)="goToLogin()"
               >
                 <ion-icon name="log-in" slot="start"></ion-icon>
                 Ya tengo cuenta

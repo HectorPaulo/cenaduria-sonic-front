@@ -1,61 +1,91 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>CenaduriaSonic - Login</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true" class="ion-padding">
-  <div class="login-container">
+  <div class="registro-container">
     <div class="logo-section">
-      <h1>🍔 CenaduriaSonic</h1>
-      <p>Selecciona tu tipo de usuario</p>
+      <h1>CenaduriaSonic</h1>
+      <p>Inicia sesión en tu cuenta</p>
     </div>
 
-    <div class="user-types">
-      <!-- Cliente -->
-      <ion-card
-        button
-        (click)="loginAs(UserRole.CLIENTE)"
-        class="user-card client-card"
-      >
+    <div class="form-section">
+      <ion-card class="registro-card">
         <ion-card-header>
-          <ion-icon name="person" size="large"></ion-icon>
-          <ion-card-title>Cliente</ion-card-title>
+          <ion-card-title>Iniciar Sesión</ion-card-title>
+          <ion-card-subtitle
+            >Ingresa tus credenciales para acceder</ion-card-subtitle
+          >
         </ion-card-header>
-        <ion-card-content>
-          <ion-text> Haz pedidos, ve el menú y gestiona tu perfil </ion-text>
-        </ion-card-content>
-      </ion-card>
 
-      <!-- Empleado -->
-      <ion-card
-        button
-        (click)="loginAs(UserRole.EMPLEADO)"
-        class="user-card employee-card"
-      >
-        <ion-card-header>
-          <ion-icon name="briefcase" size="large"></ion-icon>
-          <ion-card-title>Empleado</ion-card-title>
-        </ion-card-header>
         <ion-card-content>
-          <ion-text>
-            Gestiona pedidos, inventario y atiende a clientes
-          </ion-text>
-        </ion-card-content>
-      </ion-card>
+          <form [formGroup]="loginForm">
+            <ion-item [class.error-item]="isFieldInvalid('email')">
+              <ion-icon name="mail" slot="start" color="primary"></ion-icon>
+              <ion-input
+                formControlName="email"
+                label="Correo electrónico"
+                labelPlacement="floating"
+                placeholder="ejemplo@correo.com"
+                type="email"
+              ></ion-input>
+            </ion-item>
+            <ion-text
+              color="danger"
+              class="error-text"
+              *ngIf="isFieldInvalid('email')"
+            >
+              {{ getEmailErrorMessage() }}
+            </ion-text>
 
-      <!-- Sysadmin -->
-      <ion-card
-        button
-        (click)="loginAs(UserRole.SYSADMIN)"
-        class="user-card admin-card"
-      >
-        <ion-card-header>
-          <ion-icon name="settings" size="large"></ion-icon>
-          <ion-card-title>Administrador</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-text> Control total del sistema, usuarios y reportes </ion-text>
+            <ion-item [class.error-item]="isFieldInvalid('password')">
+              <ion-icon name="key" slot="start" color="primary"></ion-icon>
+              <ion-input
+                formControlName="password"
+                label="Contraseña"
+                labelPlacement="floating"
+                placeholder="Tu contraseña"
+                type="password"
+              ></ion-input>
+            </ion-item>
+            <ion-text
+              color="danger"
+              class="error-text"
+              *ngIf="isFieldInvalid('password')"
+            >
+              {{ getPasswordErrorMessage() }}
+            </ion-text>
+
+            <div style="text-align: right; margin: 10px 0">
+              <ion-button
+                fill="clear"
+                size="small"
+                (click)="onForgotPassword()"
+              >
+                ¿Olvidaste tu contraseña?
+              </ion-button>
+            </div>
+
+            <div class="button-section">
+              <ion-button
+                expand="block"
+                type="submit"
+                class="registro-button"
+                [disabled]="!isFormValid()"
+              >
+                <ion-icon name="log-in" slot="start"></ion-icon>
+                Iniciar Sesión
+              </ion-button>
+
+              <ion-button
+                expand="block"
+                fill="outline"
+                color="medium"
+                class="login-button"
+                type="button"
+                (click)="goToRegister()"
+              >
+                <ion-icon name="person-add" slot="start"></ion-icon>
+                Crear cuenta nueva
+              </ion-button>
+            </div>
+          </form>
         </ion-card-content>
       </ion-card>
     </div>

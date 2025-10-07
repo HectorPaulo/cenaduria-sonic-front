@@ -1,8 +1,4 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Gestión de Pedidos</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header titulo="Pedidos"></app-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <div class="pedidos-header">
@@ -11,9 +7,11 @@
   </div>
 
   <ion-list>
-    <ion-item *ngFor="let pedido of pedidos" class="pedido-item">
-      <ion-label>
-        <div class="pedido-header">
+    @for (pedido of pedidos; track $index) {
+      
+      <ion-item class="pedido-item">
+        <ion-label>
+          <div class="pedido-header">
           <h3>{{ pedido.id }} - {{ pedido.cliente }}</h3>
           <ion-badge [color]="getEstadoColor(pedido.estado)">
             <ion-icon [name]="getEstadoIcon(pedido.estado)"></ion-icon>
@@ -27,28 +25,35 @@
           <p><strong>Hora:</strong> {{ pedido.tiempo }}</p>
         </div>
 
-        <div class="pedido-actions" *ngIf="pedido.estado !== 'listo'">
-          <ion-button
-            *ngIf="pedido.estado === 'pendiente'"
-            size="small"
-            color="primary"
-            (click)="cambiarEstado(pedido, 'preparando')"
-          >
-            <ion-icon name="restaurant" slot="start"></ion-icon>
-            Iniciar Preparación
-          </ion-button>
+        @if (pedido.estado !== 'listo') {
 
+          <div class="pedido-actions">
+            @if (pedido.estado === 'pendiente') {
+
+              <ion-button
+              size="small"
+              color="primary"
+              (click)="cambiarEstado(pedido, 'preparando')"
+              >
+              <ion-icon name="restaurant" slot="start"></ion-icon>
+              Iniciar Preparación
+            </ion-button>
+          }
+        
+        @if (pedido.estado === 'preparando') {
           <ion-button
-            *ngIf="pedido.estado === 'preparando'"
-            size="small"
-            color="success"
+          size="small"
+          color="success"
             (click)="cambiarEstado(pedido, 'listo')"
-          >
+            >
             <ion-icon name="checkmark" slot="start"></ion-icon>
             Marcar Listo
           </ion-button>
-        </div>
+        }
+      </div>
+    }
       </ion-label>
     </ion-item>
+  }
   </ion-list>
 </ion-content>
