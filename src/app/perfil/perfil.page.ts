@@ -23,6 +23,7 @@ import {
   chevronForwardOutline,
   createOutline,
   logOutOutline,
+  image,
 } from 'ionicons/icons';
 import User from '../Types/User';
 import { Capacitor } from '@capacitor/core';
@@ -63,19 +64,15 @@ export class PerfilPage implements OnInit {
     nombre: 'Sonic el erizo',
     email: 'sonic.erizo@email.com',
     telefono: '+502 1234-5678',
-    direccion: 'Zona 10, Ciudad de Guatemala',
     avatar: 'assets/sonic.png',
     fechaRegistro: 'Enero 2024',
-    totalPedidos: 47,
-    puntos: 1250,
-    nivel: 'Gold',
-    favoritos: ['tacos', 'hamburguesa', 'pizza'],
+    pedidosRecientes: ['tacos', 'hamburguesa', 'pizza'],
   };
 
   constructor(private alertController: AlertController) {
     addIcons({
       personOutline,
-      camera,
+      image,
       heartOutline,
       settingsOutline,
       chevronForwardOutline,
@@ -245,33 +242,33 @@ export class PerfilPage implements OnInit {
     await alert.present();
   }
 
-  async editarDireccion() {
-    const alert = await this.alertController.create({
-      header: 'Editar dirección',
-      inputs: [
-        {
-          name: 'direccion',
-          type: 'text',
-          placeholder: 'Dirección completa',
-          value: this.usuario.direccion || '',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Guardar',
-          handler: (data) => {
-            this.usuario.direccion = data.direccion;
-            console.log('Dirección actualizada:', this.usuario.direccion);
-          },
-        },
-      ],
-    });
-    await alert.present();
-  }
+  // async editarDireccion() {
+  //   const alert = await this.alertController.create({
+  //     header: 'Editar dirección',
+  //     inputs: [
+  //       {
+  //         name: 'direccion',
+  //         type: 'text',
+  //         placeholder: 'Dirección completa',
+  //         value: this.usuario.direccion || '',
+  //       },
+  //     ],
+  //     buttons: [
+  //       {
+  //         text: 'Cancelar',
+  //         role: 'cancel',
+  //       },
+  //       {
+  //         text: 'Guardar',
+  //         handler: (data) => {
+  //           this.usuario.direccion = data.direccion;
+  //           console.log('Dirección actualizada:', this.usuario.direccion);
+  //         },
+  //       },
+  //     ],
+  //   });
+  //   await alert.present();
+  // }
 
   // * Métodos de navegación
   verFavoritos() {

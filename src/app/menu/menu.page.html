@@ -32,14 +32,14 @@
     }
 
     <!-- Categorías Horizontales Desplazables -->
-    <h2 class="text-2xl font-bold text-gray-300 mb-2">Categorías</h2>
+    <h2 class="text-2xl font-bold mb-2">Categorías</h2>
     <div class="categoria-scroll overflow-x-auto pb-4 mb-6">
       <div class="flex gap-3 min-w-max px-2">
         @for (categoria of todasCategorias; track $index) {
         <div class="flex flex-col items-center min-w-[70px]">
           <ion-button
             class="categoria-btn rounded-full w-14 h-14 text-xl mb-1"
-            [class]="filtroActivo === categoria.name ? 'active bg-blue-500 text-white shadow-lg' : 'bg-gray-100 text-gray-700'"
+            [class]="filtroActivo === categoria.name ? 'active bg-blue-500 shadow-lg' : 'bg-gray-100 text-gray-700'"
             fill="clear"
             (click)="filtrarPorCategoria(categoria.name)"
           >
@@ -58,13 +58,13 @@
 
     <!-- Sección Comida -->
     @if (comidasFiltradas.length > 0) {
-    <h2 class="text-2xl font-bold text-gray-300 mb-2">Comida</h2>
+    <h2 class="text-2xl font-bold mb-2">Comida</h2>
     <div class="grid gap-4 mb-6">
       <ion-grid fixed>
         @for (comida of comidasFiltradas; track $index) {
 
         <ion-row>
-          <ion-card color="dark" class="p-1" mode="ios">
+          <ion-card class="p-1" mode="ios">
             <img [src]="comida.image" [alt]="comida.name" class="rounded-md" />
             <ion-card-header>
               <ion-card-title class="text-lg font-bold">
@@ -106,7 +106,7 @@
 
     <!-- Sección Bebidas -->
     @if (bebidasFiltradas.length > 0) {
-    <h2 class="text-2xl font-bold text-gray-300 mb-2">Bebidas</h2>
+    <h2 class="text-2xl font-bold mb-2">Bebidas</h2>
 
     <div class="grid gap-4 mb-6">
       <ion-grid fixed>
@@ -114,7 +114,6 @@
 
         <ion-row>
           <ion-card
-            color="dark"
             class="rounded-xl p-4 flex items-center shadow-sm"
             mode="ios"
           >
