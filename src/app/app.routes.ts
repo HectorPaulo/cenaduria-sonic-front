@@ -143,9 +143,9 @@ export const routes: Routes = [
     path: 'carrito',
     redirectTo: 'cliente/carrito',
     pathMatch: 'full',
+  },  {
+    path: 'registro',
+    loadComponent: () => import('./registro/registro.page').then( m => m.RegistroPage)
   },
-  {
-    path: 'login-2',
-    loadComponent: () => import('./login-2/login-2.page').then( m => m.Login2Page)
-  },
+
 ];

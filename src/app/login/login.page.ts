@@ -31,7 +31,6 @@ import { person, briefcase, settings, logIn } from 'ionicons/icons';
     IonCardContent,
     IonCardHeader,
     IonCardTitle,
-    IonButton,
     IonIcon,
     IonText,
   ],
