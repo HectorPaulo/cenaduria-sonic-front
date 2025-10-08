@@ -15,8 +15,6 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonText,
-  IonBadge,
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth.service';
 import { addIcons } from 'ionicons';

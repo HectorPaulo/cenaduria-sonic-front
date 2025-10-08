@@ -105,11 +105,7 @@
 
     .bar {
       width: 100%;
-      background: linear-gradient(
-        to top,
-        var(--ion-color-primary),
-        var(--ion-color-primary-tint)
-      );
+      background: var(--ion-color-primary);
       border-radius: 4px 4px 0 0;
       min-height: 20%;
       margin-bottom: 0.5rem;
