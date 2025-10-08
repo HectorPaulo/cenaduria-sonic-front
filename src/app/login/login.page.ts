@@ -76,7 +76,6 @@ export class LoginPage {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // Exponer enum para uso en template
   UserRole = UserRole;
 
   constructor(
