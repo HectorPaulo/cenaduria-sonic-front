@@ -19,7 +19,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, cart, search, close } from 'ionicons/icons';
-import Pedido from '../Types/Pedido';
+import Alimento from '../Types/Pedido';
 import Recomendacion from '../Types/Recomendacion';
 import { RefresherCustomEvent } from '@ionic/core';
 import { HeaderComponent } from '../components/header/header.component';
@@ -49,11 +49,10 @@ import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
     FabbtnComponent,
   ],
 })
-
 export class MenuPage implements OnInit {
   filtroActivo: string = '';
-  comidasFiltradas: Pedido[] = [];
-  bebidasFiltradas: Pedido[] = [];
+  comidasFiltradas: Alimento[] = [];
+  bebidasFiltradas: Alimento[] = [];
 
   doRefresh(event: RefresherCustomEvent) {
     setTimeout(() => {
@@ -62,7 +61,7 @@ export class MenuPage implements OnInit {
       event.target.complete();
     }, 2000);
   }
-  comidas: Pedido[] = [
+  comidas: Alimento[] = [
     {
       name: 'Albóndigas Clásicas',
       description: 'Jugosas albóndigas de res con salsa de tomate y especias.',
@@ -93,9 +92,9 @@ export class MenuPage implements OnInit {
   categoriasComida: Recomendacion[] = [];
   categoriasBebida: Recomendacion[] = [];
   todasCategorias: Recomendacion[] = [];
-  pedidos: Pedido[] = [];
-  listaComidas: Pedido[] = [];
-  bebidas: Pedido[] = [
+  pedidos: Alimento[] = [];
+  listaComidas: Alimento[] = [];
+  bebidas: Alimento[] = [
     {
       name: 'Refresco de Cola',
       description: 'Bebida carbonatada con sabor a cola, refrescante y dulce.',
@@ -146,11 +145,11 @@ export class MenuPage implements OnInit {
     },
   ];
 
-  addToList(listaItem: Pedido) {
+  addToList(listaItem: Alimento) {
     this.listaComidas.push(listaItem);
   }
 
-  addToCart(pedido: Pedido) {
+  addToCart(pedido: Alimento) {
     this.pedidos.push(pedido);
   }
 
