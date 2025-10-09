@@ -5,4 +5,6 @@ export default interface Reporte {
     fecha: string;
     cantidadVentas: number;
     totalIngresos: number;
+    empresa: string;
+    logo?: string;
 }
