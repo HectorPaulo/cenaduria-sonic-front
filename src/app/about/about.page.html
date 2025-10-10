@@ -1,0 +1,183 @@
+<app-header titulo="Acerca de"></app-header>
+
+<ion-content [fullscreen]="true" class="bg-white">
+  <app-fabbtn></app-fabbtn>
+  <div class="max-w-lg mx-auto p-4">
+    <!-- Logo y versión -->
+    <div class="text-center mb-6">
+      <div class="flex justify-center mb-4">
+        <img
+          src="assets/sonic.png"
+          alt="Logo Cenaduria Sonic"
+          class="w-32 h-32 rounded-full shadow-lg"
+        />
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">
+        {{ appInfo.nombre }}
+      </h1>
+      <p class="text-sm text-gray-600">Versión {{ appInfo.version }}</p>
+    </div>
+
+    <!-- Descripción -->
+    <ion-card mode="ios" class="shadow-sm mb-4">
+      <ion-card-content>
+        <p class="text-gray-700 text-center leading-relaxed">
+          {{ appInfo.descripcion }}
+        </p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Características -->
+    <ion-card mode="ios" class="shadow-sm mb-4">
+      <ion-card-header>
+        <ion-card-title class="text-lg font-semibold text-gray-800">
+          <ion-icon
+            name="information-circle-outline"
+            class="mr-2 text-yellow-600"
+          ></ion-icon>
+          Características
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="space-y-4">
+        <div
+          *ngFor="let caracteristica of caracteristicas"
+          class="flex items-start"
+        >
+          <div
+            class="flex-shrink-0 w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3"
+          >
+            <ion-icon
+              [name]="caracteristica.icon"
+              class="text-yellow-600"
+            ></ion-icon>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-800">
+              {{ caracteristica.titulo }}
+            </h3>
+            <p class="text-sm text-gray-600">
+              {{ caracteristica.descripcion }}
+            </p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Contacto -->
+    <ion-card mode="ios" class="shadow-sm mb-4">
+      <ion-card-header>
+        <ion-card-title class="text-lg font-semibold text-gray-800">
+          <ion-icon name="mail-outline" class="mr-2 text-blue-600"></ion-icon>
+          Contacto
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="space-y-3">
+        <div class="flex items-center">
+          <ion-icon
+            name="mail-outline"
+            class="mr-3 text-gray-600"
+          ></ion-icon>
+          <div>
+            <p class="text-sm text-gray-500">Email</p>
+            <p class="font-medium text-gray-800">{{ appInfo.email }}</p>
+          </div>
+        </div>
+        <div class="flex items-center">
+          <ion-icon name="call-outline" class="mr-3 text-gray-600"></ion-icon>
+          <div>
+            <p class="text-sm text-gray-500">Teléfono</p>
+            <p class="font-medium text-gray-800">{{ appInfo.telefono }}</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Redes Sociales -->
+    <ion-card mode="ios" class="shadow-sm mb-4">
+      <ion-card-header>
+        <ion-card-title class="text-lg font-semibold text-gray-800">
+          Síguenos en redes
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="flex justify-center space-x-4">
+          <button
+            *ngFor="let red of redesSociales"
+            (click)="abrirRedSocial(red.url)"
+            class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+          >
+            <ion-icon [name]="red.icon" class="text-2xl text-gray-700"></ion-icon>
+          </button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Enlaces legales -->
+    <ion-card mode="ios" class="shadow-sm mb-4">
+      <ion-card-content class="space-y-2">
+        <div
+          class="flex justify-between items-center py-2 border-b border-gray-100"
+          (click)="verTerminos()"
+        >
+          <div class="flex items-center">
+            <ion-icon
+              name="document-text-outline"
+              class="mr-3 text-gray-600"
+            ></ion-icon>
+            <p class="font-medium text-gray-800">Términos y Condiciones</p>
+          </div>
+          <ion-icon
+            name="chevron-forward-outline"
+            class="text-gray-400"
+          ></ion-icon>
+        </div>
+        <div
+          class="flex justify-between items-center py-2"
+          (click)="verPrivacidad()"
+        >
+          <div class="flex items-center">
+            <ion-icon
+              name="shield-checkmark-outline"
+              class="mr-3 text-gray-600"
+            ></ion-icon>
+            <p class="font-medium text-gray-800">Política de Privacidad</p>
+          </div>
+          <ion-icon
+            name="chevron-forward-outline"
+            class="text-gray-400"
+          ></ion-icon>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Botón de soporte -->
+    <div class="space-y-3 mt-6 mb-8">
+      <ion-button
+        fill="outline"
+        color="tertiary"
+        expand="block"
+        class="font-semibold"
+        (click)="contactarSoporte()"
+      >
+        <ion-icon name="mail-outline" slot="start"></ion-icon>
+        Contactar Soporte
+      </ion-button>
+
+      <ion-button
+        fill="clear"
+        color="medium"
+        expand="block"
+        class="font-semibold"
+        (click)="volverAlPerfil()"
+      >
+        Volver al perfil
+      </ion-button>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center text-gray-500 text-sm pb-4">
+      <p>© 2024 {{ appInfo.nombre }}</p>
+      <p>Desarrollado por Los Dorpepus</p>
+    </div>
+  </div>
+</ion-content>

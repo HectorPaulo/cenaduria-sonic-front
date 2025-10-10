@@ -30,6 +30,7 @@ import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
 import { FabbtnComponent } from "../components/fabbtn/fabbtn.component";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-perfil',
@@ -49,7 +50,6 @@ import { FabbtnComponent } from "../components/fabbtn/fabbtn.component";
     CommonModule,
     FormsModule,
     HeaderComponent,
-    ThemeToggleComponent,
     FabbtnComponent
 ],
 })
@@ -69,7 +69,10 @@ export class PerfilPage implements OnInit {
     pedidosRecientes: ['tacos', 'hamburguesa', 'pizza'],
   };
 
-  constructor(private alertController: AlertController) {
+  constructor(
+    private alertController: AlertController,
+    private router: Router
+  ) {
     addIcons({
       personOutline,
       image,
@@ -323,8 +326,8 @@ export class PerfilPage implements OnInit {
   }
 
   acercaDe() {
-    console.log('Mostrando información de la app...');
-    // TODO: Implementar página de "Acerca de"
+    console.log('Navegando a Acerca de...');
+    this.router.navigate(['/about']);
   }
 
   editarPerfil() {
