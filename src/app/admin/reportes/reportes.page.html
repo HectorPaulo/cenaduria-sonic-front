@@ -12,13 +12,88 @@
   </ion-refresher>
 
   <app-fabbtn></app-fabbtn>
-  <ion-card mode="ios">
+  
+  <!-- Header Card -->
+  <!-- <ion-card>
     <ion-card-header>
-      <ion-card-subtitle>Reportes de ventas</ion-card-subtitle>
-      <ion-card-title>Reportes del sistema</ion-card-title>
+      <ion-card-title>
+        <ion-icon name="analytics" style="margin-right: 8px;"></ion-icon>
+        Reportes del Sistema
+      </ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-label>Contenido::::::</ion-label>
+      <p>Reportes y estadísticas de todas las empresas colaborativas del sistema.</p>
+    </ion-card-content>
+  </ion-card> -->
+
+  <div *ngFor="let empresa of empresas" class="empresa-card-container">
+    <ion-card class="empresa-card">
+      <ion-card-header>
+        <ion-card-title class="empresa-title">
+          <span class="empresa-logo">{{ reportesPorEmpresa[empresa][0].logo }}</span>
+          {{ empresa }}
+        </ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <div class="empresa-resumen">
+          <div class="resumen-item">
+            <div class="resumen-valor">{{ getTotalVentasEmpresa(empresa) }}</div>
+            <div class="resumen-label">Total Ventas</div>
+          </div>
+          <div class="resumen-item">
+            <div class="resumen-valor">{{ formatearMoneda(getTotalIngresosEmpresa(empresa)) }}</div>
+            <div class="resumen-label">Total Ingresos</div>
+          </div>
+          <div class="resumen-item">
+            <div class="resumen-valor">{{ reportesPorEmpresa[empresa].length }}</div>
+            <div class="resumen-label">Reportes</div>
+          </div>
+        </div>
+
+        <div class="reportes-empresa">
+          <h4>Reportes Detallados:</h4>
+          <div *ngFor="let reporte of reportesPorEmpresa[empresa]" class="reporte-item">
+            <div class="reporte-header">
+              <div class="reporte-nombre">
+                <ion-icon name="document" color="primary"></ion-icon>
+                {{ reporte.nombre }}
+              </div>
+              <div class="reporte-fecha">
+                <ion-chip color="medium" outline="true">
+                  <ion-icon name="calendar"></ion-icon>
+                  <ion-label>{{ formatearFecha(reporte.fecha) }}</ion-label>
+                </ion-chip>
+              </div>
+            </div>
+            
+            <p *ngIf="reporte.comentario" class="reporte-comentario">
+              {{ reporte.comentario }}
+            </p>
+            
+            <div class="reporte-stats">
+              <div class="stat-item">
+                <span class="stat-label">Ventas:</span>
+                <span class="stat-value">{{ reporte.cantidadVentas }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Ingresos:</span>
+                <span class="stat-value">{{ formatearMoneda(reporte.totalIngresos) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <ion-card *ngIf="empresas.length === 0" class="empty-state">
+    <ion-card-content>
+      <div class="empty-content">
+        <ion-icon name="document" size="large" color="medium"></ion-icon>
+        <h3>No hay reportes disponibles</h3>
+        <p>Los reportes de las empresas aparecerán aquí cuando estén disponibles.</p>
+      </div>
     </ion-card-content>
   </ion-card>
 </ion-content>
