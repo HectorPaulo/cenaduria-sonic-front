@@ -116,8 +116,8 @@ export class AppComponent implements OnInit {
       icon: 'clipboard',
     },
     {
-      title: 'Inventario',
-      url: '/empleado/inventario',
+      title: 'Registro de Empleado',
+      url: '/empleado/registro-empleado',
       icon: 'cube',
     },
     {

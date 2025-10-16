@@ -29,8 +29,8 @@ import {
   cash,
   person,
 } from 'ionicons/icons';
-import { HeaderComponent } from "src/app/components/header/header.component";
-import { FabbtnComponent } from "src/app/components/fabbtn/fabbtn.component";
+import { HeaderComponent } from 'src/app/components/header/header.component';
+import { FabbtnComponent } from 'src/app/components/fabbtn/fabbtn.component';
 import { RefresherCustomEvent } from '@ionic/core';
 
 @Component({
@@ -41,9 +41,6 @@ import { RefresherCustomEvent } from '@ionic/core';
   imports: [
     CommonModule,
     IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
     IonCard,
     IonCardContent,
     IonCardHeader,
@@ -54,8 +51,8 @@ import { RefresherCustomEvent } from '@ionic/core';
     IonRow,
     IonCol,
     HeaderComponent,
-    FabbtnComponent
-],
+    FabbtnComponent,
+  ],
 })
 export class AdminDashboardPage implements OnInit {
   private authService = inject(AuthService);
@@ -104,11 +101,11 @@ export class AdminDashboardPage implements OnInit {
   }
 
   doRefresh(event: RefresherCustomEvent) {
-      setTimeout(() => {
-        // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
-        event.target.complete();
-      }, 2000);
-    }
+    setTimeout(() => {
+      // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
+      event.target.complete();
+    }, 2000);
+  }
 
   navigateTo(route: string) {
     this.router.navigate([`/admin/${route}`]);

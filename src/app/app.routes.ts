@@ -78,10 +78,24 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'editar-menu',
+        loadComponent: () =>
+          import('./empleado/editar-menu/editar-menu.page').then(
+            (m) => m.EditarMenuPage
+          ),
+      },
+      {
         path: 'perfil',
         loadComponent: () =>
           import('./perfil/perfil.page').then((m) => m.PerfilPage),
       },
+      {
+        path: 'registro-empleado',
+        loadComponent: () => 
+          import('./empleado/registro-empleado/registro-empleado.page').then(
+            (m) => m.RegistroEmpleadoPage
+          ),
+      }
     ],
   },
 
@@ -146,9 +160,16 @@ export const routes: Routes = [
     path: 'registro',
     loadComponent: () =>
       import('./registro/registro.page').then((m) => m.RegistroPage),
-  },  {
-    path: 'about',
-    loadComponent: () => import('./about/about.page').then( m => m.AboutPage)
   },
-
+  {
+    path: 'about',
+    loadComponent: () => import('./about/about.page').then((m) => m.AboutPage),
+  },
+  {
+    path: 'registro-empleado',
+    loadComponent: () =>
+      import('./empleado/registro-empleado/registro-empleado.page').then(
+        (m) => m.RegistroEmpleadoPage
+      ),
+  },
 ];

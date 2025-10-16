@@ -1,0 +1,13 @@
+.muted {
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+}
+.price {
+  font-weight: 700;
+  color: var(--ion-color-success);
+}
+.actions {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}

@@ -2,23 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
   IonCard,
   IonCardContent,
   IonCardHeader,
-  IonCardTitle, 
-  IonRefresher, 
+  IonCardTitle,
+  IonRefresher,
   IonRefresherContent,
   IonIcon,
   IonChip,
   IonLabel,
-  RefresherEventDetail
 } from '@ionic/angular/standalone';
-import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
-import { HeaderComponent } from "src/app/components/header/header.component";
-import { FabbtnComponent } from "src/app/components/fabbtn/fabbtn.component";
+import { RefresherCustomEvent } from '@ionic/core';
+import { HeaderComponent } from 'src/app/components/header/header.component';
+import { FabbtnComponent } from 'src/app/components/fabbtn/fabbtn.component';
 import Reporte from 'src/app/Types/Reporte';
 import { addIcons } from 'ionicons';
 import { calendar, cash, analytics, document } from 'ionicons/icons';
@@ -32,19 +28,19 @@ import { calendar, cash, analytics, document } from 'ionicons/icons';
     IonLabel,
     IonChip,
     IonIcon,
-    IonRefresherContent, 
+    IonRefresherContent,
     IonRefresher,
     IonContent,
     IonCard,
+    IonCardContent,
     IonCardHeader,
     IonCardTitle,
-    HeaderComponent, 
+    HeaderComponent,
     FabbtnComponent,
-    CommonModule
+    CommonModule,
   ],
 })
 export class ReportesPage implements OnInit {
-  
   reportes: Reporte[] = [];
   reportesPorEmpresa: { [empresa: string]: Reporte[] } = {};
   empresas: string[] = [];
@@ -60,7 +56,6 @@ export class ReportesPage implements OnInit {
   cargarReportes() {
     // Datos mock para mostrar los reportes de múltiples empresas
     this.reportes = [
-     
       {
         id: 2,
         nombre: 'Reporte Mensual',
@@ -69,10 +64,8 @@ export class ReportesPage implements OnInit {
         cantidadVentas: 1032,
         totalIngresos: 48750.75,
         empresa: 'Cenaduria Sonic Centro',
-        logo: '🍔'
+        logo: '🍔',
       },
-      
-     
     ];
 
     this.agruparReportesPorEmpresa();
@@ -82,7 +75,7 @@ export class ReportesPage implements OnInit {
     this.reportesPorEmpresa = {};
     this.empresas = [];
 
-    this.reportes.forEach(reporte => {
+    this.reportes.forEach((reporte) => {
       if (!this.reportesPorEmpresa[reporte.empresa]) {
         this.reportesPorEmpresa[reporte.empresa] = [];
         this.empresas.push(reporte.empresa);
@@ -92,11 +85,17 @@ export class ReportesPage implements OnInit {
   }
 
   getTotalVentasEmpresa(empresa: string): number {
-    return this.reportesPorEmpresa[empresa].reduce((total, reporte) => total + reporte.cantidadVentas, 0);
+    return this.reportesPorEmpresa[empresa].reduce(
+      (total, reporte) => total + reporte.cantidadVentas,
+      0
+    );
   }
 
   getTotalIngresosEmpresa(empresa: string): number {
-    return this.reportesPorEmpresa[empresa].reduce((total, reporte) => total + reporte.totalIngresos, 0);
+    return this.reportesPorEmpresa[empresa].reduce(
+      (total, reporte) => total + reporte.totalIngresos,
+      0
+    );
   }
 
   formatearFecha(fecha: string): string {
@@ -104,14 +103,14 @@ export class ReportesPage implements OnInit {
     return date.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   }
 
   formatearMoneda(cantidad: number): string {
     return new Intl.NumberFormat('es-MX', {
       style: 'currency',
-      currency: 'MXN'
+      currency: 'MXN',
     }).format(cantidad);
   }
 

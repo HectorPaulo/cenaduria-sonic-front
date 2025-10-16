@@ -138,7 +138,6 @@
               class="text-gray-400"
             ></ion-icon>
           </div>
-
         </ion-card-content>
       </ion-card>
 
@@ -186,6 +185,18 @@
 
       <!-- Acciones -->
       <div class="space-y-3 mt-6">
+        <ion-button
+          *ngIf="isEmpleado"
+          fill="outline"
+          color="tertiary"
+          expand="block"
+          class="font-semibold"
+          (click)="editarMenu()"
+        >
+          <ion-icon name="cube" slot="start"></ion-icon>
+          Editar Menú
+        </ion-button>
+
         <ion-button
           fill="outline"
           color="tertiary"

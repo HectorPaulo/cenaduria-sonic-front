@@ -1,0 +1,75 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Editar Menú</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="back()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title
+        >{{ editingId ? 'Editar Plato' : 'Nuevo Plato' }}</ion-card-title
+      >
+    </ion-card-header>
+    <ion-card-content>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <ion-item>
+          <ion-label position="floating">Nombre</ion-label>
+          <ion-input formControlName="nombre"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Descripción</ion-label>
+          <ion-input formControlName="descripcion"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Precio</ion-label>
+          <ion-input type="number" formControlName="precio"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Disponible</ion-label>
+          <ion-toggle slot="end" formControlName="disponible"></ion-toggle>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Categoría</ion-label>
+          <ion-input formControlName="categoria"></ion-input>
+        </ion-item>
+
+        <div class="actions">
+          <ion-button expand="block" type="submit" color="primary"
+            >{{ editingId ? 'Guardar cambios' : 'Agregar al menú' }}</ion-button
+          >
+          <ion-button
+            expand="block"
+            color="medium"
+            (click)="cancelEdit()"
+            *ngIf="editingId"
+            >Cancelar</ion-button
+          >
+        </div>
+      </form>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-list>
+    <ion-item *ngFor="let it of items">
+      <ion-label>
+        <h3>{{ it.nombre }}</h3>
+        <p class="muted">{{ it.descripcion }}</p>
+        <p class="price">${{ it.precio | number: '1.2-2' }}</p>
+      </ion-label>
+      <ion-button fill="clear" color="primary" (click)="edit(it)">
+        Editar
+      </ion-button>
+      <ion-button fill="clear" color="danger" (click)="remove(it)">
+        Eliminar
+      </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>

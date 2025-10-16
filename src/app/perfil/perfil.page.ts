@@ -9,8 +9,11 @@ import {
   IonCardContent,
   IonIcon,
   IonButton,
-  AlertController, IonRefresher, IonRefresherContent, 
-RefresherEventDetail} from '@ionic/angular/standalone';
+  AlertController,
+  IonRefresher,
+  IonRefresherContent,
+  RefresherEventDetail,
+} from '@ionic/angular/standalone';
 import { BarraNavegacionComponent } from '../components/barra-navegacion/barra-navegacion.component';
 import { HeaderComponent } from '../components/header/header.component';
 import { ThemeToggleComponent } from '../components/theme-toggle/theme-toggle.component';
@@ -24,13 +27,15 @@ import {
   createOutline,
   logOutOutline,
   image,
+  cube,
 } from 'ionicons/icons';
 import User from '../Types/User';
 import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
-import { FabbtnComponent } from "../components/fabbtn/fabbtn.component";
+import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
 import { Router } from '@angular/router';
+import { AuthService, UserRole } from '../services/auth.service';
 
 @Component({
   selector: 'app-perfil',
@@ -50,10 +55,11 @@ import { Router } from '@angular/router';
     CommonModule,
     FormsModule,
     HeaderComponent,
-    FabbtnComponent
-],
+    FabbtnComponent,
+  ],
 })
 export class PerfilPage implements OnInit {
+  isEmpleado: boolean = false;
   doRefresh(event: RefresherCustomEvent) {
     setTimeout(() => {
       // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
@@ -71,14 +77,16 @@ export class PerfilPage implements OnInit {
 
   constructor(
     private alertController: AlertController,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     addIcons({
-      personOutline,
       image,
+      personOutline,
       heartOutline,
-      settingsOutline,
       chevronForwardOutline,
+      settingsOutline,
+      cube,
       createOutline,
       logOutOutline,
     });
@@ -87,6 +95,11 @@ export class PerfilPage implements OnInit {
   ngOnInit() {
     // TODO: Cargar datos de los usuarios aquí, desde el back
     this.cargarDatosUsuario();
+    // Determinar si el usuario actual es empleado o admin para mostrar opciones de gestión
+    this.isEmpleado = this.authService.hasAnyRole([
+      UserRole.EMPLEADO,
+      UserRole.SYSADMIN,
+    ]);
   }
 
   // * Métodos para cargar datos
@@ -356,6 +369,10 @@ export class PerfilPage implements OnInit {
       ],
     });
     await alert.present();
+  }
+
+  editarMenu() {
+    this.router.navigate(['/empleado/editar-menu']);
   }
 
   // * Métodos auxiliares para mostrar mensajes

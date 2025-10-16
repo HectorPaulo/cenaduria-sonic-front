@@ -21,6 +21,7 @@ import {
   IonInput,
   LoadingController,
 } from '@ionic/angular/standalone';
+import { CommonModule } from '@angular/common';
 import { AuthService, UserRole } from '../services/auth.service';
 import { addIcons } from 'ionicons';
 import {
@@ -47,6 +48,7 @@ import {
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   imports: [
+    CommonModule,
     IonInput,
     IonItem,
     IonCardSubtitle,

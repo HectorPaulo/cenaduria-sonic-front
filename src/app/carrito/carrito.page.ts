@@ -97,13 +97,6 @@ export class CarritoPage implements OnInit {
   // Métodos de pago disponibles
   metodosPago: MetodoPago[] = [
     { id: 'efectivo', nombre: 'Efectivo', icono: 'cash', disponible: true },
-    { id: 'tarjeta', nombre: 'Tarjeta', icono: 'card', disponible: true },
-    {
-      id: 'digital',
-      nombre: 'Pago Digital',
-      icono: 'wallet',
-      disponible: true,
-    },
   ];
 
   metodoSeleccionado: string = 'efectivo';

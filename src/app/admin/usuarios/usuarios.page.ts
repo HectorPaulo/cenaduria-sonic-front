@@ -12,23 +12,27 @@ import {
   IonCard,
   IonCardContent,
   IonCardHeader,
-  IonCardTitle, IonRefresher, IonRefresherContent, 
-RefresherEventDetail, IonCardSubtitle } from '@ionic/angular/standalone';
-import { HeaderComponent } from "src/app/components/header/header.component";
+  IonCardTitle,
+  IonRefresher,
+  IonRefresherContent,
+  RefresherEventDetail,
+  IonCardSubtitle,
+} from '@ionic/angular/standalone';
+import { HeaderComponent } from 'src/app/components/header/header.component';
 import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
-import { FabbtnComponent } from "src/app/components/fabbtn/fabbtn.component";
+import { FabbtnComponent } from 'src/app/components/fabbtn/fabbtn.component';
 
 @Component({
   selector: 'app-usuarios',
   templateUrl: './usuarios.page.html',
   styleUrls: ['./usuarios.page.scss'],
   standalone: true,
-  imports: [IonCardSubtitle, IonRefresherContent, IonRefresher,
+  imports: [
+    IonCardSubtitle,
+    IonRefresherContent,
+    IonRefresher,
     CommonModule,
     IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
     IonList,
     IonItem,
     IonLabel,
@@ -36,11 +40,13 @@ import { FabbtnComponent } from "src/app/components/fabbtn/fabbtn.component";
     IonCard,
     IonCardContent,
     IonCardHeader,
-    IonCardTitle,
-    HeaderComponent, FabbtnComponent],
+
+    HeaderComponent,
+    FabbtnComponent,
+  ],
 })
 export class UsuariosPage {
-doRefresh(event: RefresherCustomEvent) {
+  doRefresh(event: RefresherCustomEvent) {
     setTimeout(() => {
       // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
       event.target.complete();
