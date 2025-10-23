@@ -108,7 +108,7 @@ export class MenuPage implements OnInit {
       description: 'Cerveza perfecta para acompañar hamburguesas.',
       price: 3.49,
       image: 'assets/bebida.png',
-      tag: 'Hamburguesas',
+      tag: 'Cervezas',
       icon: '🍺',
     },
     {
@@ -116,7 +116,7 @@ export class MenuPage implements OnInit {
       description: 'Bebida tradicional perfecta con tacos.',
       price: 2.99,
       image: 'assets/bebida.png',
-      tag: 'Tacos',
+      tag: 'Aguas frescas',
       icon: '🥛',
     },
     {
@@ -132,7 +132,7 @@ export class MenuPage implements OnInit {
       description: 'Vino que complementa perfectamente los platos fuertes.',
       price: 4.99,
       image: 'assets/bebida.png',
-      tag: 'Platos fuertes',
+      tag: 'Vinos',
       icon: '🍷',
     },
     {
@@ -140,7 +140,7 @@ export class MenuPage implements OnInit {
       description: 'Jugo fresco de frutas naturales, sin conservadores.',
       price: 2.49,
       image: 'assets/bebida.png',
-      tag: 'Bebidas',
+      tag: 'Jugos',
       icon: '🧃',
     },
   ];

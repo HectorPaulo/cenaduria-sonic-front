@@ -1,0 +1,783 @@
+{
+	"info": {
+		"_postman_id": "97de529e-4248-49d5-b839-a9411a984641",
+		"name": "FOODTRUCK",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "36910961",
+		"_collection_link": "https://equipo-9631.postman.co/workspace/Team-Workspace~3c7c8a49-8308-40b5-8b31-d4433ff53e1c/collection/36910961-97de529e-4248-49d5-b839-a9411a984641?action=share&source=collection_link&creator=36910961"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Registrar un nuevo usuario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"jonhdoe\",\r\n    \"name\" : \"Jonh Doe\",\r\n    \"email\": \"jonhdoe@foodtruck.com\",\r\n    \"password\": \"Password123#\",\r\n    \"roles\": [\"ROLE_USER\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8081/api/auth/register"
+					},
+					"response": []
+				},
+				{
+					"name": "Refrescar token JWT",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"refreshToken\" : \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb25oZG9lIiwiaWF0IjoxNzYwODIyOTE5LCJleHAiOjE3NjE0Mjc3MTl9.r8oJlc9AYa0BuDEz1t7JaucHObWV-VLYXrN_lr-nnqQ\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8081/api/auth/refresh"
+					},
+					"response": []
+				},
+				{
+					"name": "Cerrar sesión",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwic3ViIjoiam9uaGRvZSIsImlhdCI6MTc2MDgyMjkxOSwiZXhwIjoxNzYwODI2NTE5fQ.OwUL8XF6JbFoJWC65u4_JaZ2hxr3xAhUgQ6bR7G9xUQ"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"url": "localhost:8081/api/auth/logout"
+					},
+					"response": []
+				},
+				{
+					"name": "Iniciar sesión​",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwic3ViIjoiam9uaGRvZSIsImlhdCI6MTc2MDgyMjkxOSwiZXhwIjoxNzYwODI2NTE5fQ.OwUL8XF6JbFoJWC65u4_JaZ2hxr3xAhUgQ6bR7G9xUQ"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\" : \"devdaniel\",\r\n    \"password\" : \"Password123#\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8081/api/auth/login"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Perfil del Usuario",
+			"item": [
+				{
+					"name": "Actualizar foto de perfil​",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwic3ViIjoiam9uaGRvZSIsImlhdCI6MTc2MDg1MDA3MiwiZXhwIjoxNzYwODUzNjcyfQ.QkP0zl4-6gQJV0l5yNbXkf4Q4pfSHb_fiEhKAMsShIE"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "avatar",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/Daniel Santiago/Downloads/istockphoto-1682296067-612x612.jpg"
+								}
+							]
+						},
+						"url": "localhost:8081/api/profile/avatar"
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar contraseña​",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwic3ViIjoiam9uaGRvZSIsImlhdCI6MTc2MDgyMzQ1OCwiZXhwIjoxNzYwODI3MDU4fQ.P956vgHTYzbC9RCm5sEkL-PehIMPy3uY6kRXn7YSbgQ"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"currentPassword\" : \"Password123##\",\r\n    \"newPassword\" : \"Password123#\",\r\n    \"confirmNewPassword\" : \"Password123#\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8081/api/profile/password"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener perfil de usuario​",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg1MDY1OSwiZXhwIjoxNzYwODU0MjU5fQ.QC-XWzGiTDakmI0J4m8eLqELyrpcH5i4nYXl8BkHiDg"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\" : \"jonhdoe\",\r\n    \"password\" : \"Password123#\"\r\n}"
+						},
+						"url": "localhost:8081/api/profile"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Categorías",
+			"item": [
+				{
+					"name": "Crear nueva categoría",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDgzMTM3NiwiZXhwIjoxNzYwODM0OTc2fQ.rsD9PVHpvEGJ9tS1K7DUyZdhUAPPUCAoSKHB8IcFAU8"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "avatar",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"Dulces\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8081/api/categories"
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar categoría",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDgzMTM3NiwiZXhwIjoxNzYwODM0OTc2fQ.rsD9PVHpvEGJ9tS1K7DUyZdhUAPPUCAoSKHB8IcFAU8"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "avatar",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"Dulces\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8081/api/categories/11"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar categoría​",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDgzMTM3NiwiZXhwIjoxNzYwODM0OTc2fQ.rsD9PVHpvEGJ9tS1K7DUyZdhUAPPUCAoSKHB8IcFAU8"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "localhost:8081/api/categories/11"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener categoría por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDgzMTM3NiwiZXhwIjoxNzYwODM0OTc2fQ.rsD9PVHpvEGJ9tS1K7DUyZdhUAPPUCAoSKHB8IcFAU8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/categories/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener todas las categorías",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDgzMTM3NiwiZXhwIjoxNzYwODM0OTc2fQ.rsD9PVHpvEGJ9tS1K7DUyZdhUAPPUCAoSKHB8IcFAU8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/categories"
+					},
+					"response": []
+				},
+				{
+					"name": "Contar productos de una categoría",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDgzMTM3NiwiZXhwIjoxNzYwODM0OTc2fQ.rsD9PVHpvEGJ9tS1K7DUyZdhUAPPUCAoSKHB8IcFAU8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/categories/1/products/count"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener categoría con productos detallados",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDgzMTM3NiwiZXhwIjoxNzYwODM0OTc2fQ.rsD9PVHpvEGJ9tS1K7DUyZdhUAPPUCAoSKHB8IcFAU8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/categories/1/detailed"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener categorías vacías​",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDgzMTM3NiwiZXhwIjoxNzYwODM0OTc2fQ.rsD9PVHpvEGJ9tS1K7DUyZdhUAPPUCAoSKHB8IcFAU8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/categories/without-products"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener categorías con productos​",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDgzMTM3NiwiZXhwIjoxNzYwODM0OTc2fQ.rsD9PVHpvEGJ9tS1K7DUyZdhUAPPUCAoSKHB8IcFAU8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/categories/with-products"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener categorías con productos activos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDgzMTM3NiwiZXhwIjoxNzYwODM0OTc2fQ.rsD9PVHpvEGJ9tS1K7DUyZdhUAPPUCAoSKHB8IcFAU8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/categories/with-active-products"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar categorías por nombre",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDgzMTM3NiwiZXhwIjoxNzYwODM0OTc2fQ.rsD9PVHpvEGJ9tS1K7DUyZdhUAPPUCAoSKHB8IcFAU8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8081/api/categories/search?name=ham",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"categories",
+								"search"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "ham"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar categoría por nombre exacto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDgzMTM3NiwiZXhwIjoxNzYwODM0OTc2fQ.rsD9PVHpvEGJ9tS1K7DUyZdhUAPPUCAoSKHB8IcFAU8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/categories/name/Hamburguesas"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Productos",
+			"item": [
+				{
+					"name": "Crear un nuevo producto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NTAxNSwiZXhwIjoxNzYwODQ4NjE1fQ.1ssEOmcQi-g4sXAORvuRqhsACC4w5_n9k8PqKC0syGU"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Hamburguesa BBQ",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "139.99",
+									"type": "text"
+								},
+								{
+									"key": "categoryId",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/Daniel Santiago/Downloads/bbq-chedar-burger.jpg"
+								}
+							]
+						},
+						"url": "localhost:8081/api/products"
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar producto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NTAxNSwiZXhwIjoxNzYwODQ4NjE1fQ.1ssEOmcQi-g4sXAORvuRqhsACC4w5_n9k8PqKC0syGU"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"price\" : 139.99\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8081/api/products/32"
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar estado del producto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NTAxNSwiZXhwIjoxNzYwODQ4NjE1fQ.1ssEOmcQi-g4sXAORvuRqhsACC4w5_n9k8PqKC0syGU"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"price\" : 139.99\r\n}"
+						},
+						"url": {
+							"raw": "localhost:8081/api/products/32/status?active=true",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"products",
+								"32",
+								"status"
+							],
+							"query": [
+								{
+									"key": "active",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar imagen del producto",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NTAxNSwiZXhwIjoxNzYwODQ4NjE1fQ.1ssEOmcQi-g4sXAORvuRqhsACC4w5_n9k8PqKC0syGU"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/Daniel Santiago/Downloads/front-view-burger-on-stand-scaled.jpg"
+								}
+							]
+						},
+						"url": "localhost:8081/api/products/32/image"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar producto",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "localhost:8081/api/products/33"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener producto por ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NTAxNSwiZXhwIjoxNzYwODQ4NjE1fQ.1ssEOmcQi-g4sXAORvuRqhsACC4w5_n9k8PqKC0syGU"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"price\" : 139.99\r\n}"
+						},
+						"url": "localhost:8081/api/products/32"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener producto activo por ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NzUzNywiZXhwIjoxNzYwODUxMTM3fQ.sYxNPccSBTOkeRkUPgS-11vKbLDDAjOsXlT6mUPKHCc"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/products/32/active"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar productos por nombre​",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NzUzNywiZXhwIjoxNzYwODUxMTM3fQ.sYxNPccSBTOkeRkUPgS-11vKbLDDAjOsXlT6mUPKHCc"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8081/api/products/search?name=ham",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"products",
+								"search"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "ham"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Búsqueda avanzada de productos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NzUzNywiZXhwIjoxNzYwODUxMTM3fQ.sYxNPccSBTOkeRkUPgS-11vKbLDDAjOsXlT6mUPKHCc"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8081/api/products/search/advanced?name=hor&categoryId=4",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"products",
+								"search",
+								"advanced"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "hor"
+								},
+								{
+									"key": "categoryId",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar productos activos por nombre​",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NzUzNywiZXhwIjoxNzYwODUxMTM3fQ.sYxNPccSBTOkeRkUPgS-11vKbLDDAjOsXlT6mUPKHCc"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8081/api/products/search/active?name=ha",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"products",
+								"search",
+								"active"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "ha"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener productos por categoría",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NzUzNywiZXhwIjoxNzYwODUxMTM3fQ.sYxNPccSBTOkeRkUPgS-11vKbLDDAjOsXlT6mUPKHCc"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/products/category/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Contar productos por categoría",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NzUzNywiZXhwIjoxNzYwODUxMTM3fQ.sYxNPccSBTOkeRkUPgS-11vKbLDDAjOsXlT6mUPKHCc"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/products/category/1/count"
+					},
+					"response": []
+				},
+				{
+					"name": "Contar productos activos por categoría",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NzUzNywiZXhwIjoxNzYwODUxMTM3fQ.sYxNPccSBTOkeRkUPgS-11vKbLDDAjOsXlT6mUPKHCc"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/products/category/1/count/active"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener productos activos por categoría​",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NzUzNywiZXhwIjoxNzYwODUxMTM3fQ.sYxNPccSBTOkeRkUPgS-11vKbLDDAjOsXlT6mUPKHCc"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/products/category/2/active"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener todos los productos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NzUzNywiZXhwIjoxNzYwODUxMTM3fQ.sYxNPccSBTOkeRkUPgS-11vKbLDDAjOsXlT6mUPKHCc"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/products/all"
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener todos los productos activos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sInN1YiI6ImRldmRhbmllbCIsImlhdCI6MTc2MDg0NzUzNywiZXhwIjoxNzYwODUxMTM3fQ.sYxNPccSBTOkeRkUPgS-11vKbLDDAjOsXlT6mUPKHCc"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8081/api/products/active"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
