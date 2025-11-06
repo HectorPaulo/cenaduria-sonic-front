@@ -1,10 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, Inject, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
   IonCard,
   IonCardContent,
   IonCardHeader,
@@ -12,9 +9,7 @@ import {
   IonButton,
   IonIcon,
   IonText,
-  IonRefresher,
   RefresherEventDetail,
-  IonRefresherContent,
   ToastController,
   IonCardSubtitle,
   IonItem,
@@ -35,13 +30,14 @@ import {
   informationCircle,
 } from 'ionicons/icons';
 import { IonRefresherCustomEvent } from '@ionic/core';
-import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { Usuarios } from '../services/usuarios.service';
+import { HttpAuthService } from '../services/http-auth.service';
 
 @Component({
   selector: 'app-login',
@@ -63,7 +59,7 @@ import {
     ReactiveFormsModule,
   ],
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
   loginForm: FormGroup;
 
   doRefresh($event: IonRefresherCustomEvent<RefresherEventDetail>) {
@@ -71,6 +67,8 @@ export class LoginPage {
   }
   private authService = inject(AuthService);
   private router = inject(Router);
+  private usuarios = inject(Usuarios);
+  private httpAuth = inject(HttpAuthService);
 
   UserRole = UserRole;
 
@@ -79,6 +77,11 @@ export class LoginPage {
     private toastController: ToastController,
     private loadingController: LoadingController
   ) {
+    try {
+      console.debug('[LoginPage] diagnostics', this.httpAuth.getDiagnostics());
+    } catch (e) {
+      console.debug('[LoginPage] diagnostics unavailable', e);
+    }
     addIcons({
       mail,
       key,
@@ -91,18 +94,25 @@ export class LoginPage {
     });
 
     this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/),
+        ],
+      ],
     });
   }
 
-  getEmailErrorMessage(): string {
-    const emailControl = this.loginForm.get('email');
-    if (emailControl?.hasError('required')) {
-      return 'El correo electrónico es obligatorio';
+  getUsernameErrorMessage(): string {
+    const usernameControl = this.loginForm.get('username');
+    if (usernameControl?.hasError('required')) {
+      return 'El nombre de usuario es obligatorio';
     }
-    if (emailControl?.hasError('email')) {
-      return 'Ingresa un correo electrónico válido';
+    if (usernameControl?.hasError('minlength')) {
+      return 'El nombre de usuario debe tener al menos 3 caracteres';
     }
     return '';
   }
@@ -146,28 +156,17 @@ export class LoginPage {
     toast.present();
   }
 
-  // Credenciales temporales para testing
   private validCredentials = {
-    // Cliente
-    'cliente@cenaduria.com': {
-      password: 'Cliente123!',
-      role: UserRole.CLIENTE,
-    },
-    'customer@sonic.com': { password: 'Customer1!', role: UserRole.CLIENTE },
+    cliente: { password: 'Cliente123!', role: UserRole.CLIENTE },
+    customer: { password: 'Customer1!', role: UserRole.CLIENTE },
 
-    // Empleado
-    'empleado@cenaduria.com': {
-      password: 'Empleado123!',
-      role: UserRole.EMPLEADO,
-    },
-    'worker@sonic.com': { password: 'Worker123!', role: UserRole.EMPLEADO },
+    empleado: { password: 'Empleado123!', role: UserRole.EMPLEADO },
+    worker: { password: 'Worker123!', role: UserRole.EMPLEADO },
 
-    // Administrador
-    'admin@cenaduria.com': { password: 'Admin123!', role: UserRole.SYSADMIN },
-    'sysadmin@sonic.com': { password: 'SysAdmin1!', role: UserRole.SYSADMIN },
+    admin: { password: 'Admin123!', role: UserRole.SYSADMIN },
+    sysadmin: { password: 'SysAdmin1!', role: UserRole.SYSADMIN },
   };
 
-  // Método para iniciar sesión con credenciales del formulario
   async onLogin() {
     if (!this.loginForm.valid) {
       await this.showToast(
@@ -177,43 +176,59 @@ export class LoginPage {
       return;
     }
 
-    const email = this.loginForm.get('email')?.value;
+    const username = this.loginForm.get('username')?.value;
     const password = this.loginForm.get('password')?.value;
 
-    // Mostrar loading
     const loading = await this.loadingController.create({
       message: 'Iniciando sesión...',
       duration: 1500,
     });
     await loading.present();
 
-    // Simular delay de red
-    setTimeout(async () => {
-      await loading.dismiss();
+    this.authService.loginRemote(username, password).subscribe({
+      next: async (user) => {
+        await loading.dismiss();
 
-      // Verificar credenciales
-      const validUser =
-        this.validCredentials[email as keyof typeof this.validCredentials];
+        if (!user) {
+          await this.showToast('Credenciales incorrectas', 'danger');
+          return;
+        }
 
-      if (validUser && validUser.password === password) {
-        await this.showToast(
-          `¡Bienvenido! Iniciando sesión como ${this.getRoleName(
-            validUser.role
-          )}`,
-          'success'
-        );
-        await this.authService.login(validUser.role);
-        this.navigateToRole(validUser.role);
-      } else {
-        await this.showToast(
-          'Credenciales incorrectas. Verifica tu email y contraseña.',
-          'danger'
-        );
-      }
-    }, 1000);
+        const role = user.role as unknown as string;
+        if (role === UserRole.CLIENTE || role === 'cliente') {
+          this.navigateToRole(UserRole.CLIENTE);
+        } else if (role === UserRole.EMPLEADO || role === 'empleado') {
+          this.navigateToRole(UserRole.EMPLEADO);
+        } else if (role === UserRole.SYSADMIN || role === 'sysadmin') {
+          this.navigateToRole(UserRole.SYSADMIN);
+        } else {
+          this.navigateToRole(UserRole.CLIENTE);
+        }
+      },
+      error: async (err) => {
+        await loading.dismiss();
+        console.error('[LoginPage] login error', err);
+        let message = 'Credenciales incorrectas';
+        if (
+          err instanceof ProgressEvent ||
+          err?.message === 'Failed to fetch' ||
+          err?.status === 0
+        ) {
+          message =
+            'Error de red: no se pudo conectar al backend. Revisa que el servidor esté arriba y la URL en environment.BASE_URL.';
+        } else if (err?.error?.message) {
+          message = err.error.message;
+        } else if (err?.status) {
+          message = `Error ${err.status}: ${
+            err.statusText || 'Unexpected error'
+          }`;
+        }
+
+        await this.showToast(message, 'danger');
+      },
+    });
   }
 
-  // Método auxiliar para obtener el nombre del rol
   private getRoleName(role: UserRole): string {
     switch (role) {
       case UserRole.CLIENTE:
@@ -227,7 +242,6 @@ export class LoginPage {
     }
   }
 
-  // Método auxiliar para navegar según el rol
   private navigateToRole(role: UserRole) {
     switch (role) {
       case UserRole.CLIENTE:
@@ -248,6 +262,27 @@ export class LoginPage {
       this.navigateToRole(role);
     } catch (error) {
       console.error('Error during login:', error);
+    }
+  }
+
+  ngOnInit(): void {
+    try {
+      const token = localStorage.getItem('access_token');
+      const logged = this.authService.isLoggedIn();
+      console.debug(
+        '[LoginPage] ngOnInit auto-login check, token?',
+        !!token,
+        'logged?',
+        logged
+      );
+      if (token && logged) {
+        const role = this.authService.getUserRole();
+        if (role) {
+          this.navigateToRole(role);
+        }
+      }
+    } catch (e) {
+      console.error('[LoginPage] auto-login check failed', e);
     }
   }
 }

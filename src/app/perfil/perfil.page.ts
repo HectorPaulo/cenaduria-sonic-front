@@ -12,15 +12,11 @@ import {
   AlertController,
   IonRefresher,
   IonRefresherContent,
-  RefresherEventDetail,
 } from '@ionic/angular/standalone';
-import { BarraNavegacionComponent } from '../components/barra-navegacion/barra-navegacion.component';
 import { HeaderComponent } from '../components/header/header.component';
-import { ThemeToggleComponent } from '../components/theme-toggle/theme-toggle.component';
 import { addIcons } from 'ionicons';
 import {
   personOutline,
-  camera,
   heartOutline,
   settingsOutline,
   chevronForwardOutline,
@@ -31,8 +27,7 @@ import {
 } from 'ionicons/icons';
 import User from '../Types/User';
 import { Capacitor } from '@capacitor/core';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
+import { RefresherCustomEvent } from '@ionic/core';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
 import { Router } from '@angular/router';
 import { AuthService, UserRole } from '../services/auth.service';
@@ -170,34 +165,7 @@ export class PerfilPage implements OnInit {
   // }
 
   async seleccionarDeGaleria() {
-    try {
-      // Verificar si estamos en un dispositivo con galería
-      if (!Capacitor.isPluginAvailable('Camera')) {
-        this.mostrarError('La galería no está disponible en este dispositivo');
-        return;
-      }
-
-      const image = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: true,
-        resultType: CameraResultType.DataUrl,
-        source: CameraSource.Photos,
-        width: 300,
-        height: 300,
-      });
-
-      if (image.dataUrl) {
-        // Actualizar la foto del usuario
-        this.usuario.avatar = image.dataUrl;
-
-        // Aquí guardarías la imagen en el servidor
-        console.log('Nueva foto seleccionada de galería');
-        this.mostrarExito('Foto de perfil actualizada correctamente');
-      }
-    } catch (error) {
-      console.error('Error al seleccionar foto:', error);
-      this.mostrarError('Error al acceder a la galería');
-    }
+    console.log("Por implementar");
   }
 
   async editarNombre() {

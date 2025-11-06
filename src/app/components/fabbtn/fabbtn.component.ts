@@ -27,7 +27,7 @@ import { AuthService, UserRole } from 'src/app/services/auth.service';
   selector: 'app-fabbtn',
   templateUrl: './fabbtn.component.html',
   styleUrls: ['./fabbtn.component.scss'],
-  imports: [CommonModule, IonIcon, IonFabList, IonFab, IonFabButton],
+  imports: [CommonModule],
 })
 export class FabbtnComponent implements OnInit {
   private router = inject(Router);

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -12,8 +12,6 @@ import {
   IonButton,
   IonIcon,
   IonLabel,
-  IonCol,
-  IonText,
   IonRefresher,
   IonRefresherContent,
 } from '@ionic/angular/standalone';
@@ -21,6 +19,8 @@ import { addIcons } from 'ionicons';
 import { add, cart, search, close } from 'ionicons/icons';
 import Alimento from '../Types/Pedido';
 import Recomendacion from '../Types/Recomendacion';
+import { Subscription } from 'rxjs';
+import { ComidasService } from '../services/comidas.service';
 import { RefresherCustomEvent } from '@ionic/core';
 import { HeaderComponent } from '../components/header/header.component';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
@@ -50,6 +50,7 @@ import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
   ],
 })
 export class MenuPage implements OnInit {
+  private itemsSub?: Subscription;
   filtroActivo: string = '';
   comidasFiltradas: Alimento[] = [];
   bebidasFiltradas: Alimento[] = [];
@@ -61,34 +62,8 @@ export class MenuPage implements OnInit {
       event.target.complete();
     }, 2000);
   }
-  comidas: Alimento[] = [
-    {
-      name: 'Albóndigas Clásicas',
-      description: 'Jugosas albóndigas de res con salsa de tomate y especias.',
-      price: 8.99,
-      image: 'assets/comida.png',
-      tag: 'Platos fuertes',
-      icon: '🍽️',
-    },
-    {
-      name: 'Hamburguesa con Queso',
-      description:
-        'Hamburguesa de res con queso cheddar, lechuga, tomate y cebolla.',
-      price: 7.99,
-      image: 'assets/burgers.png',
-      tag: 'Hamburguesas',
-      icon: '🍔',
-    },
-    {
-      name: 'Tacos',
-      description: 'Tacos de carne asada con cebolla, cilantro y salsa.',
-      price: 7.99,
-      image: 'assets/tacos.png',
-      tag: 'Tacos',
-      icon: '🌮',
-    },
-  ];
-  // Categorías dinámicas basadas en los datos reales
+
+  comidas: Alimento[] = [];
   categoriasComida: Recomendacion[] = [];
   categoriasBebida: Recomendacion[] = [];
   todasCategorias: Recomendacion[] = [];
@@ -153,36 +128,51 @@ export class MenuPage implements OnInit {
     this.pedidos.push(pedido);
   }
 
-  constructor() {
+  constructor(private comidasService: ComidasService) {
     addIcons({ search, cart, add, close });
   }
 
   ngOnInit() {
-    // Inicializar los arrays filtrados con todos los elementos
-    this.comidasFiltradas = [...this.comidas];
-    this.bebidasFiltradas = [...this.bebidas];
-
-    // Generar categorías dinámicas
-    this.generarCategorias();
+    this.itemsSub = this.comidasService.items$.subscribe((items) => {
+      console.debug('ComidasService emitted items:', items);
+      this.comidas = items;
+      this.comidasFiltradas = [...this.comidas];
+      this.bebidasFiltradas = [...this.bebidas];
+      this.generarCategorias();
+      this.cargarDesdeApi();
+    });
   }
 
-  // Generar categorías basadas en los datos
+  ngOnDestroy() {
+    this.itemsSub?.unsubscribe();
+  }
+
+  cargarDesdeApi() {
+    console.debug('Intentando cargar comidas desde API...');
+    this.comidasService.loadFromApi().subscribe({
+      next: (items) => {
+        console.debug('Respuesta API comidas:', items);
+        this.comidasService.setItems(items);
+      },
+      error: (err) => {
+        console.error('Error al cargar comidas desde API:', err);
+      },
+    });
+  }
+
   generarCategorias() {
-    // Categorías únicas de comida
     const categoriasComidaUnicas = [...new Set(this.comidas.map((c) => c.tag))];
     this.categoriasComida = categoriasComidaUnicas.map((tag) => {
       const comida = this.comidas.find((c) => c.tag === tag);
       return { name: tag, icon: comida?.icon || '🍽️' };
     });
 
-    // Categorías únicas de bebidas
     const categoriasBebidaUnicas = [...new Set(this.bebidas.map((b) => b.tag))];
     this.categoriasBebida = categoriasBebidaUnicas.map((tag) => {
       const bebida = this.bebidas.find((b) => b.tag === tag);
       return { name: tag, icon: bebida?.icon || '🥤' };
     });
 
-    // Todas las categorías con la opción "Todos"
     this.todasCategorias = [
       { name: 'Todos', icon: '🌟' },
       ...this.categoriasComida,
@@ -190,7 +180,6 @@ export class MenuPage implements OnInit {
     ];
   }
 
-  // Método para filtrar por categoría
   filtrarPorCategoria(categoria: string) {
     this.filtroActivo = categoria;
 
@@ -199,12 +188,10 @@ export class MenuPage implements OnInit {
       return;
     }
 
-    // Filtrar comidas por tag
     this.comidasFiltradas = this.comidas.filter((comida) =>
       comida.tag.toLowerCase().includes(categoria.toLowerCase())
     );
 
-    // Filtrar bebidas por tag
     this.bebidasFiltradas = this.bebidas.filter((bebida) =>
       bebida.tag.toLowerCase().includes(categoria.toLowerCase())
     );
@@ -214,14 +201,12 @@ export class MenuPage implements OnInit {
     console.log('Bebidas filtradas:', this.bebidasFiltradas.length);
   }
 
-  // Método para resetear filtros y mostrar todo
   resetearFiltros() {
     this.filtroActivo = '';
     this.comidasFiltradas = [...this.comidas];
     this.bebidasFiltradas = [...this.bebidas];
   }
 
-  // Método para verificar si hay elementos filtrados
   hayElementosFiltrados(): boolean {
     return this.comidasFiltradas.length > 0 || this.bebidasFiltradas.length > 0;
   }

@@ -7,7 +7,7 @@
 
     <div class="form-section">
       <!-- Card informativo con credenciales de prueba -->
-      <ion-card class="info-card" color="light">
+      <!-- <ion-card class="info-card" color="light">
         <ion-card-header>
           <ion-card-title>
             <ion-icon name="information-circle" color="primary"></ion-icon>
@@ -16,14 +16,12 @@
         </ion-card-header>
         <ion-card-content>
           <div class="credentials-info">
-            <p><strong>Cliente:</strong> cliente@cenaduria.com | Cliente123!</p>
-            <p>
-              <strong>Empleado:</strong> empleado@cenaduria.com | Empleado123!
-            </p>
-            <p><strong>Admin:</strong> admin@cenaduria.com | Admin123!</p>
+            <p><strong>Cliente:</strong> cliente | Cliente123!</p>
+            <p><strong>Empleado:</strong> empleado | Empleado123!</p>
+            <p><strong>Admin:</strong> admin | Admin123!</p>
           </div>
         </ion-card-content>
-      </ion-card>
+      </ion-card> -->
 
       <ion-card class="registro-card">
         <ion-card-header>
@@ -35,24 +33,25 @@
 
         <ion-card-content>
           <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-            <ion-item [class.error-item]="isFieldInvalid('email')">
-              <ion-icon name="mail" slot="start" color="primary"></ion-icon>
+            <ion-item [class.error-item]="isFieldInvalid('username')">
+              <ion-icon name="person" slot="start" color="primary"></ion-icon>
               <ion-input
-                formControlName="email"
-                label="Correo electrónico"
+                formControlName="username"
+                label="Nombre de usuario"
                 labelPlacement="floating"
-                placeholder="ejemplo@correo.com"
-                type="email"
+                placeholder="tu nombre de usuario"
+                type="text"
               ></ion-input>
             </ion-item>
-            <ion-text
+            @if (isFieldInvalid('username')) {
+
+              <ion-text
               color="danger"
               class="error-text"
-              *ngIf="isFieldInvalid('email')"
-            >
-              {{ getEmailErrorMessage() }}
+              >
+              {{ getUsernameErrorMessage() }}
             </ion-text>
-
+          }
             <ion-item [class.error-item]="isFieldInvalid('password')">
               <ion-icon name="key" slot="start" color="primary"></ion-icon>
               <ion-input
@@ -63,13 +62,14 @@
                 type="text"
               ></ion-input>
             </ion-item>
-            <ion-text
+            @if (isFieldInvalid('password')) {
+              <ion-text
               color="danger"
               class="error-text"
-              *ngIf="isFieldInvalid('password')"
-            >
+              >
               {{ getPasswordErrorMessage() }}
             </ion-text>
+          }
 
             <div style="text-align: right; margin: 10px 0">
               <ion-button

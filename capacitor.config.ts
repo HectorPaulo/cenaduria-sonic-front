@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'CenaduriaSonic',
   webDir: 'www',
   server: {
-    url: 'http://175.1.54.122:8100',
+    url: 'http://192.168.0.9:8100',
     cleartext: true,
   }
 };

@@ -70,3 +70,7 @@ testem.log
 Thumbs.db
 
 .fakefirebase-credentials.json
+
+# Local environment files and service account credentials
+.env
+firebase-credentials.json

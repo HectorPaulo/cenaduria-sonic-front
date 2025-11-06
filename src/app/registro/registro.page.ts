@@ -74,7 +74,6 @@ export class RegistroPage implements OnInit {
 
   ngOnInit() {}
 
-  // Método para obtener mensaje de error del email
   getEmailErrorMessage(): string {
     const emailControl = this.registroForm.get('email');
     if (emailControl?.hasError('required')) {
@@ -86,7 +85,6 @@ export class RegistroPage implements OnInit {
     return '';
   }
 
-  // Método para obtener mensaje de error de la contraseña
   getPasswordErrorMessage(): string {
     const passwordControl = this.registroForm.get('password');
     if (passwordControl?.hasError('required')) {
@@ -104,7 +102,6 @@ export class RegistroPage implements OnInit {
     return '';
   }
 
-  // Método para obtener mensaje de error de confirmar contraseña
   getConfirmPasswordErrorMessage(): string {
     const confirmPasswordControl = this.registroForm.get('confirmPassword');
     if (confirmPasswordControl?.hasError('required')) {
