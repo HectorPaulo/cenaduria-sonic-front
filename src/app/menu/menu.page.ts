@@ -51,6 +51,7 @@ import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
 })
 export class MenuPage implements OnInit {
   private itemsSub?: Subscription;
+  private categoriesSub?: Subscription;
   filtroActivo: string = '';
   comidasFiltradas: Alimento[] = [];
   bebidasFiltradas: Alimento[] = [];
@@ -139,12 +140,27 @@ export class MenuPage implements OnInit {
       this.comidasFiltradas = [...this.comidas];
       this.bebidasFiltradas = [...this.bebidas];
       this.generarCategorias();
-      this.cargarDesdeApi();
     });
+
+    // Suscribir a categorías que provea el servicio (desde /api/categories)
+    this.categoriesSub = this.comidasService.categories$.subscribe((cats) => {
+      console.debug('ComidasService emitted categories:', cats);
+      if (cats && cats.length > 0) {
+        this.todasCategorias = [{ name: 'Todos', icon: '🌟' }, ...cats];
+      } else {
+        // si no hay categorías del backend, recalcular localmente
+        this.generarCategorias();
+      }
+    });
+
+    // Cargar datos desde API
+    this.cargarDesdeApi();
+    this.cargarCategoriasDesdeApi();
   }
 
   ngOnDestroy() {
     this.itemsSub?.unsubscribe();
+    this.categoriesSub?.unsubscribe();
   }
 
   cargarDesdeApi() {
@@ -160,7 +176,35 @@ export class MenuPage implements OnInit {
     });
   }
 
+  cargarCategoriasDesdeApi() {
+    console.debug('Intentando cargar categorías desde API...');
+    this.comidasService.loadCategories().subscribe({
+      next: (res) => {
+        try {
+          const cats: Recomendacion[] = (res || []).map((c: any) => ({
+            name: c.name || c.title || String(c),
+            icon: '🫓',
+          }));
+          this.comidasService.setCategories(cats);
+        } catch (e) {
+          console.error('Error mapeando categories response', e);
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar categorías desde API:', err);
+      },
+    });
+  }
+
   generarCategorias() {
+    const backendCats = this.comidasService.getCategories();
+    if (backendCats && backendCats.length > 0) {
+      this.categoriasComida = backendCats;
+      this.categoriasBebida = [];
+      this.todasCategorias = [{ name: 'Todos', icon: '🌟' }, ...backendCats];
+      return;
+    }
+
     const categoriasComidaUnicas = [...new Set(this.comidas.map((c) => c.tag))];
     this.categoriasComida = categoriasComidaUnicas.map((tag) => {
       const comida = this.comidas.find((c) => c.tag === tag);

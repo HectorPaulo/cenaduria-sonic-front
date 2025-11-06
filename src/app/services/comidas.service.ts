@@ -3,16 +3,27 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import Alimento from '../Types/Pedido';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import Recomendacion from '../Types/Recomendacion';
 
 @Injectable({ providedIn: 'root' })
 export class ComidasService {
   private _items = new BehaviorSubject<Alimento[]>([]);
   public items$ = this._items.asObservable();
+  private _categories = new BehaviorSubject<Recomendacion[]>([]);
+  public categories$ = this._categories.asObservable();
 
   constructor(private http: HttpClient) {}
 
   getItems(): Alimento[] {
     return this._items.getValue();
+  }
+
+  getCategories(): Recomendacion[] {
+    return this._categories.getValue();
+  }
+
+  setCategories(categories: Recomendacion[]) {
+    this._categories.next(categories);
   }
 
   setItems(items: Alimento[]) {
@@ -60,9 +71,16 @@ export class ComidasService {
     const token = localStorage.getItem('access_token');
     const response = this.http.get<Alimento[]>(url, {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
+    console.log('Token: ', token);
+    console.debug('Respuesta API comidas:', response);
     return response;
+  }
+
+  loadCategories(): Observable<any> {
+    const url = `${environment.BASE_URL}/api/categories`;
+    return this.http.get<any>(url);
   }
 }
