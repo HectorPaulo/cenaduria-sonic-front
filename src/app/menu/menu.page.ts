@@ -17,13 +17,13 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, cart, search, close } from 'ionicons/icons';
-import Alimento from '../Types/Pedido';
 import Recomendacion from '../Types/Recomendacion';
 import { Subscription } from 'rxjs';
 import { ComidasService } from '../services/comidas.service';
 import { RefresherCustomEvent } from '@ionic/core';
 import { HeaderComponent } from '../components/header/header.component';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
+import { Alimento } from '../Types/Alimento';
 
 @Component({
   selector: 'app-menu',
@@ -70,56 +70,56 @@ export class MenuPage implements OnInit {
   todasCategorias: Recomendacion[] = [];
   pedidos: Alimento[] = [];
   listaComidas: Alimento[] = [];
-  bebidas: Alimento[] = [
-    {
-      name: 'Refresco de Cola',
-      description: 'Bebida carbonatada con sabor a cola, refrescante y dulce.',
-      price: 1.99,
-      image: 'assets/bebida.png',
-      tag: 'Bebidas',
-      icon: '🥤',
-    },
-    {
-      name: 'Cerveza Artesanal',
-      description: 'Cerveza perfecta para acompañar hamburguesas.',
-      price: 3.49,
-      image: 'assets/bebida.png',
-      tag: 'Cervezas',
-      icon: '🍺',
-    },
-    {
-      name: 'Horchata',
-      description: 'Bebida tradicional perfecta con tacos.',
-      price: 2.99,
-      image: 'assets/bebida.png',
-      tag: 'Aguas frescas',
-      icon: '🥛',
-    },
-    {
-      name: 'Agua Mineral',
-      description: 'Agua con gas, ligera y burbujeante.',
-      price: 1.49,
-      image: 'assets/agua.png',
-      tag: 'Bebidas',
-      icon: '💧',
-    },
-    {
-      name: 'Vino Tinto',
-      description: 'Vino que complementa perfectamente los platos fuertes.',
-      price: 4.99,
-      image: 'assets/bebida.png',
-      tag: 'Vinos',
-      icon: '🍷',
-    },
-    {
-      name: 'Jugo Natural',
-      description: 'Jugo fresco de frutas naturales, sin conservadores.',
-      price: 2.49,
-      image: 'assets/bebida.png',
-      tag: 'Jugos',
-      icon: '🧃',
-    },
-  ];
+  // bebidas: Alimento[] = [
+  //   {
+  //     name: 'Refresco de Cola',
+  //     description: 'Bebida carbonatada con sabor a cola, refrescante y dulce.',
+  //     price: 1.99,
+  //     image: 'assets/bebida.png',
+  //     tag: 'Bebidas',
+  //     icon: '🥤',
+  //   },
+  //   {
+  //     name: 'Cerveza Artesanal',
+  //     description: 'Cerveza perfecta para acompañar hamburguesas.',
+  //     price: 3.49,
+  //     image: 'assets/bebida.png',
+  //     tag: 'Cervezas',
+  //     icon: '🍺',
+  //   },
+  //   {
+  //     name: 'Horchata',
+  //     description: 'Bebida tradicional perfecta con tacos.',
+  //     price: 2.99,
+  //     image: 'assets/bebida.png',
+  //     tag: 'Aguas frescas',
+  //     icon: '🥛',
+  //   },
+  //   {
+  //     name: 'Agua Mineral',
+  //     description: 'Agua con gas, ligera y burbujeante.',
+  //     price: 1.49,
+  //     image: 'assets/agua.png',
+  //     tag: 'Bebidas',
+  //     icon: '💧',
+  //   },
+  //   {
+  //     name: 'Vino Tinto',
+  //     description: 'Vino que complementa perfectamente los platos fuertes.',
+  //     price: 4.99,
+  //     image: 'assets/bebida.png',
+  //     tag: 'Vinos',
+  //     icon: '🍷',
+  //   },
+  //   {
+  //     name: 'Jugo Natural',
+  //     description: 'Jugo fresco de frutas naturales, sin conservadores.',
+  //     price: 2.49,
+  //     image: 'assets/bebida.png',
+  //     tag: 'Jugos',
+  //     icon: '🧃',
+  //   },
+  // ];
 
   addToList(listaItem: Alimento) {
     this.listaComidas.push(listaItem);
@@ -138,7 +138,7 @@ export class MenuPage implements OnInit {
       console.debug('ComidasService emitted items:', items);
       this.comidas = items;
       this.comidasFiltradas = [...this.comidas];
-      this.bebidasFiltradas = [...this.bebidas];
+      // this.bebidasFiltradas = [...this.bebidas];
       this.generarCategorias();
     });
 
@@ -146,7 +146,7 @@ export class MenuPage implements OnInit {
     this.categoriesSub = this.comidasService.categories$.subscribe((cats) => {
       console.debug('ComidasService emitted categories:', cats);
       if (cats && cats.length > 0) {
-        this.todasCategorias = [{ name: 'Todos', icon: '🌟' }, ...cats];
+        // this.todasCategorias = [{ name: 'Todos', icon: '🌟' }, ...cats];
       } else {
         // si no hay categorías del backend, recalcular localmente
         this.generarCategorias();
@@ -201,24 +201,38 @@ export class MenuPage implements OnInit {
     if (backendCats && backendCats.length > 0) {
       this.categoriasComida = backendCats;
       this.categoriasBebida = [];
-      this.todasCategorias = [{ name: 'Todos', icon: '🌟' }, ...backendCats];
+      // this.todasCategorias = [{ name: 'Todos', icon: '🌟' }, ...backendCats];
       return;
     }
 
-    const categoriasComidaUnicas = [...new Set(this.comidas.map((c) => c.tag))];
-    this.categoriasComida = categoriasComidaUnicas.map((tag) => {
-      const comida = this.comidas.find((c) => c.tag === tag);
-      return { name: tag, icon: comida?.icon || '🍽️' };
+    // Adaptación para type Alimento: usar category.name y imageUrl
+    const categoriasComidaUnicas = [
+      ...new Set(this.comidas.map((c) => c.category?.name)),
+    ];
+    this.categoriasComida = categoriasComidaUnicas.map((catName) => {
+      const comida = this.comidas.find((c) => c.category?.name === catName);
+      return {
+        name: catName,
+        icon: comida?.imageUrl || '🍽️', // Usa imageUrl como icono si existe
+      };
     });
 
-    const categoriasBebidaUnicas = [...new Set(this.bebidas.map((b) => b.tag))];
-    this.categoriasBebida = categoriasBebidaUnicas.map((tag) => {
-      const bebida = this.bebidas.find((b) => b.tag === tag);
-      return { name: tag, icon: bebida?.icon || '🥤' };
-    });
+    // Si tienes bebidas separadas, aplica lo mismo:
+    // if (this.bebidas) {
+    //   const categoriasBebidaUnicas = [
+    //     ...new Set(this.bebidas.map((b) => b.category?.name)),
+    //   ];
+    //   this.categoriasBebida = categoriasBebidaUnicas.map((catName) => {
+    //     const bebida = this.bebidas.find((b) => b.category?.name === catName);
+    //     return {
+    //       name: catName,
+    //       icon: bebida?.imageUrl || '🥤',
+    //     };
+    //   });
+    // }
 
     this.todasCategorias = [
-      { name: 'Todos', icon: '🌟' },
+      // { name: 'Todos', icon: '🌟' },
       ...this.categoriasComida,
       ...this.categoriasBebida,
     ];
@@ -233,12 +247,13 @@ export class MenuPage implements OnInit {
     }
 
     this.comidasFiltradas = this.comidas.filter((comida) =>
-      comida.tag.toLowerCase().includes(categoria.toLowerCase())
+      comida.category?.name?.toLowerCase().includes(categoria.toLowerCase())
     );
 
-    this.bebidasFiltradas = this.bebidas.filter((bebida) =>
-      bebida.tag.toLowerCase().includes(categoria.toLowerCase())
-    );
+    // Si en el futuro agregas bebidas, puedes replicar la lógica aquí
+    // this.bebidasFiltradas = this.bebidas.filter((bebida) =>
+    //   bebida.category?.name?.toLowerCase().includes(categoria.toLowerCase())
+    // );
 
     console.log('Filtrando por:', categoria);
     console.log('Comidas filtradas:', this.comidasFiltradas.length);
@@ -248,7 +263,7 @@ export class MenuPage implements OnInit {
   resetearFiltros() {
     this.filtroActivo = '';
     this.comidasFiltradas = [...this.comidas];
-    this.bebidasFiltradas = [...this.bebidas];
+    // this.bebidasFiltradas = [...this.bebidas];
   }
 
   hayElementosFiltrados(): boolean {

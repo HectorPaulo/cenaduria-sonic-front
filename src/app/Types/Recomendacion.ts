@@ -1,6 +1,5 @@
-import Alimento from './Pedido';
+import { Alimento } from './Alimento';
 
 export default interface Recomendacion {
-  name: Alimento['tag'];
-  icon: Alimento['icon'];
+  name: Alimento['name'];
 }

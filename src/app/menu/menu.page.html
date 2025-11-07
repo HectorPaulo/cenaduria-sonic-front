@@ -43,7 +43,7 @@
             fill="clear"
             (click)="filtrarPorCategoria(categoria.name)"
           >
-            {{ categoria.icon }}
+            <!-- {{ categoria.icon }} -->
           </ion-button>
           <span
             class="text-xs text-center font-medium max-w-[70px] leading-tight truncate"
@@ -65,14 +65,18 @@
 
         <ion-row>
           <ion-card class="p-1" mode="ios">
-            <img [src]="comida.image" [alt]="comida.name" class="rounded-md" />
+            <img
+              [src]="comida.imageUrl"
+              [alt]="comida.name"
+              class="rounded-md"
+            />
             <ion-card-header>
               <ion-card-title class="text-lg font-bold">
                 <p class="text-gray-800 font-semibold">{{ comida.name }}</p>
               </ion-card-title>
             </ion-card-header>
             <ion-card-content class="text-sm">
-              <p class="text-gray-600">{{ comida.description }}</p>
+              <!-- <p class="text-gray-600">{{ comida.description }}</p> -->
               <p class="font-bold text-green-700">
                 ${{ comida.price | number: '1.2-2' }}
               </p>
@@ -120,7 +124,7 @@
             <div
               class="w-16 h-16 flex items-center justify-center bg-white rounded-lg text-3xl mr-4"
             >
-              {{ bebida.icon }}
+              <!-- {{ bebida.icon }} -->
             </div>
             <div class="flex-1">
               <ion-card-header>
@@ -129,7 +133,7 @@
                 </ion-card-title>
               </ion-card-header>
               <ion-card-content class="text-sm text-zinc-700">
-                <div class="text-gray-600">{{ bebida.description }}</div>
+                <!-- <div class="text-gray-600">{{ bebida.description }}</div> -->
                 <div class="font-bold text-green-700">
                   ${{ bebida.price | number: '1.2-2' }}
                 </div>

@@ -5,7 +5,7 @@ const firebaseConfig = {
   apiKey: '',
   authDomain: '',
   projectId: '',
-  storageBucket: 'foodtruck-filestorage.appspot.com',
+  storageBucket: 'foodtruck-filestorage.firebasestorage.app',
   messagingSenderId: '',
   appId: '',
 };
@@ -18,10 +18,9 @@ export const environment = {
   CORS_ORIGINS: 'http://localhost:8100',
   BASE_URL: 'http://localhost:8081',
   PORT: '8081',
-  FIREBASE_BUCKET_NAME: 'foodtruck-filestorage.appspot.com',
+  FIREBASE_BUCKET_NAME: 'foodtruck-filestorage.firebasestorage.app',
   FIREBASE_SERVICE_ACCOUNT: 'file:./firebase-credentials.json',
 } as const;
 
 const storageRef = ref(storage, 'path/en/storage.jpg');
-getDownloadURL(storageRef).then((url) => {
-});
+getDownloadURL(storageRef).then((url) => {});

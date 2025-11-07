@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import Alimento from '../Types/Pedido';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import Recomendacion from '../Types/Recomendacion';
+import { Alimento } from '../Types/Alimento';
 
 @Injectable({ providedIn: 'root' })
 export class ComidasService {
