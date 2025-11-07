@@ -1,5 +1,5 @@
-import { Alimento } from './Alimento';
-
 export default interface Recomendacion {
-  name: Alimento['name'];
+  name: string;
+  icon?: string;
+  id?: number;
 }
