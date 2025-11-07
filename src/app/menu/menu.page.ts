@@ -14,6 +14,7 @@ import {
   IonLabel,
   IonRefresher,
   IonRefresherContent,
+  IonChip,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, cart, search, close } from 'ionicons/icons';
@@ -31,6 +32,7 @@ import { Alimento } from '../Types/Alimento';
   styleUrls: ['./menu.page.scss'],
   standalone: true,
   imports: [
+    IonChip,
     IonRefresherContent,
     IonRefresher,
     IonLabel,
@@ -70,6 +72,7 @@ export class MenuPage implements OnInit {
   todasCategorias: Recomendacion[] = [];
   pedidos: Alimento[] = [];
   listaComidas: Alimento[] = [];
+  bebidas: Alimento[] = [];
   // bebidas: Alimento[] = [
   //   {
   //     name: 'Refresco de Cola',
@@ -146,7 +149,7 @@ export class MenuPage implements OnInit {
     this.categoriesSub = this.comidasService.categories$.subscribe((cats) => {
       console.debug('ComidasService emitted categories:', cats);
       if (cats && cats.length > 0) {
-        // this.todasCategorias = [{ name: 'Todos', icon: '🌟' }, ...cats];
+        this.todasCategorias = [{ name: 'Todos' }, ...cats];
       } else {
         // si no hay categorías del backend, recalcular localmente
         this.generarCategorias();
@@ -156,6 +159,7 @@ export class MenuPage implements OnInit {
     // Cargar datos desde API
     this.cargarDesdeApi();
     this.cargarCategoriasDesdeApi();
+    this.cargarBebidasDesdeApi();
   }
 
   ngOnDestroy() {
@@ -183,7 +187,6 @@ export class MenuPage implements OnInit {
         try {
           const cats: Recomendacion[] = (res || []).map((c: any) => ({
             name: c.name || c.title || String(c),
-            icon: '🫓',
           }));
           this.comidasService.setCategories(cats);
         } catch (e) {
@@ -192,6 +195,27 @@ export class MenuPage implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar categorías desde API:', err);
+      },
+    });
+  }
+
+  cargarBebidasDesdeApi() {
+    console.debug('Intentando cargar bebidas desde API (category 4)...');
+    this.comidasService.loadProductsByCategory(4).subscribe({
+      next: (items) => {
+        try {
+          console.debug('Respuesta API bebidas:', items);
+          this.bebidas = items || [];
+          this.bebidasFiltradas = [...this.bebidas];
+          // si las categorías no vienen del backend, podemos generar etiquetas a partir de bebidas
+          if (!this.comidasService.getCategories().length)
+            this.generarCategorias();
+        } catch (e) {
+          console.error('Error procesando bebidas response', e);
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar bebidas desde API:', err);
       },
     });
   }
@@ -213,7 +237,6 @@ export class MenuPage implements OnInit {
       const comida = this.comidas.find((c) => c.category?.name === catName);
       return {
         name: catName,
-        icon: comida?.imageUrl || '🍽️', // Usa imageUrl como icono si existe
       };
     });
 
@@ -232,7 +255,7 @@ export class MenuPage implements OnInit {
     // }
 
     this.todasCategorias = [
-      // { name: 'Todos', icon: '🌟' },
+      { name: 'Todos' },
       ...this.categoriasComida,
       ...this.categoriasBebida,
     ];

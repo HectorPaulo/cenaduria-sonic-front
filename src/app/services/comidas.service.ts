@@ -68,19 +68,17 @@ export class ComidasService {
 
   loadFromApi(): Observable<Alimento[]> {
     const url = `${environment.BASE_URL}/api/products/active`;
-    const token = localStorage.getItem('access_token');
-    const response = this.http.get<Alimento[]>(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log('Token: ', token);
-    console.debug('Respuesta API comidas:', response);
-    return response;
+    // Let the HTTP interceptor add Authorization header. Return observable directly.
+    return this.http.get<Alimento[]>(url);
   }
 
   loadCategories(): Observable<any> {
-    const url = `${environment.BASE_URL}/api/categories`;
+    const url = `${environment.BASE_URL}/api/categories/with-active-products`;
     return this.http.get<any>(url);
+  }
+
+  loadProductsByCategory(categoryId: number): Observable<Alimento[]> {
+    const url = `${environment.BASE_URL}/api/products/category/${categoryId}/active`;
+    return this.http.get<Alimento[]>(url);
   }
 }

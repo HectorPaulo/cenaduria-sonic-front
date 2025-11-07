@@ -17,9 +17,6 @@ const env = {
   PORT: process.env.PORT || 8081,
 
   // Firebase
-  FIRABSE_BUCKET_NAME:
-    process.env.FIRABSE_BUCKET_NAME ||
-    "foodtruck-filestorage.firebasestorage.app",
   FIREBASE_SERVICE_ACCOUNT:
     process.env.FIREBASE_SERVICE_ACCOUNT || 
       "file:./firebase-credentials.json",

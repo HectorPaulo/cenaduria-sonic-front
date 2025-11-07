@@ -37,20 +37,27 @@
       <div class="flex gap-3 min-w-max px-2">
         @for (categoria of todasCategorias; track $index) {
         <div class="flex flex-col items-center min-w-[70px]">
-          <ion-button
+          <ion-chip button
+            class="categoria-btn h-8 text-lg mb-1"
+            [class]="filtroActivo === categoria.name ? 'active bg-blue-500 shadow-lg' : 'bg-gray-100 text-gray-700'"
+            fill="clear"
+            (click)="filtrarPorCategoria(categoria.name)">
+            <ion-label>{{categoria.name}}</ion-label>
+          </ion-chip>
+          <!-- <ion-button
             class="categoria-btn rounded-full w-14 h-14 text-xl mb-1"
             [class]="filtroActivo === categoria.name ? 'active bg-blue-500 shadow-lg' : 'bg-gray-100 text-gray-700'"
             fill="clear"
             (click)="filtrarPorCategoria(categoria.name)"
-          >
-            <!-- {{ categoria.icon }} -->
-          </ion-button>
+          > -->
+          <!-- {{ categoria.icon }} -->
+          <!-- </ion-button>
           <span
             class="text-xs text-center font-medium max-w-[70px] leading-tight truncate"
             [class]="filtroActivo === categoria.name ? 'text-blue-600 font-bold' : 'text-gray-600'"
           >
             {{ categoria.name }}
-          </span>
+          </span> -->
         </div>
         }
       </div>
