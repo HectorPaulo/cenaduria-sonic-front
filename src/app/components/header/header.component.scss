@@ -1,0 +1,53 @@
+:host {
+  display: block;
+}
+
+/* Make the header fixed/absolute so long titles don't push its height */
+ion-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+}
+
+ion-toolbar {
+  height: 64px; /* fixed height to avoid growing */
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+/* Title should truncate instead of wrapping and pushing the toolbar */
+.header-title {
+  display: inline-block;
+  max-width: calc(100% - 160px); /* leave room for profile */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Profile area positioned to the right so it doesn't affect title width */
+.profile-area {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Ensure the avatar doesn't change the toolbar height */
+.profile-area img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+}
+
+/* Optionally add a background to ensure readability when absolute */
+ion-header,
+ion-toolbar {
+  background: var(--ion-color-primary, #fff);
+}
