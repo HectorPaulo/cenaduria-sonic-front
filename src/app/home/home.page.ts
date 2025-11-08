@@ -23,6 +23,7 @@ import { Subscription } from 'rxjs';
 import { Alimento } from '../Types/Alimento';
 import { ComidasService } from '../services/comidas.service';
 import Recomendacion from '../Types/Recomendacion';
+import { PromosService } from '../services/promos.service';
 
 @Component({
   selector: 'app-home',
@@ -49,6 +50,7 @@ import Recomendacion from '../Types/Recomendacion';
   ],
 })
 export class HomePage implements OnInit {
+  private promosSub?: Subscription;
   private itemsSub?: Subscription;
   private categoriesSub?: Subscription;
   filtroActivo: string = '';
@@ -73,24 +75,30 @@ export class HomePage implements OnInit {
   @ViewChild(IonContent) content!: IonContent;
 
   menuDestacado: Alimento[] = [];
-  promociones: Promocion[] = [
-    {
-      name: '2x1 en Tacos',
-      description: 'Solo hoy de 6pm a 9pm',
-      image: 'assets/tacos.png',
-    },
-    {
-      name: 'Combo Familiar',
-      description: '4 hamburguesas + 4 papas + 4 refrescos por $150',
-      image: 'assets/burgers.png',
-    },
-  ];
+  promociones: Promocion[] = [];
 
-  constructor(private comidasService: ComidasService) {}
+  constructor(
+    private comidasService: ComidasService,
+    private promosService: PromosService
+  ) {}
   ngOnInit() {
+    // Load promotions from API and keep local cache in the service
+    this.promosSub = this.promosService.loadFromApi().subscribe({
+      next: (promos: Promocion[]) => {
+        this.promociones = promos || [];
+        try {
+          this.promosService.setItems(promos || []);
+        } catch (e) {
+          // setItems exists on the service; if it changes, ignore silently
+          console.debug('PromosService.setItems not available or failed', e);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading promotions from API:', err);
+      },
+    });
     this.itemsSub = this.comidasService.items$.subscribe((items) => {
       this.menuDestacado = items;
-      // cada vez que cambian los items, recalcular el menu destacado filtrado
       this.applyFeaturedFilter();
     });
 
@@ -100,7 +108,6 @@ export class HomePage implements OnInit {
       } else {
         this.generarCategorias();
       }
-      // categories changed -> re-aplicar filtro por hamburguesas
       this.applyFeaturedFilter();
     });
 
@@ -111,6 +118,7 @@ export class HomePage implements OnInit {
   ngOnDestroy() {
     this.itemsSub?.unsubscribe();
     this.categoriesSub?.unsubscribe();
+    this.promosSub?.unsubscribe();
   }
 
   cargarDesdeApi() {
@@ -127,7 +135,6 @@ export class HomePage implements OnInit {
   }
 
   cargarCategoriasDesdeApi() {
-    console.debug('Intentando cargar categorías desde API...');
     this.comidasService.loadCategories().subscribe({
       next: (res) => {
         try {

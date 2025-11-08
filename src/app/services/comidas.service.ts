@@ -68,7 +68,6 @@ export class ComidasService {
 
   loadFromApi(): Observable<Alimento[]> {
     const url = `${environment.BASE_URL}/api/products/active`;
-    // Let the HTTP interceptor add Authorization header. Return observable directly.
     return this.http.get<Alimento[]>(url);
   }
 

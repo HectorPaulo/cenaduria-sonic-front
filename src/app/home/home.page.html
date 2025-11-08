@@ -70,7 +70,7 @@
         <ion-row>
           <ion-card class="p-1" mode="ios">
             <img
-              [src]="promocion.image"
+              [src]="promocion.imageUrl"
               [alt]="promocion.name"
               class="rounded-md"
             />
@@ -80,7 +80,7 @@
               </ion-card-title>
             </ion-card-header>
             <ion-card-content class="text-sm">
-              <p class="text-gray-600">{{ promocion.description }}</p>
+              <p class="text-gray-300">${{ promocion.price }}</p>
             </ion-card-content>
           </ion-card>
         </ion-row>
@@ -99,11 +99,12 @@
         } @else { @for (item of menuDestacado; track $index) {
         <ion-card mode="ios" class="shadow-sm">
           <div class="flex items-center p-4">
-            <!-- <div
+            <div
               class="w-16 h-16 flex items-center justify-center bg-green-50 rounded-lg text-3xl mr-4"
             >
-              {{ item.icon }}
-            </div> -->
+            <img [src]="item.imageUrl" [alt]="item.name">
+              <!-- {{ item.imageUrl }} -->
+            </div>
             <div class="flex-1">
               <div class="text-lg font-semibold">{{ item.name }}</div>
               <!-- <div class="text-sm text-zinc-500">{{ item.description }}</div> -->
