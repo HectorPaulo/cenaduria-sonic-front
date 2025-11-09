@@ -91,10 +91,9 @@
               <ion-button
                 (click)="addToCart(comida)"
                 color="light"
-                class="-ml-2 mt-2"
+                class="-ml-2"
               >
-                <ion-icon color="dark" slot="start" name="cart"></ion-icon>
-                <ion-label color="dark">Ordenar</ion-label>
+                <ion-icon color="dark" slot="icon-only" class="ion-padding" name="cart"></ion-icon>
               </ion-button>
 
               <ion-button
@@ -102,9 +101,9 @@
                 shape="round"
                 color="light"
                 size="small"
-                class="float-right mt-5"
+                class="float-right mt-1"
               >
-                <ion-icon slot="icon-only" name="add"></ion-icon>
+                <ion-icon slot="icon-only" name="heart" class="ion-padding"></ion-icon>
               </ion-button>
             </ion-card-content>
           </ion-card>

@@ -34,10 +34,21 @@ export interface User {
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  // Timer id for periodic refresh (ms interval)
+  private refreshTimerId: number | null = null;
+  // default refresh interval: 60 minutes
+  private readonly REFRESH_INTERVAL_MS = 60 * 60 * 1000;
 
   constructor(private httpAuth: HttpAuthService) {
     // ? Cargar usuario desde localStorage si existe
     this.loadUserFromStorage();
+    // If there is an access or refresh token in storage, start the auto-refresh timer
+    if (
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('refresh_token')
+    ) {
+      this.startAutoRefresh();
+    }
   }
 
   loginRemote(username: string, password: string): Observable<User | null> {
@@ -155,6 +166,10 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
+    // remove tokens and stop auto refresh
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    this.stopAutoRefresh();
   }
 
   getCurrentUser(): User | null {
@@ -207,6 +222,8 @@ export class AuthService {
   public setCurrentUser(user: User): void {
     localStorage.setItem('currentUser', JSON.stringify(user));
     this.currentUserSubject.next(user);
+    // ensure refresh timer is active after login/set user
+    this.startAutoRefresh();
   }
 
   public getCurrentToken(): string | null {
@@ -227,6 +244,12 @@ export class AuthService {
           if (res.refreshToken) {
             localStorage.setItem('refresh_token', res.refreshToken);
           }
+          // reset/start the auto-refresh timer so next refresh happens after full interval
+          try {
+            (this as any).startAutoRefresh?.();
+          } catch (e) {
+            // ignore if method not present for some reason
+          }
           return true;
         }
         return false;
@@ -236,6 +259,45 @@ export class AuthService {
         return of(false);
       })
     );
+  }
+
+  /**
+   * Start periodic refresh of access token using the stored refresh_token.
+   * Refresh runs every REFRESH_INTERVAL_MS. Calling startAutoRefresh resets the timer.
+   */
+  public startAutoRefresh(intervalMs?: number) {
+    try {
+      const ms = intervalMs ?? this.REFRESH_INTERVAL_MS;
+      // clear existing timer if any
+      if (this.refreshTimerId) {
+        clearInterval(this.refreshTimerId);
+        this.refreshTimerId = null;
+      }
+
+      // Only start if there's a refresh token present
+      if (!localStorage.getItem('refresh_token')) return;
+
+      this.refreshTimerId = window.setInterval(() => {
+        this.refreshToken().subscribe((ok) => {
+          if (!ok) {
+            console.warn('[AuthService] automatic refresh failed');
+            // if refresh fails, stop the periodic attempts to avoid pounding the server
+            this.stopAutoRefresh();
+            // consider logging out the user here if desired
+          }
+        });
+      }, ms);
+    } catch (e) {
+      console.warn('[AuthService] startAutoRefresh failed', e);
+    }
+  }
+
+  /** Stop periodic refresh timer */
+  public stopAutoRefresh() {
+    if (this.refreshTimerId) {
+      clearInterval(this.refreshTimerId);
+      this.refreshTimerId = null;
+    }
   }
 
   private normalizeRole(raw?: string | string[]): UserRole {

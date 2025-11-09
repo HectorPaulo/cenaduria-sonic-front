@@ -17,7 +17,7 @@ import {
   IonChip,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, cart, search, close } from 'ionicons/icons';
+import { add, cart, search, close, heart } from 'ionicons/icons';
 import Recomendacion from '../Types/Recomendacion';
 import { Subscription } from 'rxjs';
 import { ComidasService } from '../services/comidas.service';
@@ -25,6 +25,7 @@ import { RefresherCustomEvent } from '@ionic/core';
 import { HeaderComponent } from '../components/header/header.component';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
 import { Alimento } from '../Types/Alimento';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-menu',
@@ -128,12 +129,31 @@ export class MenuPage implements OnInit {
     this.listaComidas.push(listaItem);
   }
 
-  addToCart(pedido: Alimento) {
+  async addToCart(pedido: Alimento) {
     this.pedidos.push(pedido);
+    try {
+      await this.presentAddedToCartToast(pedido);
+    } catch (e) {
+      console.warn('Failed to show toast', e);
+    }
   }
 
-  constructor(private comidasService: ComidasService) {
-    addIcons({ search, cart, add, close });
+  private async presentAddedToCartToast(pedido: Alimento) {
+    const title = pedido?.name ? String(pedido.name) : 'Producto';
+    const toast = await this.toastCtrl.create({
+      message: `${title} añadido al carrito`,
+      duration: 1500,
+      position: 'bottom',
+      color: 'success',
+    });
+    await toast.present();
+  }
+
+  constructor(
+    private comidasService: ComidasService,
+    private toastCtrl: ToastController
+  ) {
+    addIcons({ close, cart, heart, search, add });
   }
 
   ngOnInit() {
