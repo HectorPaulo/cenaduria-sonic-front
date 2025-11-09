@@ -11,7 +11,7 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <div class="max-w-lg mx-auto p-4">
+  <div class="max-w-lg mx-auto p-4 mt-16">
     <!-- Filtro activo -->
     @if (filtroActivo) {
     <div class="mb-4">
@@ -38,7 +38,7 @@
         @for (categoria of todasCategorias; track $index) {
         <div class="flex flex-col items-center min-w-[70px]">
           <ion-chip button
-            class="categoria-btn h-8 text-lg mb-1"
+            class="categoria-btn h-10 text-lg mb-1"
             [class]="filtroActivo === categoria.name ? 'active bg-blue-500 shadow-lg' : 'bg-gray-100 text-gray-700'"
             fill="clear"
             (click)="filtrarPorCategoria(categoria.name)">
@@ -115,63 +115,6 @@
     </div>
     }
 
-    <!-- Sección Bebidas -->
-    @if (bebidasFiltradas.length > 0) {
-    <h2 class="text-2xl font-bold mb-2">Bebidas</h2>
-
-    <div class="grid gap-4 mb-6">
-      <ion-grid fixed>
-        @for (bebida of bebidasFiltradas; track $index) {
-
-        <ion-row>
-          <ion-card
-            class="rounded-xl p-4 flex items-center shadow-sm"
-            mode="ios"
-          >
-            <div
-              class="w-16 h-16 flex items-center justify-center bg-white rounded-lg text-3xl mr-4"
-            >
-              <!-- {{ bebida.icon }} -->
-            </div>
-            <div class="flex-1">
-              <ion-card-header>
-                <ion-card-title class="text-lg font-semibold text-green-700">
-                  <p class="text-gray-800 font-semibold">{{ bebida.name }}</p>
-                </ion-card-title>
-              </ion-card-header>
-              <ion-card-content class="text-sm text-zinc-700">
-                <!-- <div class="text-gray-600">{{ bebida.description }}</div> -->
-                <div class="font-bold text-green-700">
-                  ${{ bebida.price | number: '1.2-2' }}
-                </div>
-
-                <ion-button
-                  (click)="addToCart(bebida)"
-                  color="light"
-                  class="-ml-2 mt-2"
-                >
-                  <ion-icon color="dark" slot="start" name="cart"></ion-icon>
-                  <ion-label color="dark">Ordenar</ion-label>
-                </ion-button>
-
-                <ion-button
-                  (click)="addToList(bebida)"
-                  shape="round"
-                  color="light"
-                  size="small"
-                  class="float-right mt-5"
-                >
-                  <ion-icon slot="icon-only" name="add"></ion-icon>
-                </ion-button>
-              </ion-card-content>
-            </div>
-          </ion-card>
-        </ion-row>
-
-        }
-      </ion-grid>
-    </div>
-    }
 
     <!-- Mensaje cuando no hay resultados -->
     @if (filtroActivo && !hayElementosFiltrados()) {

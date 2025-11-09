@@ -1,15 +1,14 @@
 .categoria-scroll {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
   &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
   }
 
   scroll-behavior: smooth;
 }
 
-// Animaciones para botones de categoría
 .categoria-btn {
   transition: all 0.2s ease-in-out;
 
@@ -23,10 +22,8 @@
   }
 }
 
-// Estilos responsivos
 @media (max-width: 768px) {
   .categoria-scroll {
-    padding-left: 1rem;
     padding-right: 1rem;
   }
 }
