@@ -12,27 +12,36 @@
   </ion-refresher>
   <app-fabbtn></app-fabbtn>
   <div class="max-w-lg mx-auto p-4">
-    <!-- Filtros de estado -->
+    <!-- Filtros / Acciones -->
     <div class="flex justify-center gap-2 mb-6">
-      <ion-chip mode="ios" class="font-semibold bg-yellow-100 text-yellow-800">
-        <ion-label class="text-xs">En proceso</ion-label>
-      </ion-chip>
-      <ion-chip mode="ios" class="font-semibold bg-green-100 text-green-800">
-        <ion-label class="text-xs">Listos</ion-label>
-      </ion-chip>
-      <ion-chip mode="ios" class="font-semibold bg-blue-100 text-blue-800">
-        <ion-label class="text-xs">Entregados</ion-label>
-      </ion-chip>
+      <ion-button size="small" fill="outline" (click)="loadMyOrdersPaged(1,10)"
+        >Todos</ion-button
+      >
+      <ion-button size="small" color="primary" (click)="loadRecent()"
+        >Recientes</ion-button
+      >
+      <ion-button size="small" color="tertiary" (click)="loadPending()"
+        >Pendientes</ion-button
+      >
+      <ion-button size="small" color="success" (click)="loadLast()"
+        >Última</ion-button
+      >
     </div>
 
     <!-- Sección Pedidos Activos -->
-    <h2 class="text-2xl font-bold text-gray-700 mb-4">Pedidos Activos</h2>
+    <h2 class="text-2xl font-bold text-gray-300 mb-4">
+      Pedidos Activos — {{ filterLabel }}
+    </h2>
 
     <!-- Lista de pedidos activos -->
     <div class="grid gap-4">
       <ion-grid fixed>
-        @for (pedido of pedidosActivos; track pedido.id) {
-        <ion-row>
+        <ion-row *ngIf="!loading && pedidosActivos.length === 0">
+          <div class="w-full p-6 text-center text-gray-400">
+            No hay pedidos activos.
+          </div>
+        </ion-row>
+        <ion-row *ngFor="let pedido of pedidosActivos">
           <ion-card>
             <img
               [src]="pedido.imagen"
@@ -63,54 +72,57 @@
                 <p class="font-semibold text-green-700 text-lg">
                   ${{ pedido.precio | number: '1.2-2' }}
                 </p>
-                @if (pedido.tiempoEstimado) {
-                <p class="text-xs text-gray-800">
-                  Tiempo estimado: {{ pedido.tiempoEstimado }}
-                </p>
-                } @else if (pedido.estado === 'listo') {
-                <p class="text-xs text-green-600 font-semibold">
-                  ¡Recoge tu pedido!
-                </p>
-                }
+                <ng-container>
+                  <p
+                    *ngIf="pedido.tiempoEstimado"
+                    class="text-xs text-gray-800"
+                  >
+                    Tiempo estimado: {{ pedido.tiempoEstimado }}
+                  </p>
+                  <p
+                    *ngIf="!pedido.tiempoEstimado && pedido.estado === 'listo'"
+                    class="text-xs text-green-600 font-semibold"
+                  >
+                    ¡Recoge tu pedido!
+                  </p>
+                </ng-container>
               </div>
 
               <!-- Chips de reseñas -->
-              @if (pedido.reviews.length > 0) {
-              <div class="flex gap-2 mb-3">
-                @for (review of pedido.reviews; track $index) {
-                <ion-chip mode="ios" [class]="review.bgColor">
-                  <ion-avatar>
-                    <img [src]="review.avatar" />
-                  </ion-avatar>
-                  <ion-label class="text-xs">{{ review.comment }}</ion-label>
-                </ion-chip>
-                }
+              <div
+                *ngIf="pedido.reviews && pedido.reviews.length > 0"
+                class="flex gap-2 mb-3"
+              >
+                <ng-container
+                  *ngFor="let review of pedido.reviews; let i = index"
+                >
+                  <ion-chip mode="ios" [class]="review.bgColor">
+                    <ion-avatar>
+                      <img [src]="review.avatar" />
+                    </ion-avatar>
+                    <ion-label class="text-xs">{{ review.comment }}</ion-label>
+                  </ion-chip>
+                </ng-container>
               </div>
-              }
             </ion-card-content>
           </ion-card>
         </ion-row>
-        }
       </ion-grid>
     </div>
-
-    <ion-loading
-      trigger="open-loading"
-      message="Pidiendo su orden"
-      showBackdrop="true"
-      translucent="true"
-      class="custom-loading"
-      [duration]="3000"
-      spinner="circles"
-      mode="ios"
-    ></ion-loading>
+    <div *ngIf="loading" class="flex justify-center my-4">
+      <ion-spinner name="circles"></ion-spinner>
+    </div>
     <!-- Sección Historial -->
     <h2 class="text-2xl font-bold text-gray-500 mb-4">Historial Reciente</h2>
 
     <div class="grid gap-4 mb-6">
       <ion-grid fixed>
-        @for (pedido of pedidosHistorial; track pedido.id) {
-        <ion-row>
+        <ion-row *ngIf="!loading && pedidosHistorial.length === 0">
+          <div class="w-full p-6 text-center text-gray-400">
+            No hay historial de pedidos.
+          </div>
+        </ion-row>
+        <ion-row *ngFor="let pedido of pedidosHistorial">
           <ion-card class="p-1 w-full">
             <img
               [src]="pedido.imagen"
@@ -141,8 +153,7 @@
                 <p class="font-bold text-gray-600 text-lg">
                   ${{ pedido.precio | number: '1.2-2' }}
                 </p>
-                @if (pedido.calificacion) {
-                <div class="flex items-center">
+                <div *ngIf="pedido.calificacion" class="flex items-center">
                   <span class="text-yellow-400 text-sm"
                     >{{ getStars(pedido.calificacion) }}</span
                   >
@@ -150,7 +161,6 @@
                     >{{ pedido.calificacion }}.0</span
                   >
                 </div>
-                }
               </div>
 
               <!-- Botón para reordenar -->
@@ -165,9 +175,7 @@
             </ion-card-content>
           </ion-card>
         </ion-row>
-        }
       </ion-grid>
     </div>
-  </div>
-  <app-fabbtn></app-fabbtn>
-</ion-content>
+  </div></ion-content
+>

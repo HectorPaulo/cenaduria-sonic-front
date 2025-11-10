@@ -21,6 +21,7 @@ import { add, cart, search, close, heart } from 'ionicons/icons';
 import Recomendacion from '../Types/Recomendacion';
 import { Subscription } from 'rxjs';
 import { ComidasService } from '../services/comidas.service';
+import { CartService } from '../services/cart.service';
 import { RefresherCustomEvent } from '@ionic/core';
 import { HeaderComponent } from '../components/header/header.component';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
@@ -71,70 +72,19 @@ export class MenuPage implements OnInit {
   categoriasComida: Recomendacion[] = [];
   categoriasBebida: Recomendacion[] = [];
   todasCategorias: Recomendacion[] = [];
-  pedidos: Alimento[] = [];
   listaComidas: Alimento[] = [];
   bebidas: Alimento[] = [];
-  // bebidas: Alimento[] = [
-  //   {
-  //     name: 'Refresco de Cola',
-  //     description: 'Bebida carbonatada con sabor a cola, refrescante y dulce.',
-  //     price: 1.99,
-  //     image: 'assets/bebida.png',
-  //     tag: 'Bebidas',
-  //     icon: '🥤',
-  //   },
-  //   {
-  //     name: 'Cerveza Artesanal',
-  //     description: 'Cerveza perfecta para acompañar hamburguesas.',
-  //     price: 3.49,
-  //     image: 'assets/bebida.png',
-  //     tag: 'Cervezas',
-  //     icon: '🍺',
-  //   },
-  //   {
-  //     name: 'Horchata',
-  //     description: 'Bebida tradicional perfecta con tacos.',
-  //     price: 2.99,
-  //     image: 'assets/bebida.png',
-  //     tag: 'Aguas frescas',
-  //     icon: '🥛',
-  //   },
-  //   {
-  //     name: 'Agua Mineral',
-  //     description: 'Agua con gas, ligera y burbujeante.',
-  //     price: 1.49,
-  //     image: 'assets/agua.png',
-  //     tag: 'Bebidas',
-  //     icon: '💧',
-  //   },
-  //   {
-  //     name: 'Vino Tinto',
-  //     description: 'Vino que complementa perfectamente los platos fuertes.',
-  //     price: 4.99,
-  //     image: 'assets/bebida.png',
-  //     tag: 'Vinos',
-  //     icon: '🍷',
-  //   },
-  //   {
-  //     name: 'Jugo Natural',
-  //     description: 'Jugo fresco de frutas naturales, sin conservadores.',
-  //     price: 2.49,
-  //     image: 'assets/bebida.png',
-  //     tag: 'Jugos',
-  //     icon: '🧃',
-  //   },
-  // ];
 
   addToList(listaItem: Alimento) {
     this.listaComidas.push(listaItem);
   }
 
   async addToCart(pedido: Alimento) {
-    this.pedidos.push(pedido);
     try {
+      this.cartService.add(pedido, 1);
       await this.presentAddedToCartToast(pedido);
     } catch (e) {
-      console.warn('Failed to show toast', e);
+      console.error('Funcion addToCart fallida', e);
     }
   }
 
@@ -151,7 +101,8 @@ export class MenuPage implements OnInit {
 
   constructor(
     private comidasService: ComidasService,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private cartService: CartService
   ) {
     addIcons({ close, cart, heart, search, add });
   }
@@ -161,22 +112,18 @@ export class MenuPage implements OnInit {
       console.debug('ComidasService emitted items:', items);
       this.comidas = items;
       this.comidasFiltradas = [...this.comidas];
-      // this.bebidasFiltradas = [...this.bebidas];
       this.generarCategorias();
     });
 
-    // Suscribir a categorías que provea el servicio (desde /api/categories)
     this.categoriesSub = this.comidasService.categories$.subscribe((cats) => {
       console.debug('ComidasService emitted categories:', cats);
       if (cats && cats.length > 0) {
         this.todasCategorias = [{ name: 'Todos' }, ...cats];
       } else {
-        // si no hay categorías del backend, recalcular localmente
         this.generarCategorias();
       }
     });
 
-    // Cargar datos desde API
     this.cargarDesdeApi();
     this.cargarCategoriasDesdeApi();
     this.cargarBebidasDesdeApi();

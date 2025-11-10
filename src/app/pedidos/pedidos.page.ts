@@ -10,14 +10,17 @@ import {
   IonCardTitle,
   IonCardHeader,
   IonAvatar,
+  IonSpinner,
   IonGrid,
   IonRow,
   IonButton,
-  IonLoading, IonRefresher, IonRefresherContent, 
-RefresherEventDetail} from '@ionic/angular/standalone';
+  IonRefresher,
+  IonRefresherContent,
+} from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
-import { FabbtnComponent } from "../components/fabbtn/fabbtn.component";
-import { IonRefresherCustomEvent, RefresherCustomEvent } from '@ionic/core';
+import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
+import { OrdersService } from '../services/orders.service';
+import { RefresherCustomEvent } from '@ionic/core';
 
 interface Review {
   avatar: string;
@@ -26,16 +29,16 @@ interface Review {
 }
 
 interface Pedido {
-  id: string;
+  id: string | number;
   nombre: string;
-  descripcion: string;
-  precio: number;
-  imagen: string;
-  estado: 'en-proceso' | 'listo' | 'entregado';
+  descripcion?: string;
+  precio?: number;
+  imagen?: string;
+  estado?: string; // backend uses pendiente, en_preparacion, listo, entregado, cancelado
   tiempoEstimado?: string;
   fechaEntrega?: string;
   calificacion?: number;
-  reviews: Review[];
+  reviews?: Review[];
 }
 
 @Component({
@@ -46,7 +49,7 @@ interface Pedido {
   imports: [
     IonRefresherContent,
     IonRefresher,
-    IonLoading,
+    IonSpinner,
     IonContent,
     IonChip,
     IonLabel,
@@ -71,86 +74,169 @@ export class PedidosPage implements OnInit {
       event.target.complete();
     }, 2000);
   }
-  pedidosActivos: Pedido[] = [
-    {
-      id: '#1023',
-      nombre: 'Albóndigas Clásicas',
-      descripcion: 'Jugosas albóndigas de res con salsa de tomate y especias.',
-      precio: 8.99,
-      imagen: 'assets/comida.png',
-      estado: 'en-proceso',
-      tiempoEstimado: '15 min',
-      reviews: [
-        {
-          avatar: 'assets/sonic.png',
-          comment: '¡Deliciosas!',
-          bgColor: 'bg-blue-100',
-        },
-        {
-          avatar: 'assets/goku.png',
-          comment: '¡Trikitrákatelas!',
-          bgColor: 'bg-purple-100',
-        },
-      ],
-    },
-    {
-      id: '#1024',
-      nombre: 'Hamburguesa con Queso',
-      descripcion:
-        'Hamburguesa de res con queso cheddar, lechuga, tomate y cebolla.',
-      precio: 7.99,
-      imagen: 'assets/burgers.png',
-      estado: 'listo',
-      reviews: [
-        {
-          avatar: 'assets/sonic.png',
-          comment: 'Jugosa',
-          bgColor: 'bg-orange-100',
-        },
-        {
-          avatar: 'assets/goku.png',
-          comment: '¡Increíble!',
-          bgColor: 'bg-red-100',
-        },
-      ],
-    },
-  ];
+  pedidosActivos: Pedido[] = [];
 
-  pedidosHistorial: Pedido[] = [
-    {
-      id: '#1020',
-      nombre: 'Tacos de Carne Asada',
-      descripcion: 'Tacos de carne asada con cebolla, cilantro y salsa.',
-      precio: 7.99,
-      imagen: 'assets/tacos.png',
-      estado: 'entregado',
-      fechaEntrega: 'Hace 2 días',
-      calificacion: 5.0,
-      reviews: [],
-    },
-  ];
+  pedidosHistorial: Pedido[] = [];
 
-  constructor() {}
+  // UI state
+  loading = false;
+  filterLabel = 'Todos';
+
+  constructor(private ordersService: OrdersService) {}
 
   ngOnInit() {}
 
-  getEstadoChip(estado: string) {
-    switch (estado) {
-      case 'en-proceso':
-        return {
-          class: 'bg-yellow-100 text-yellow-800',
-          label: 'En preparación',
-        };
-      case 'listo':
-        return { class: 'bg-green-100 text-green-800', label: '¡Lista!' };
-      case 'entregado':
-        return { class: 'bg-blue-100 text-blue-800', label: 'Entregado' };
-      default:
-        return { class: 'bg-gray-100 text-gray-800', label: 'Desconocido' };
-    }
+  ngAfterViewInit() {
+    // Load initial set of orders (user's last active orders)
+    this.loadMyOrdersPaged(1, 10);
   }
 
-  getStars(calificacion: number): string {
-    return '★'.repeat(calificacion) + '☆'.repeat(5 - calificacion);
+  loadMyOrdersPaged(page = 1, size = 10, sort = '') {
+    this.loading = true;
+    this.ordersService.getMyOrdersPaged(page, size, sort).subscribe({
+      next: (res) => {
+        // Try common payload shapes: array or { data: [...] }
+        const raw = Array.isArray(res) ? res : res?.data || res?.orders || [];
+        const items = raw.map((r: any) => this.normalizeOrder(r));
+        // split between active (not final) and historial (final)
+        this.pedidosActivos = items.filter((o: any) => {
+          const estado = (o.estado || '').toString().toLowerCase();
+          return !estado.includes('entregado') && !estado.includes('cancelado');
+        });
+        this.pedidosHistorial = items.filter((o: any) => {
+          const estado = (o.estado || '').toString().toLowerCase();
+          return estado.includes('entregado') || estado.includes('cancelado');
+        });
+        this.loading = false;
+        this.filterLabel = 'Todos';
+      },
+      error: (err) => {
+        console.error('Failed to load my orders', err);
+        this.loading = false;
+      },
+    });
+  }
+
+  loadRecent() {
+    this.loading = true;
+    this.ordersService.getRecentOrders().subscribe({
+      next: (res) => {
+        const raw = Array.isArray(res) ? res : res?.data || [];
+        this.pedidosActivos = raw.map((r: any) => this.normalizeOrder(r));
+        this.pedidosHistorial = [];
+        this.loading = false;
+        this.filterLabel = 'Recientes';
+      },
+      error: (err) => {
+        console.error('Failed to load recent orders', err);
+        this.loading = false;
+      },
+    });
+  }
+
+  loadPending() {
+    this.loading = true;
+    this.ordersService.getPendingOrders().subscribe({
+      next: (res) => {
+        const raw = Array.isArray(res) ? res : res?.data || [];
+        this.pedidosActivos = raw.map((r: any) => this.normalizeOrder(r));
+        this.pedidosHistorial = [];
+        this.loading = false;
+        this.filterLabel = 'Pendientes';
+      },
+      error: (err) => {
+        console.error('Failed to load pending orders', err);
+        this.loading = false;
+      },
+    });
+  }
+
+  loadLast() {
+    this.loading = true;
+    this.ordersService.getLastOrder().subscribe({
+      next: (res) => {
+        const itemRaw = res?.data || res || null;
+        this.pedidosActivos = itemRaw ? [this.normalizeOrder(itemRaw)] : [];
+        this.pedidosHistorial = [];
+        this.loading = false;
+        this.filterLabel = 'Última';
+      },
+      error: (err) => {
+        console.error('Failed to load last order', err);
+        this.loading = false;
+      },
+    });
+  }
+
+  loadByDateRange(startIso: string, endIso: string) {
+    this.loading = true;
+    this.ordersService.getOrdersByDateRange(startIso, endIso).subscribe({
+      next: (res) => {
+        const raw = Array.isArray(res) ? res : res?.data || [];
+        const items = raw.map((r: any) => this.normalizeOrder(r));
+        this.pedidosActivos = items.filter((o: any) => {
+          const estado = (o.estado || '').toString().toLowerCase();
+          return !estado.includes('entregado') && !estado.includes('cancelado');
+        });
+        this.pedidosHistorial = items.filter((o: any) => {
+          const estado = (o.estado || '').toString().toLowerCase();
+          return estado.includes('entregado') || estado.includes('cancelado');
+        });
+        this.loading = false;
+        this.filterLabel = 'Rango de fechas';
+      },
+      error: (err) => {
+        console.error('Failed to load orders by date range', err);
+        this.loading = false;
+      },
+    });
+  }
+
+  getEstadoChip(estado?: string) {
+    const s = (estado || '').toString().toLowerCase();
+    if (s.includes('pend')) {
+      return { class: 'bg-yellow-100 text-yellow-800', label: 'Pendiente' };
+    }
+    if (
+      s.includes('en') ||
+      s.includes('prepar') ||
+      s.includes('en_preparacion') ||
+      s.includes('en-proceso')
+    ) {
+      return {
+        class: 'bg-yellow-100 text-yellow-800',
+        label: 'En preparación',
+      };
+    }
+    if (s.includes('listo')) {
+      return { class: 'bg-green-100 text-green-800', label: '¡Lista!' };
+    }
+    if (s.includes('entreg')) {
+      return { class: 'bg-blue-100 text-blue-800', label: 'Entregado' };
+    }
+    if (s.includes('cancel')) {
+      return { class: 'bg-gray-100 text-gray-800', label: 'Cancelado' };
+    }
+    return { class: 'bg-gray-100 text-gray-800', label: 'Desconocido' };
+  }
+
+  private normalizeOrder(o: any): Pedido {
+    return {
+      id: o?.id ?? o?.orderId ?? o?.uuid ?? 'unknown',
+      nombre: o?.nombre || o?.name || o?.title || 'Pedido',
+      descripcion: o?.descripcion || o?.description || '',
+      precio: o?.precio || o?.price || 0,
+      imagen: o?.imagen || o?.image || 'assets/comida.png',
+      estado: o?.estado || o?.status || '',
+      tiempoEstimado: o?.tiempoEstimado || o?.eta || '',
+      fechaEntrega: o?.fechaEntrega || o?.deliveredAt || '',
+      calificacion: o?.calificacion || o?.rating || undefined,
+      reviews: Array.isArray(o?.reviews) ? o.reviews : [],
+    } as Pedido;
+  }
+
+  getStars(calificacion: number = 0): string {
+    const n = Math.max(0, Math.min(5, Math.floor(calificacion)));
+    return '★'.repeat(n) + '☆'.repeat(5 - n);
   }
 }

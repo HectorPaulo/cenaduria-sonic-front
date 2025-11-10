@@ -17,9 +17,9 @@
     } @else {
 
     <!-- Header del carrito -->
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-bold text-gray-700">
-        Tu Carrito ({{ cantidadItems }} {{ cantidadItems === 1 ? 'producto' :
+    <div class="flex justify-between items-center mb-4 mt-16">
+      <h2 class="text-2xl font-bold text-white">
+        Tu carrito ({{ cantidadItems }} {{ cantidadItems === 1 ? 'producto' :
         'productos' }})
       </h2>
       <ion-button
@@ -49,7 +49,7 @@
             <div class="flex-1 min-w-0">
               <div class="flex justify-between items-start mb-2">
                 <div>
-                  <h3 class="font-semibold text-gray-800 text-sm">
+                  <h3 class="font-semibold text-gray-800">
                     {{ item.nombre }}
                   </h3>
                   <p class="text-xs text-gray-600 line-clamp-2">
@@ -63,7 +63,8 @@
                   (click)="eliminarItem(item)"
                 >
                   <ion-icon
-                    name="trash"
+                    name="close"
+                    size="small"
                     slot="icon-only"
                     class="text-sm"
                   ></ion-icon>
@@ -83,7 +84,7 @@
 
               <!-- Precio y controles -->
               <div class="flex justify-between items-center">
-                <span class="font-bold text-green-700"
+                <span class="font-bold text-green-300"
                   >${{ (item.precio * item.cantidad) | number: '1.2-2' }}</span
                 >
                 <div class="flex items-center gap-2">
@@ -96,11 +97,11 @@
                     <ion-icon
                       name="remove"
                       slot="icon-only"
-                      class="text-sm"
+                      size="small"
                     ></ion-icon>
                   </ion-button>
                   <span
-                    class="px-3 py-1 bg-gray-100 rounded-full text-sm font-semibold min-w-[40px] text-center"
+                    class="px-3 py-1 rounded-full text-sm font-semibold min-w-[40px] text-center"
                   >
                     {{ item.cantidad }}
                   </span>
@@ -159,11 +160,6 @@
           <span>-${{ descuentoAplicado | number: '1.2-2' }}</span>
         </div>
         }
-
-        <div class="flex justify-between">
-          <span class="text-gray-600">Impuestos (12%):</span>
-          <span class="font-semibold">${{ impuestos | number: '1.2-2' }}</span>
-        </div>
 
         @if (propina > 0) {
         <div class="flex justify-between">

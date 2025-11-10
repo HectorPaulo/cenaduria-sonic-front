@@ -15,17 +15,22 @@ import {
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
+import { CartService } from '../services/cart.service';
+import {
+  OrdersService,
+  CreateOrderDto,
+  OrderItemDto,
+} from '../services/orders.service';
 import { RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { add, remove, trash, card, cash, wallet } from 'ionicons/icons';
+import { add, remove, trash, card, cash, wallet, close } from 'ionicons/icons';
 
-// Interfaces
 interface ItemCarrito {
   id: string;
   nombre: string;
   descripcion: string;
   precio: number;
-  imagen: string;
+  imagen?: string;
   cantidad: number;
   categoria: 'comida' | 'bebida';
   extras?: string[];
@@ -61,40 +66,8 @@ interface MetodoPago {
   ],
 })
 export class CarritoPage implements OnInit {
-  // Items en el carrito (temporal - vendrán de un servicio)
-  itemsCarrito: ItemCarrito[] = [
-    {
-      id: '1',
-      nombre: 'Albóndigas Clásicas',
-      descripcion: 'Jugosas albóndigas de res con salsa de tomate y especias.',
-      precio: 8.99,
-      imagen: 'assets/comida.png',
-      cantidad: 2,
-      categoria: 'comida',
-      extras: ['Queso extra', 'Pan adicional'],
-    },
-    {
-      id: '2',
-      nombre: 'Hamburguesa con Queso',
-      descripcion:
-        'Hamburguesa de res con queso cheddar, lechuga, tomate y cebolla.',
-      precio: 7.99,
-      imagen: 'assets/burgers.png',
-      cantidad: 1,
-      categoria: 'comida',
-    },
-    {
-      id: '3',
-      nombre: 'Refresco de Cola',
-      descripcion: 'Bebida carbonatada con sabor a cola, refrescante y dulce.',
-      precio: 1.99,
-      imagen: 'assets/sonic.png',
-      cantidad: 3,
-      categoria: 'bebida',
-    },
-  ];
+  itemsCarrito: ItemCarrito[] = [];
 
-  // Métodos de pago disponibles
   metodosPago: MetodoPago[] = [
     { id: 'efectivo', nombre: 'Efectivo', icono: 'cash', disponible: true },
   ];
@@ -103,25 +76,36 @@ export class CarritoPage implements OnInit {
   descuentoAplicado: number = 0;
   propina: number = 0;
 
-  constructor(private alertController: AlertController) {
-    addIcons({ add, remove, trash, card, cash, wallet });
+  constructor(
+    private alertController: AlertController,
+    private cartService: CartService,
+    private ordersService: OrdersService
+  ) {
+    addIcons({ close, trash, remove, add, card, cash, wallet });
   }
 
   ngOnInit() {
-    this.calcularTotales();
+    this.cartService.items$.subscribe((items) => {
+      this.itemsCarrito = items.map((i: any) => ({
+        id: i.id,
+        nombre: i.nombre,
+        descripcion: i.descripcion ?? '',
+        precio: i.precio ?? 0,
+        imagen: i.imagen,
+        cantidad: i.cantidad ?? 1,
+        categoria: i.categoria === 'bebida' ? 'bebida' : 'comida',
+        extras: i.extras ?? [],
+      }));
+      this.calcularTotales();
+    });
   }
 
-  // Métodos para manejar cantidades
   aumentarCantidad(item: ItemCarrito) {
-    item.cantidad++;
-    this.calcularTotales();
+    this.cartService.increaseQuantity(item.id);
   }
 
   disminuirCantidad(item: ItemCarrito) {
-    if (item.cantidad > 1) {
-      item.cantidad--;
-      this.calcularTotales();
-    }
+    this.cartService.decreaseQuantity(item.id);
   }
 
   async eliminarItem(item: ItemCarrito) {
@@ -136,11 +120,8 @@ export class CarritoPage implements OnInit {
         {
           text: 'Eliminar',
           handler: () => {
-            const index = this.itemsCarrito.findIndex((i) => i.id === item.id);
-            if (index > -1) {
-              this.itemsCarrito.splice(index, 1);
-              this.calcularTotales();
-            }
+            // remove using cart service
+            this.cartService.removeById(item.id);
           },
         },
       ],
@@ -148,7 +129,6 @@ export class CarritoPage implements OnInit {
     await alert.present();
   }
 
-  // Métodos de cálculo
   get subtotal(): number {
     return this.itemsCarrito.reduce(
       (total, item) => total + item.precio * item.cantidad,
@@ -156,16 +136,12 @@ export class CarritoPage implements OnInit {
     );
   }
 
-  get impuestos(): number {
-    return this.subtotal * 0.12; // 12% de impuestos
-  }
-
   get totalConDescuento(): number {
     return this.subtotal - this.descuentoAplicado;
   }
 
   get total(): number {
-    return this.totalConDescuento + this.impuestos + this.propina;
+    return this.totalConDescuento + this.propina;
   }
 
   get cantidadItems(): number {
@@ -270,18 +246,151 @@ export class CarritoPage implements OnInit {
   }
 
   async procesarPedido() {
-    // Aquí se procesaría el pedido con el backend
-    console.log('Procesando pedido...', {
-      items: this.itemsCarrito,
-      metodo: this.metodoSeleccionado,
-      total: this.total,
+    if (this.itemsCarrito.length === 0) {
+      this.mostrarMensaje('Tu carrito está vacío');
+      return;
+    }
+
+    // Build order payload
+    const items: OrderItemDto[] = this.itemsCarrito.map((it) => {
+      const pid = Number(it.id);
+      return {
+        type: 'PRODUCT',
+        productId: Number.isFinite(pid) ? pid : null,
+        promotionId: null,
+        quantity: it.cantidad,
+      } as OrderItemDto;
     });
 
-    this.mostrarMensaje('¡Pedido realizado con éxito!');
-    // Limpiar carrito
-    this.itemsCarrito = [];
-    this.descuentoAplicado = 0;
-    this.propina = 0;
+    const payload: CreateOrderDto = {
+      tip: this.propina || 0,
+      items,
+    };
+
+    try {
+      const existingOrderId = localStorage.getItem('active_order_id');
+
+      if (existingOrderId) {
+        // update existing order
+        this.ordersService.updateOrder(existingOrderId, payload).subscribe({
+          next: (res) => {
+            console.debug('Order updated', res);
+            // Save returned id if present
+            const returnedId = res?.id || res?.orderId || existingOrderId;
+            if (returnedId)
+              localStorage.setItem('active_order_id', String(returnedId));
+            this.mostrarMensaje('Pedido actualizado con éxito');
+            this.cartService.clear();
+            this.descuentoAplicado = 0;
+            this.propina = 0;
+          },
+          error: (err) => {
+            console.error('Order update failed', err);
+            const msg =
+              err?.error?.message ||
+              err?.message ||
+              'Error al actualizar el pedido';
+            this.mostrarMensaje(`No se pudo actualizar el pedido: ${msg}`);
+          },
+        });
+      } else {
+        this.ordersService.createOrder(payload).subscribe({
+          next: (res) => {
+            console.debug('Order created', res);
+            const returnedId =
+              res?.id ||
+              res?.orderId ||
+              (res && res.data && res.data.id) ||
+              null;
+            if (returnedId)
+              localStorage.setItem('active_order_id', String(returnedId));
+            this.mostrarMensaje('¡Pedido realizado con éxito!');
+            this.cartService.clear();
+            this.descuentoAplicado = 0;
+            this.propina = 0;
+          },
+          error: (err) => {
+            console.error('Order creation failed', err);
+            const msg =
+              err?.error?.message || err?.message || 'Error al crear el pedido';
+
+            const lower = String(msg).toLowerCase();
+            const looksLikeActiveLimit =
+              lower.includes('3') ||
+              lower.includes('tres') ||
+              lower.includes('activo') ||
+              lower.includes('activos') ||
+              lower.includes('active');
+
+            if (looksLikeActiveLimit) {
+              console.warn(
+                'Server reported active-order limit; attempting to find and update an existing order instead.'
+              );
+              this.ordersService.getMyOrders().subscribe({
+                next: (ordersRes) => {
+                  const orders = Array.isArray(ordersRes)
+                    ? ordersRes
+                    : ordersRes?.data || [];
+                  const candidate = orders.find((o: any) => {
+                    const estado = (o.estado || o.status || '')
+                      .toString()
+                      .toLowerCase();
+                    return (
+                      !estado.includes('entregado') &&
+                      !estado.includes('cancelado')
+                    );
+                  });
+
+                  if (candidate && candidate.id) {
+                    console.debug(
+                      'Found existing active order to update:',
+                      candidate.id
+                    );
+                    this.ordersService
+                      .updateOrder(candidate.id, payload)
+                      .subscribe({
+                        next: (r2) => {
+                          const returnedId =
+                            r2?.id || r2?.orderId || candidate.id;
+                          if (returnedId)
+                            localStorage.setItem(
+                              'active_order_id',
+                              String(returnedId)
+                            );
+                          this.mostrarMensaje(
+                            'Pedido actualizado (por límite de pedidos activos).'
+                          );
+                          this.cartService.clear();
+                          this.descuentoAplicado = 0;
+                          this.propina = 0;
+                        },
+                        error: (err2) => {
+                          console.error('Fallback update failed', err2);
+                          this.mostrarMensaje(
+                            `No se pudo crear ni actualizar el pedido: ${msg}`
+                          );
+                        },
+                      });
+                    return;
+                  }
+
+                  this.mostrarMensaje(`No se pudo crear el pedido: ${msg}`);
+                },
+                error: (fetchErr) => {
+                  console.error('Failed to fetch my orders', fetchErr);
+                  this.mostrarMensaje(`No se pudo crear el pedido: ${msg}`);
+                },
+              });
+            } else {
+              this.mostrarMensaje(`No se pudo crear el pedido: ${msg}`);
+            }
+          },
+        });
+      }
+    } catch (e) {
+      console.error('procesarPedido unexpected error', e);
+      this.mostrarMensaje('Error inesperado al procesar el pedido');
+    }
   }
 
   async limpiarCarrito() {
@@ -296,7 +405,7 @@ export class CarritoPage implements OnInit {
         {
           text: 'Limpiar',
           handler: () => {
-            this.itemsCarrito = [];
+            this.cartService.clear();
             this.descuentoAplicado = 0;
             this.propina = 0;
             this.calcularTotales();
