@@ -64,9 +64,11 @@
     </div>
 
     <!-- spinner de carga -->
-    <div *ngIf="loading" class="ion-text-center p-4">
-      <ion-spinner name="crescent"></ion-spinner>
-    </div>
+     @if (loading) {
+       <div class="ion-text-center p-4">
+         <ion-spinner name="crescent"></ion-spinner>
+        </div>
+      }
 
     <!-- Sección Pedidos Activos -->
     <h2 class="text-2xl font-bold text-gray-300 mb-4">Pedidos</h2>
@@ -95,51 +97,36 @@
           <ion-card-content class="text-sm">
             <div class="flex justify-between items-center mb-3">
               <ion-chip class="px-2 py-1 rounded-md" [class]="getEstadoChip(pedido.estado).class">
-                <ion-label class="text-xs font-semibold text-black">{{ getEstadoChip(pedido.estado).label }}</ion-label>
+                <ion-label class="text-lg font-semibold text-black">{{ getEstadoChip(pedido.estado).label }}</ion-label>
               </ion-chip>
             </div>
-
-            <p class="text-gray-800 mb-2">{{ pedido.descripcion }}</p>
-
             <div class="flex justify-between items-center mb-3">
-              <p class="font-semibold text-green-700 text-lg">
-                ${{ pedido.precio | number: '1.2-2' }}
-              </p>
               <ng-container>
-                <p *ngIf="pedido.tiempoEstimado" class="text-xs text-gray-800">
-                  Tiempo estimado: {{ pedido.tiempoEstimado }}
-                </p>
-                <p
-                  *ngIf="!pedido.tiempoEstimado && pedido.estado === 'listo'"
+                @if (pedido.estado?.includes('listo')) {
+                  <p
                   class="text-xs text-green-600 font-semibold"
-                >
+                  >
                   ¡Recoge tu pedido!
                 </p>
-              </ng-container>
-            </div>
-
-            <div *ngIf="pedido.reviews && pedido.reviews.length > 0" class="flex gap-2 mb-3">
-              <ng-container *ngFor="let review of pedido.reviews">
-                <ion-chip mode="ios" [class]="review.bgColor">
-                  <ion-label class="text-xs">{{ review?.comment || 'Reseña' }}</ion-label>
-                </ion-chip>
+              }
               </ng-container>
             </div>
           </ion-card-content>
         </ion-card>
       </div>
     </div>
+
     <!-- Sección Historial -->
     <h2 class="text-2xl font-bold text-gray-500 mb-4">Historial Reciente</h2>
 
     <div class="flex flex-col gap-4 mb-6">
-      <div
-        *ngIf="!loading && pedidosHistorial.length === 0"
+      @if (!loading && pedidosHistorial.length === 0) {
+        <div
         class="w-full p-6 text-center text-gray-400"
-      >
+        >
         No hay historial de pedidos.
       </div>
-
+    }
       <div *ngFor="let pedido of pedidosHistorial" class="w-full">
         <ion-card class="p-1 w-full">
           <img
@@ -155,33 +142,14 @@
           <ion-card-content class="text-sm">
             <div class="flex justify-between items-center mb-3">
               <ion-chip [class]="getEstadoChip(pedido.estado).class">
-                <ion-label class="text-xs"
+                <ion-label class=" text-black font-semibold text-lg"
                   >{{ getEstadoChip(pedido.estado).label }}</ion-label
                 >
               </ion-chip>
-              <span class="text-xs text-gray-100"
-                >{{ pedido.fechaEntrega }}</span
-              >
             </div>
 
-            <p class="text-gray-500 mb-2">{{ pedido.descripcion }}</p>
-
-            <div class="flex justify-between items-center mb-3">
-              <p class="font-bold text-gray-100 text-lg">
-                ${{ pedido.precio | number: '1.2-2' }}
-              </p>
-              <div *ngIf="pedido.calificacion" class="flex items-center">
-                <span class="text-yellow-400 text-sm"
-                  >{{ getStars(pedido.calificacion) }}</span
-                >
-                <span class="text-xs text-gray-500 ml-1"
-                  >{{ pedido.calificacion }}.0</span
-                >
-              </div>
-            </div>
-
-            <ion-button
-              *ngIf="getEstadoChip(pedido.estado).label === 'ENTREGADO'"
+            @if (getEstadoChip(pedido.estado).label === 'ENTREGADO') {
+              <ion-button
               fill="outline"
               color="warning"
               size="small"
@@ -189,6 +157,7 @@
             >
               <ion-label id="open-loading">Volver a pedir</ion-label>
             </ion-button>
+          }
           </ion-card-content>
         </ion-card>
       </div>

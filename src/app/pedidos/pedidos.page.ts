@@ -16,7 +16,7 @@ import {
   IonButton,
   IonRefresher,
   IonRefresherContent,
-} from '@ionic/angular/standalone';
+  IonFab, IonIcon } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
 import { OrdersService } from '../services/orders.service';
@@ -47,7 +47,8 @@ interface Pedido {
   templateUrl: './pedidos.page.html',
   styleUrls: ['./pedidos.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonIcon, 
+    IonFab,
     IonRefresherContent,
     IonRefresher,
     IonSpinner,
@@ -288,7 +289,7 @@ export class PedidosPage implements OnInit {
       };
     }
     if (s.includes('listo')) {
-      return { class: 'bg-green-100 text-green-800', label: '¡Lista!' };
+      return { class: 'bg-green-100 text-green-800', label: '¡Listo!' };
     }
     if (s.includes('entreg')) {
       return { class: 'bg-blue-100 text-blue-800', label: 'Entregado' };
