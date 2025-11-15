@@ -271,28 +271,15 @@ export class CarritoPage implements OnInit {
       const existingOrderId = localStorage.getItem('active_order_id');
 
       if (existingOrderId) {
-        // update existing order
-        this.ordersService.updateOrder(existingOrderId, payload).subscribe({
-          next: (res) => {
-            console.debug('Order updated', res);
-            // Save returned id if present
-            const returnedId = res?.id || res?.orderId || existingOrderId;
-            if (returnedId)
-              localStorage.setItem('active_order_id', String(returnedId));
-            this.mostrarMensaje('Pedido actualizado con éxito');
-            this.cartService.clear();
-            this.descuentoAplicado = 0;
-            this.propina = 0;
-          },
-          error: (err) => {
-            console.error('Order update failed', err);
-            const msg =
-              err?.error?.message ||
-              err?.message ||
-              'Error al actualizar el pedido';
-            this.mostrarMensaje(`No se pudo actualizar el pedido: ${msg}`);
-          },
-        });
+        // Client is not allowed to update orders; inform the user and suggest opening Pedidos
+        console.warn(
+          'Client-side updateOrder disabled; existing active_order_id:',
+          existingOrderId
+        );
+        this.mostrarMensaje(
+          `Ya existe un pedido activo (id: ${existingOrderId}). Ve a Mis Pedidos para gestionarlo.`
+        );
+        return;
       } else {
         this.ordersService.createOrder(payload).subscribe({
           next: (res) => {
@@ -324,13 +311,14 @@ export class CarritoPage implements OnInit {
 
             if (looksLikeActiveLimit) {
               console.warn(
-                'Server reported active-order limit; attempting to find and update an existing order instead.'
+                'Server reported active-order limit; fetching my orders to inform the user.'
               );
               this.ordersService.getMyOrders().subscribe({
                 next: (ordersRes) => {
+                  console.log('Fallback getMyOrders response:', ordersRes);
                   const orders = Array.isArray(ordersRes)
                     ? ordersRes
-                    : ordersRes?.data || [];
+                    : ordersRes?.data || ordersRes?.orders || [];
                   const candidate = orders.find((o: any) => {
                     const estado = (o.estado || o.status || '')
                       .toString()
@@ -341,36 +329,21 @@ export class CarritoPage implements OnInit {
                     );
                   });
 
-                  if (candidate && candidate.id) {
+                  if (
+                    candidate &&
+                    (candidate.id || candidate.orderId || candidate.uuid)
+                  ) {
+                    const cid =
+                      candidate.id || candidate.orderId || candidate.uuid;
                     console.debug(
-                      'Found existing active order to update:',
-                      candidate.id
+                      'Found existing active order id (will store locally):',
+                      cid
                     );
-                    this.ordersService
-                      .updateOrder(candidate.id, payload)
-                      .subscribe({
-                        next: (r2) => {
-                          const returnedId =
-                            r2?.id || r2?.orderId || candidate.id;
-                          if (returnedId)
-                            localStorage.setItem(
-                              'active_order_id',
-                              String(returnedId)
-                            );
-                          this.mostrarMensaje(
-                            'Pedido actualizado (por límite de pedidos activos).'
-                          );
-                          this.cartService.clear();
-                          this.descuentoAplicado = 0;
-                          this.propina = 0;
-                        },
-                        error: (err2) => {
-                          console.error('Fallback update failed', err2);
-                          this.mostrarMensaje(
-                            `No se pudo crear ni actualizar el pedido: ${msg}`
-                          );
-                        },
-                      });
+                    localStorage.setItem('active_order_id', String(cid));
+                    this.mostrarMensaje(
+                      `Tienes un pedido activo (id: ${cid}). Ve a Mis Pedidos para gestionarlo.`
+                    );
+                    // Do not attempt to update the order from client-side (no permission)
                     return;
                   }
 

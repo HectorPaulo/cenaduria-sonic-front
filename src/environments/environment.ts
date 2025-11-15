@@ -21,6 +21,3 @@ export const environment = {
   FIREBASE_BUCKET_NAME: 'foodtruck-filestorage.firebasestorage.app',
   FIREBASE_SERVICE_ACCOUNT: 'file:./firebase-credentials.json',
 } as const;
-
-const storageRef = ref(storage, 'path/en/storage.jpg');
-getDownloadURL(storageRef).then((url) => {});

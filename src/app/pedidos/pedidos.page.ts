@@ -20,6 +20,7 @@ import {
 import { HeaderComponent } from '../components/header/header.component';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
 import { OrdersService } from '../services/orders.service';
+import { AuthService } from '../services/auth.service';
 import { RefresherCustomEvent } from '@ionic/core';
 
 interface Review {
@@ -78,40 +79,111 @@ export class PedidosPage implements OnInit {
 
   pedidosHistorial: Pedido[] = [];
 
-  // UI state
   loading = false;
-  filterLabel = 'Todos';
+  selectedFilter: 'todos' | 'recientes' | 'pendientes' | 'ultima' =
+    'pendientes';
 
-  constructor(private ordersService: OrdersService) {}
+  constructor(
+    private ordersService: OrdersService,
+    private auth: AuthService
+  ) {}
 
   ngOnInit() {}
 
   ngAfterViewInit() {
-    // Load initial set of orders (user's last active orders)
-    this.loadMyOrdersPaged(1, 10);
+    try {
+      const t =
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('auth_token') ||
+        null;
+      console.log(
+        '[PedidosPage] token present:',
+        t ? `yes (len=${t.length})` : 'no'
+      );
+    } catch (e) {
+      console.error('[PedidosPage] error reading token from storage', e);
+    }
+    // default view: pendientes + historial (pending first)
+    this.selectFilter('pendientes');
+  }
+
+  selectFilter(filter: 'todos' | 'recientes' | 'pendientes' | 'ultima') {
+    this.selectedFilter = filter;
+    if (filter === 'todos') {
+      this.loadMyOrders();
+      return;
+    }
+    if (filter === 'pendientes') {
+      this.pedidosHistorial = [];
+      this.loadPending();
+      this.loadRecent();
+      return;
+    }
+    if (filter === 'recientes') {
+      this.pedidosActivos = [];
+      this.loadRecent();
+      return;
+    }
+    if (filter === 'ultima') {
+      this.pedidosHistorial = [];
+      this.pedidosActivos = [];
+      this.loadLast();
+      return;
+    }
   }
 
   loadMyOrdersPaged(page = 1, size = 10, sort = '') {
     this.loading = true;
     this.ordersService.getMyOrdersPaged(page, size, sort).subscribe({
       next: (res) => {
-        // Try common payload shapes: array or { data: [...] }
-        const raw = Array.isArray(res) ? res : res?.data || res?.orders || [];
+        console.log('[PedidosPage] loadMyOrdersPaged raw response:', res);
+        const raw = Array.isArray(res)
+          ? res
+          : res?.data || res?.orders || res?.content || [];
         const items = raw.map((r: any) => this.normalizeOrder(r));
-        // split between active (not final) and historial (final)
+
         this.pedidosActivos = items.filter((o: any) => {
-          const estado = (o.estado || '').toString().toLowerCase();
+          const estado = o.estado.toString().toLowerCase();
           return !estado.includes('entregado') && !estado.includes('cancelado');
         });
+
         this.pedidosHistorial = items.filter((o: any) => {
           const estado = (o.estado || '').toString().toLowerCase();
           return estado.includes('entregado') || estado.includes('cancelado');
         });
         this.loading = false;
-        this.filterLabel = 'Todos';
       },
       error: (err) => {
         console.error('Failed to load my orders', err);
+        this.loading = false;
+      },
+    });
+  }
+
+  loadMyOrders() {
+    this.loading = true;
+    this.ordersService.getMyOrders().subscribe({
+      next: (res) => {
+        console.log('[PedidosPage] loadMyOrders raw response:', res);
+        const raw = Array.isArray(res)
+          ? res
+          : res?.data || res?.orders || res?.content || [];
+        const items = raw.map((r: any) => this.normalizeOrder(r));
+
+        this.pedidosActivos = items.filter((o: any) => {
+          const estado = (o.estado || '').toString().toLowerCase();
+          return !estado.includes('entregado') && !estado.includes('cancelado');
+        });
+
+        this.pedidosHistorial = items.filter((o: any) => {
+          const estado = (o.estado || '').toString().toLowerCase();
+          return estado.includes('entregado') || estado.includes('cancelado');
+        });
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load my orders (non-paged)', err);
         this.loading = false;
       },
     });
@@ -121,11 +193,13 @@ export class PedidosPage implements OnInit {
     this.loading = true;
     this.ordersService.getRecentOrders().subscribe({
       next: (res) => {
-        const raw = Array.isArray(res) ? res : res?.data || [];
-        this.pedidosActivos = raw.map((r: any) => this.normalizeOrder(r));
-        this.pedidosHistorial = [];
+        console.log('[PedidosPage] loadRecent raw response:', res);
+        const raw = Array.isArray(res)
+          ? res
+          : res?.data || res?.orders || res?.content || [];
+        // Recent orders should populate the history section
+        this.pedidosHistorial = raw.map((r: any) => this.normalizeOrder(r));
         this.loading = false;
-        this.filterLabel = 'Recientes';
       },
       error: (err) => {
         console.error('Failed to load recent orders', err);
@@ -138,11 +212,13 @@ export class PedidosPage implements OnInit {
     this.loading = true;
     this.ordersService.getPendingOrders().subscribe({
       next: (res) => {
-        const raw = Array.isArray(res) ? res : res?.data || [];
+        console.log('[PedidosPage] loadPending raw response:', res);
+        const raw = Array.isArray(res)
+          ? res
+          : res?.data || res?.orders || res?.content || [];
+        // Pending orders should populate the active section only
         this.pedidosActivos = raw.map((r: any) => this.normalizeOrder(r));
-        this.pedidosHistorial = [];
         this.loading = false;
-        this.filterLabel = 'Pendientes';
       },
       error: (err) => {
         console.error('Failed to load pending orders', err);
@@ -155,11 +231,11 @@ export class PedidosPage implements OnInit {
     this.loading = true;
     this.ordersService.getLastOrder().subscribe({
       next: (res) => {
-        const itemRaw = res?.data || res || null;
+        console.log('[PedidosPage] loadLast raw response:', res);
+        const itemRaw = res?.data || res?.orders || res?.content || res || null;
         this.pedidosActivos = itemRaw ? [this.normalizeOrder(itemRaw)] : [];
         this.pedidosHistorial = [];
         this.loading = false;
-        this.filterLabel = 'Última';
       },
       error: (err) => {
         console.error('Failed to load last order', err);
@@ -172,7 +248,10 @@ export class PedidosPage implements OnInit {
     this.loading = true;
     this.ordersService.getOrdersByDateRange(startIso, endIso).subscribe({
       next: (res) => {
-        const raw = Array.isArray(res) ? res : res?.data || [];
+        console.log('[PedidosPage] loadByDateRange raw response:', res);
+        const raw = Array.isArray(res)
+          ? res
+          : res?.data || res?.orders || res?.content || [];
         const items = raw.map((r: any) => this.normalizeOrder(r));
         this.pedidosActivos = items.filter((o: any) => {
           const estado = (o.estado || '').toString().toLowerCase();
@@ -183,7 +262,6 @@ export class PedidosPage implements OnInit {
           return estado.includes('entregado') || estado.includes('cancelado');
         });
         this.loading = false;
-        this.filterLabel = 'Rango de fechas';
       },
       error: (err) => {
         console.error('Failed to load orders by date range', err);
@@ -194,6 +272,7 @@ export class PedidosPage implements OnInit {
 
   getEstadoChip(estado?: string) {
     const s = (estado || '').toString().toLowerCase();
+    // Map backend states to UI chips. Backend possible values: pendiente, en_preparacion, listo, entregado, cancelado
     if (s.includes('pend')) {
       return { class: 'bg-yellow-100 text-yellow-800', label: 'Pendiente' };
     }
