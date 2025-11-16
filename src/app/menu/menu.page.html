@@ -79,15 +79,16 @@
             />
             <ion-card-header>
               <ion-card-title class="text-lg font-bold">
-                <p class="text-gray-800 font-semibold">{{ comida.name }}</p>
+                <p class="text-gray-800 font-semibold text-2xl">{{ comida.name }}</p>
               </ion-card-title>
             </ion-card-header>
-            <ion-card-content class="text-sm">
-              <!-- <p class="text-gray-600">{{ comida.description }}</p> -->
-              <p class="font-bold text-green-700">
-                ${{ comida.price | number: '1.2-2' }}
-              </p>
-
+            <ion-card-content class="flex flex-row justify-between items-center">
+               <ion-chip 
+               color="success" 
+               mode="ios"
+               class="font-semibold text-lg bg-green-200 text-green-800">
+                <ion-label>${{comida.price | number: '1.2-2'}}</ion-label>
+               </ion-chip>
               <ion-button
                 (click)="addToCart(comida)"
                 color="light"
@@ -96,15 +97,6 @@
                 <ion-icon color="dark" slot="icon-only" class="ion-padding" name="cart"></ion-icon>
               </ion-button>
 
-              <ion-button
-                (click)="addToList(comida)"
-                shape="round"
-                color="light"
-                size="small"
-                class="float-right mt-1"
-              >
-                <ion-icon slot="icon-only" name="heart" class="ion-padding"></ion-icon>
-              </ion-button>
             </ion-card-content>
           </ion-card>
         </ion-row>

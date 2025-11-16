@@ -3,7 +3,7 @@
 <ion-content [fullscreen]="true" class="bg-white">
   <app-fabbtn></app-fabbtn>
   <div class="max-w-lg mx-auto p-4">
-    <!-- Logo y versión -->
+    <!-- Logo y versión
     <div class="text-center mb-6">
       <div class="flex justify-center mb-4">
         <img
@@ -16,12 +16,12 @@
         {{ appInfo.nombre }}
       </h1>
       <p class="text-sm text-gray-600">Versión {{ appInfo.version }}</p>
-    </div>
+    </div> -->
 
     <!-- Descripción -->
-    <ion-card mode="ios" class="shadow-sm mb-4">
+    <ion-card mode="ios" class="shadow-sm mb-4 mt-16">
       <ion-card-content>
-        <p class="text-gray-700 text-center leading-relaxed">
+        <p class="text-gray-400 text-justify leading-relaxed">
           {{ appInfo.descripcion }}
         </p>
       </ion-card-content>
@@ -55,7 +55,7 @@
             <h3 class="font-semibold text-gray-800">
               {{ caracteristica.titulo }}
             </h3>
-            <p class="text-sm text-gray-600">
+            <p class="text-sm text-gray-400">
               {{ caracteristica.descripcion }}
             </p>
           </div>
@@ -112,57 +112,9 @@
       </ion-card-content>
     </ion-card>
 
-    <!-- Enlaces legales -->
-    <ion-card mode="ios" class="shadow-sm mb-4">
-      <ion-card-content class="space-y-2">
-        <div
-          class="flex justify-between items-center py-2 border-b border-gray-100"
-          (click)="verTerminos()"
-        >
-          <div class="flex items-center">
-            <ion-icon
-              name="document-text-outline"
-              class="mr-3 text-gray-600"
-            ></ion-icon>
-            <p class="font-medium text-gray-800">Términos y Condiciones</p>
-          </div>
-          <ion-icon
-            name="chevron-forward-outline"
-            class="text-gray-400"
-          ></ion-icon>
-        </div>
-        <div
-          class="flex justify-between items-center py-2"
-          (click)="verPrivacidad()"
-        >
-          <div class="flex items-center">
-            <ion-icon
-              name="shield-checkmark-outline"
-              class="mr-3 text-gray-600"
-            ></ion-icon>
-            <p class="font-medium text-gray-800">Política de Privacidad</p>
-          </div>
-          <ion-icon
-            name="chevron-forward-outline"
-            class="text-gray-400"
-          ></ion-icon>
-        </div>
-      </ion-card-content>
-    </ion-card>
-
     <!-- Botón de soporte -->
     <div class="space-y-3 mt-6 mb-8">
-      <ion-button
-        fill="outline"
-        color="tertiary"
-        expand="block"
-        class="font-semibold"
-        (click)="contactarSoporte()"
-      >
-        <ion-icon name="mail-outline" slot="start"></ion-icon>
-        Contactar Soporte
-      </ion-button>
-
+      
       <ion-button
         fill="clear"
         color="medium"
@@ -176,7 +128,7 @@
 
     <!-- Footer -->
     <div class="text-center text-gray-500 text-sm pb-4">
-      <p>© 2024 {{ appInfo.nombre }}</p>
+      <p>© 2025 {{ appInfo.nombre }}</p>
       <p>Desarrollado por Los Dorpepus</p>
     </div>
   </div>

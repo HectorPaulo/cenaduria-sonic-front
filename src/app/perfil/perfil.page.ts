@@ -29,6 +29,8 @@ import User from '../Types/User';
 import { Capacitor } from '@capacitor/core';
 import { RefresherCustomEvent } from '@ionic/core';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
+import { Usuarios } from '../services/usuarios.service';
+import { ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService, UserRole } from '../services/auth.service';
 
@@ -73,7 +75,8 @@ export class PerfilPage implements OnInit {
   constructor(
     private alertController: AlertController,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private usuarios: Usuarios
   ) {
     addIcons({
       image,
@@ -99,9 +102,25 @@ export class PerfilPage implements OnInit {
 
   // * Métodos para cargar datos
   cargarDatosUsuario() {
-    // ? Simulación de carga de datos
+    // Cargar datos reales desde el backend
     console.log('Cargando datos del usuario...');
-    // ! En el futuro: this.userService.getUserProfile().subscribe(...)
+    this.usuarios.getProfile().subscribe({
+      next: (res) => {
+        this.usuario = {
+          nombre: res.name || res.username || this.usuario.nombre,
+          email: res.email || this.usuario.email,
+          telefono: this.usuario.telefono,
+          avatar: res.avatarUrl || this.usuario.avatar,
+          fechaRegistro: res.registerDate
+            ? new Date(res.registerDate).toLocaleDateString()
+            : this.usuario.fechaRegistro,
+          pedidosRecientes: this.usuario.pedidosRecientes,
+        } as any;
+      },
+      error: (err) => {
+        console.error('Error cargando perfil:', err);
+      },
+    });
   }
 
   // * Métodos de edición para datos de usuario
@@ -165,7 +184,42 @@ export class PerfilPage implements OnInit {
   // }
 
   async seleccionarDeGaleria() {
-    console.log("Por implementar");
+    // Abrir selector de archivos oculto
+    try {
+      this.fileInput?.nativeElement.click();
+    } catch (e) {
+      console.error('Error abriendo selector de archivos', e);
+      this.mostrarError('No se pudo abrir la galería');
+    }
+  }
+
+  @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files && input.files[0];
+    if (!file) return;
+
+    const form = new FormData();
+    form.append('avatar', file, file.name);
+    this.usuarios.updateAvatar(form).subscribe({
+      next: (res) => {
+        console.log('Avatar actualizado:', res);
+        // Backend may return the new avatar URL
+        const newUrl =
+          res?.avatarUrl || res?.data?.avatarUrl || res?.url || null;
+        if (newUrl) {
+          this.usuario.avatar = newUrl;
+        }
+        this.mostrarExito('Foto de perfil actualizada correctamente');
+      },
+      error: (err) => {
+        console.error('Error subiendo avatar', err);
+        this.mostrarError('No se pudo actualizar la foto de perfil');
+      },
+    });
+    // limpiar el input
+    input.value = '';
   }
 
   async editarNombre() {
@@ -293,12 +347,28 @@ export class PerfilPage implements OnInit {
         {
           text: 'Cambiar',
           handler: (data) => {
-            if (data.passwordNueva === data.passwordConfirmar) {
-              console.log('Cambiando contraseña...');
-              // TODO: Implementar cambio de contraseña
-            } else {
+            if (data.passwordNueva !== data.passwordConfirmar) {
               this.mostrarError('Las contraseñas no coinciden');
+              return false; // keep the alert open
             }
+            const payload = {
+              currentPassword: data.passwordActual || '',
+              newPassword: data.passwordNueva || '',
+              confirmNewPassword: data.passwordConfirmar || '',
+            };
+            this.usuarios.updatePassword(payload).subscribe({
+              next: (res) => {
+                console.log('Contraseña cambiada', res);
+                this.mostrarExito('Contraseña actualizada correctamente');
+              },
+              error: (err) => {
+                console.error('Error cambiando contraseña', err);
+                const msg =
+                  err?.error?.message || 'No se pudo cambiar la contraseña';
+                this.mostrarError(msg);
+              },
+            });
+            return true;
           },
         },
       ],

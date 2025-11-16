@@ -28,7 +28,7 @@ import { Router } from '@angular/router';
   templateUrl: './about.page.html',
   styleUrls: ['./about.page.scss'],
   standalone: true,
-  imports: [ 
+  imports: [
     IonContent,
     IonCard,
     IonCardHeader,
@@ -45,18 +45,35 @@ import { Router } from '@angular/router';
 export class AboutPage implements OnInit {
   appInfo = {
     nombre: 'Cenaduria Sonic',
-    version: '1.0.0',
+    version: '16.5.2',
     descripcion:
-      'Tu app favorita para ordenar las mejores cenas de la ciudad. Rápido, fácil y delicioso.',
+      'Tu app favorita para ordenar las mejores cenas de la ciudad. Rápido, fácil y delicioso. En realidad esta app no existe ni será aplicada a ningun tipo de negocio real; los datos mostrados no son reales.',
     desarrollador: 'Equipo Sonic Dev',
     email: 'soporte@cenaduriasonic.com',
-    telefono: '+502 1234-5678',
+    telefono: '+52 1 951 440 6951',
   };
 
   redesSociales = [
-    { nombre: 'Facebook', icon: 'logo-facebook', url: '#' },
-    { nombre: 'Instagram', icon: 'logo-instagram', url: '#' },
-    { nombre: 'GitHub', icon: 'logo-github', url: '#' },
+    {
+      nombre: 'GitHub',
+      icon: 'logo-github',
+      url: 'https://github.com/HectorPaulo',
+    },
+    {
+      nombre: 'GitHub',
+      icon: 'logo-github',
+      url: 'https://github.com/MandraVEVO',
+    },
+    {
+      nombre: 'GitHub',
+      icon: 'logo-github',
+      url: 'https://github.com/ElMemelitas',
+    },
+    {
+      nombre: 'GitHub',
+      icon: 'logo-github',
+      url: 'https://github.com/danielpraisethelord',
+    },
   ];
 
   caracteristicas = [
@@ -87,7 +104,7 @@ export class AboutPage implements OnInit {
       shieldCheckmarkOutline,
       logoGithub,
       logoInstagram,
-      logoFacebook
+      logoFacebook,
     });
   }
 
