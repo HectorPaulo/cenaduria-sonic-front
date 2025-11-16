@@ -8,6 +8,8 @@ import {
   AbstractControl,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpAuthService } from 'src/app/services/http-auth.service';
+import { AuthService } from 'src/app/services/auth.service';
 import {
   IonContent,
   IonHeader,
@@ -52,11 +54,14 @@ import {
 })
 export class RegistroEmpleadoPage {
   empleadoForm: FormGroup;
+  submitting = false;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private httpAuth: HttpAuthService,
+    private authService: AuthService
   ) {
     this.empleadoForm = this.fb.group(
       {
@@ -129,14 +134,49 @@ export class RegistroEmpleadoPage {
       return;
     }
 
-    // Aquí podrías enviar al backend; de momento sólo mostramos un toast
-    const toast = await this.toastCtrl.create({
-      message: 'Empleado creado (simulado)',
-      color: 'success',
-      duration: 2000,
+    this.submitting = true;
+    const values = this.empleadoForm.value;
+    const payload = {
+      username: values.email || values.nombre,
+      email: values.email,
+      password: values.password,
+      roles: ['ROLE_EMPLOYEE'],
+      // additional metadata if backend accepts it
+      puesto: values.puesto,
+      telefono: values.telefono,
+    };
+
+    // Use admin token from AuthService/localStorage to authorize registration
+    const token =
+      this.authService.getCurrentToken() ||
+      localStorage.getItem('access_token') ||
+      null;
+
+    this.httpAuth.register(payload, token).subscribe({
+      next: async (res: any) => {
+        console.log('[RegistroEmpleado] register success', res);
+        this.submitting = false;
+        const toast = await this.toastCtrl.create({
+          message: 'Empleado registrado correctamente',
+          color: 'success',
+          duration: 2000,
+        });
+        await toast.present();
+        this.router.navigate(['/empleado/dashboard']);
+      },
+      error: async (err: any) => {
+        console.error('[RegistroEmpleado] register failed', err);
+        this.submitting = false;
+        const msg =
+          err?.error?.message || err?.message || 'Error registrando empleado';
+        const toast = await this.toastCtrl.create({
+          message: msg,
+          color: 'danger',
+          duration: 3000,
+        });
+        await toast.present();
+      },
     });
-    await toast.present();
-    this.router.navigate(['/empleado/dashboard']);
   }
 
   cancel() {

@@ -30,7 +30,6 @@ export class HttpAuthService {
     return this.http.post<LoginResponse>(url, { username, password });
   }
 
-
   getProfile(): Observable<ProfileResponse> {
     const url = `${environment.BASE_URL}/api/profile`;
     console.debug('[HttpAuthService] GET profile', url);
@@ -43,6 +42,18 @@ export class HttpAuthService {
       hasRefresh: !!refreshToken,
     });
     return this.http.post<LoginResponse>(url, { refreshToken });
+  }
+
+  register(payload: any, adminToken?: string | null): Observable<any> {
+    const url = `${environment.BASE_URL}/api/auth/register`;
+    const headers: any = {};
+    if (adminToken) {
+      headers.Authorization = `Bearer ${adminToken}`;
+    }
+    console.debug('[HttpAuthService] POST register', url, {
+      hasToken: !!adminToken,
+    });
+    return this.http.post<any>(url, payload, { headers });
   }
 
   getDiagnostics(): { baseUrl: string; platform?: string } {

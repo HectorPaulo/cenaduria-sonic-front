@@ -75,9 +75,11 @@
             <ion-button
               expand="block"
               type="submit"
-              [disabled]="!empleadoForm.valid"
-              >Crear Empleado</ion-button
+              [disabled]="!empleadoForm.valid || submitting"
             >
+              <ng-container *ngIf="!submitting">Crear Empleado</ng-container>
+              <ng-container *ngIf="submitting">Creando...</ng-container>
+            </ion-button>
             <ion-button
               expand="block"
               fill="outline"

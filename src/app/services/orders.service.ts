@@ -195,6 +195,32 @@ export class OrdersService {
     return this.doGet(url, 'getPendingOrders');
   }
 
+  getActiveOrdersPaged(
+    page: number = 1,
+    size: number = 10,
+    sort: string = ''
+  ): Observable<any> {
+    const url = `${
+      environment.BASE_URL
+    }/api/orders/active?page=${page}&size=${size}&sort=${encodeURIComponent(
+      sort
+    )}`;
+    const token =
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('auth_token') ||
+      '';
+    const masked = token
+      ? `${token.slice(0, 6)}...${token.slice(-4)} (len=${token.length})`
+      : 'none';
+    console.log('[OrdersService] getActiveOrdersPaged token:', masked);
+    const headers = new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : '',
+    });
+    console.log('[OrdersService] GET', url, 'headers present:', !!token);
+    return this.doGet(url, 'getActiveOrdersPaged');
+  }
+
   getLastOrder(): Observable<any> {
     const url = `${environment.BASE_URL}/api/orders/my-orders/last`;
     const token =

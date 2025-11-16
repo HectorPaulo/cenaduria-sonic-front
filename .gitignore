@@ -74,3 +74,5 @@ Thumbs.db
 # Local environment files and service account credentials
 .env
 firebase-credentials.json
+
+.fake
