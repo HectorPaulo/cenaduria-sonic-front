@@ -149,11 +149,20 @@ export class CarritoPage implements OnInit {
   }
 
   calcularTotales() {
-    // Método para recalcular totales cuando cambian los items
     console.log('Recalculando totales...');
   }
 
-  // Métodos de pago
+  private getActiveOrderStorageKey(): string {
+    const token =
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('auth_token') ||
+      '';
+    if (!token) return 'active_order_id_guest';
+    const prefix = token.slice(0, 8);
+    return `active_order_id_${prefix}`;
+  }
+
   seleccionarMetodoPago(metodoId: string) {
     this.metodoSeleccionado = metodoId;
   }
@@ -251,7 +260,6 @@ export class CarritoPage implements OnInit {
       return;
     }
 
-    // Build order payload
     const items: OrderItemDto[] = this.itemsCarrito.map((it) => {
       const pid = Number(it.id);
       return {
@@ -268,13 +276,17 @@ export class CarritoPage implements OnInit {
     };
 
     try {
-      const existingOrderId = localStorage.getItem('active_order_id');
+      const activeKey = this.getActiveOrderStorageKey();
+      const existingOrderId = localStorage.getItem(activeKey);
 
       if (existingOrderId) {
         // Client is not allowed to update orders; inform the user and suggest opening Pedidos
         console.warn(
-          'Client-side updateOrder disabled; existing active_order_id:',
-          existingOrderId
+          'Client-side updateOrder disabled; existing active_order_id: ' +
+            existingOrderId +
+            ' (storage key: ' +
+            activeKey +
+            ')'
         );
         this.mostrarMensaje(
           `Ya existe un pedido activo (id: ${existingOrderId}). Ve a Mis Pedidos para gestionarlo.`
@@ -289,8 +301,10 @@ export class CarritoPage implements OnInit {
               res?.orderId ||
               (res && res.data && res.data.id) ||
               null;
-            if (returnedId)
-              localStorage.setItem('active_order_id', String(returnedId));
+            if (returnedId) {
+              const key = this.getActiveOrderStorageKey();
+              localStorage.setItem(key, String(returnedId));
+            }
             this.mostrarMensaje('¡Pedido realizado con éxito!');
             this.cartService.clear();
             this.descuentoAplicado = 0;
@@ -339,7 +353,8 @@ export class CarritoPage implements OnInit {
                       'Found existing active order id (will store locally):',
                       cid
                     );
-                    localStorage.setItem('active_order_id', String(cid));
+                    const key = this.getActiveOrderStorageKey();
+                    localStorage.setItem(key, String(cid));
                     this.mostrarMensaje(
                       `Tienes un pedido activo (id: ${cid}). Ve a Mis Pedidos para gestionarlo.`
                     );

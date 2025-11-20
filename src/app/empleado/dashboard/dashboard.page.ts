@@ -63,7 +63,6 @@ throw new Error('Method not implemented.');
 
   user = this.authService.getCurrentUser();
 
-  // Datos simulados para el dashboard
   stats = {
     pedidosPendientes: 8,
     pedidosCompletados: 24,

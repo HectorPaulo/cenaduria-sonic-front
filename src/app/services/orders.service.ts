@@ -45,7 +45,6 @@ export class OrdersService {
       tap((res) => console.log(`[OrdersService] ${logLabel} response:`, res)),
       catchError((err) => {
         console.error(`[OrdersService] ${logLabel} error:`, err);
-        // If unauthorized/forbidden, attempt a refresh and retry once
         if (
           (err?.status === 401 || err?.status === 403) &&
           localStorage.getItem('refresh_token')
@@ -259,5 +258,48 @@ export class OrdersService {
     });
     console.log('[OrdersService] GET', url, 'headers present:', !!token);
     return this.doGet(url, 'getOrdersByDateRange');
+  }
+
+  updateOrderStatus(orderId: number | string, status: string): Observable<any> {
+    const url = `${environment.BASE_URL}/api/orders/${orderId}/status`;
+    const token =
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('auth_token') ||
+      '';
+    const masked = token
+      ? `${token.slice(0, 6)}...${token.slice(-4)} (len=${token.length})`
+      : 'none';
+    console.log('[OrdersService] updateOrderStatus token:', masked);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: token ? `Bearer ${token}` : '',
+    });
+    console.log('[OrdersService] PATCH', url, 'status:', status);
+    return this.http
+      .patch<any>(url, { status }, { headers })
+      .pipe(
+        tap((res) => console.log('[OrdersService] updateOrderStatus res:', res))
+      );
+  }
+
+  cancelOrder(orderId: number | string): Observable<any> {
+    const url = `${environment.BASE_URL}/api/orders/${orderId}/cancel`;
+    const token =
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('token') ||
+      localStorage.getItem('auth_token') ||
+      '';
+    const masked = token
+      ? `${token.slice(0, 6)}...${token.slice(-4)} (len=${token.length})`
+      : 'none';
+    console.log('[OrdersService] cancelOrder token:', masked);
+    const headers = new HttpHeaders({
+      Authorization: token ? `Bearer ${token}` : '',
+    });
+    console.log('[OrdersService] PATCH', url, 'cancel');
+    return this.http
+      .patch<any>(url, {}, { headers })
+      .pipe(tap((res) => console.log('[OrdersService] cancelOrder res:', res)));
   }
 }

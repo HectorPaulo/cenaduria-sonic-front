@@ -27,6 +27,7 @@ import {
   IonText,
   ToastController,
 } from '@ionic/angular/standalone';
+import { HeaderComponent } from "src/app/components/header/header.component";
 
 @Component({
   selector: 'app-registro-empleado',
@@ -50,7 +51,8 @@ import {
     IonInput,
     IonButton,
     IonText,
-  ],
+    HeaderComponent
+],
 })
 export class RegistroEmpleadoPage {
   empleadoForm: FormGroup;
