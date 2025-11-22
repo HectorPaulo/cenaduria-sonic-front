@@ -125,23 +125,33 @@ export class PedidosEmpleadoPage implements OnInit {
 
   loadActiveOrders(cb?: () => void) {
     this.loading = true;
-    const page = 1;
-    const size = 100; 
 
-    this.pedidosService.getActiveOrdersPaged(page, size).subscribe({
-      next: (r: any) => {
-        console.log('[PedidosEmpleado] loadActiveOrders response:', r);
-        const raw = Array.isArray(r)
-          ? r
-          : r?.content || r?.data || r?.orders || [];
-        const mapped = raw.map((o: any) => this.normalize(o));
-        this.pedidos = mapped;
+    const statuses = ['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'ENTREGADO'];
+    const calls = statuses.map((s) =>
+      this.pedidosService.getOrdersByStatusPaged(s).pipe(
+        catchError((err) => {
+          console.error(
+            '[PedidosEmpleado] getOrdersByStatusPaged failed for',
+            s,
+            err
+          );
+          return of([]);
+        })
+      )
+    );
+
+    forkJoin(calls).subscribe({
+      next: (responses: any[]) => {
+        const raw = responses.flatMap((r) =>
+          Array.isArray(r) ? r : r?.content || r?.data || r?.orders || []
+        );
+        this.pedidos = raw.map((o: any) => this.normalize(o));
         this.recomputeGroups();
         this.loading = false;
         if (cb) cb();
       },
       error: (err: any) => {
-        console.error('[PedidosEmpleado] failed to load active orders', err);
+        console.error('[PedidosEmpleado] failed to load orders by status', err);
         this.loading = false;
         if (cb) cb();
       },
@@ -165,8 +175,6 @@ export class PedidosEmpleadoPage implements OnInit {
     const statusRaw = o?.status ?? o?.estado ?? '';
     const statusServer = statusRaw ? String(statusRaw) : '';
     const estado = this.mapServerStatusToNormalized(statusServer);
-    // The backend does not always include item details in this API,
-    // so for the employee view we omit item parsing and keep an empty list.
     const items: string[] = [];
     const total = o?.total ?? o?.amount ?? o?.price ?? o?.subtotal ?? 0;
     const tiempo =
@@ -244,24 +252,6 @@ export class PedidosEmpleadoPage implements OnInit {
     this.pedidosService.cancelOrder(id).subscribe({
       next: async (res: any) => {
         console.log('[PedidosEmpleado] order cancelled', res);
-        // remove from all lists
-        const matchId = id;
-        this.pedidos = this.pedidos.filter(
-          (p) => (p.raw?.id || p.id) !== matchId
-        );
-        this.pedidosPendientes = this.pedidosPendientes.filter(
-          (p) => (p.raw?.id || p.id) !== matchId
-        );
-        this.pedidosPreparando = this.pedidosPreparando.filter(
-          (p) => (p.raw?.id || p.id) !== matchId
-        );
-        this.pedidosListos = this.pedidosListos.filter(
-          (p) => (p.raw?.id || p.id) !== matchId
-        );
-        this.pedidosEntregados = this.pedidosEntregados.filter(
-          (p) => (p.raw?.id || p.id) !== matchId
-        );
-
         const message = res?.message || 'Pedido cancelado correctamente';
         const toast = await this.toastController.create({
           message,
@@ -269,7 +259,9 @@ export class PedidosEmpleadoPage implements OnInit {
           color: 'success',
         });
         toast.present();
-        this.changingStatus[id] = false;
+        this.loadActiveOrders(() => {
+          this.changingStatus[id] = false;
+        });
       },
       error: async (err: any) => {
         console.error('[PedidosEmpleado] failed to cancel order', err);
@@ -291,21 +283,9 @@ export class PedidosEmpleadoPage implements OnInit {
     this.pedidosService.updateOrderStatus(id, newStatus).subscribe({
       next: (res: any) => {
         console.log('[PedidosEmpleado] status updated', res);
-        // Update local pedido using returned fields when available
-        const statusFromRes = res?.status || res?.statusServer || newStatus;
-        pedido.raw = { ...(pedido.raw || {}), ...(res || {}) };
-        pedido.statusServer = statusFromRes;
-        pedido.estado = this.mapServerStatusToNormalized(
-          String(statusFromRes || newStatus)
-        );
-        // update master list entry too
-        const idx = this.pedidos.findIndex(
-          (p) => (p.raw?.id || p.id) === (pedido.raw?.id || pedido.id)
-        );
-        if (idx >= 0) this.pedidos[idx] = pedido;
-        // recompute grouped lists
-        this.recomputeGroups();
-        this.changingStatus[id] = false;
+        this.loadActiveOrders(() => {
+          this.changingStatus[id] = false;
+        });
       },
       error: (err: any) => {
         console.error('[PedidosEmpleado] failed to update status', err);
@@ -337,13 +317,9 @@ export class PedidosEmpleadoPage implements OnInit {
     this.pedidosService.cancelOrder(id).subscribe({
       next: (res: any) => {
         console.log('[PedidosEmpleado] order cancelled', res);
-        // remove from list or update status
-        const idx = this.pedidos.findIndex((p) => (p.raw?.id || p.id) === id);
-        if (idx >= 0) {
-          // remove cancelled order from pending list
-          this.pedidos.splice(idx, 1);
-        }
-        this.changingStatus[id] = false;
+        this.loadActiveOrders(() => {
+          this.changingStatus[id] = false;
+        });
       },
       error: (err: any) => {
         console.error('[PedidosEmpleado] failed to cancel order', err);

@@ -27,155 +27,181 @@
     </ng-container>
 
     <!-- Pendientes -->
-    <ion-card class="mb-4" *ngIf="pedidosPendientes.length > 0">
+    <ion-card class="mb-4">
       <ion-card-header>
         <ion-card-title>Pendientes</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-item
-          class="pedido-item"
-          *ngFor="let pedido of pedidosPendientes; let i = index; trackBy: trackById"
+        <ng-container
+          *ngIf="pedidosPendientes.length > 0; else emptyPendientes"
         >
-          <ion-label>
-            <div class="pedido-header">
-              <h3>{{ pedido.id }} - {{ pedido.cliente }}</h3>
-              <ion-badge [color]="getEstadoColor(pedido.estado)">
-                <ion-icon [name]="getEstadoIcon(pedido.estado)"></ion-icon>
-                {{ getEstadoTexto(pedido.estado) }}
-              </ion-badge>
-            </div>
-            <div class="pedido-details">
-              <p><strong>Total:</strong> ${{ pedido.total }}</p>
-              <p><strong>Hora:</strong> {{ pedido.tiempo }}</p>
-            </div>
-            <div class="pedido-actions">
-              <ion-item lines="none">
-                <ion-select
-                  interface="popover"
-                  placeholder="Estado"
-                  [value]="pedido.statusServer || ''"
-                  (ionChange)="changeOrderStatus(pedido, $event.detail.value)"
+          <ion-item
+            class="pedido-item"
+            *ngFor="let pedido of pedidosPendientes; let i = index; trackBy: trackById"
+          >
+            <ion-label>
+              <div class="pedido-header">
+                <h3>{{ pedido.id }} - {{ pedido.cliente }}</h3>
+                <ion-badge [color]="getEstadoColor(pedido.estado)">
+                  <ion-icon [name]="getEstadoIcon(pedido.estado)"></ion-icon>
+                  {{ getEstadoTexto(pedido.estado) }}
+                </ion-badge>
+              </div>
+              <div class="pedido-details">
+                <p><strong>Total:</strong> ${{ pedido.total }}</p>
+                <p><strong>Hora:</strong> {{ pedido.tiempo }}</p>
+              </div>
+              <div class="pedido-actions">
+                <ion-item lines="none">
+                  <ion-select
+                    interface="popover"
+                    placeholder="Estado"
+                    [value]="pedido.statusServer || ''"
+                    (ionChange)="changeOrderStatus(pedido, $event.detail.value)"
+                  >
+                    <ion-select-option value="EN_PREPARACION"
+                      >En preparación</ion-select-option
+                    >
+                    <ion-select-option value="LISTO">Listo</ion-select-option>
+                    <ion-select-option value="ENTREGADO"
+                      >Entregado</ion-select-option
+                    >
+                  </ion-select>
+                </ion-item>
+                <ion-button
+                  size="small"
+                  color="danger"
+                  (click)="confirmCancel(pedido)"
+                  [disabled]="changingStatus[pedido.raw?.id || pedido.id]"
                 >
-                  <ion-select-option value="EN_PREPARACION"
-                    >En preparación</ion-select-option
-                  >
-                  <ion-select-option value="LISTO">Listo</ion-select-option>
-                  <ion-select-option value="ENTREGADO"
-                    >Entregado</ion-select-option
-                  >
-                </ion-select>
-              </ion-item>
-              <ion-button
-                size="small"
-                color="danger"
-                (click)="confirmCancel(pedido)"
-                [disabled]="changingStatus[pedido.raw?.id || pedido.id]"
-              >
-                <ion-icon name="close" slot="start"></ion-icon>
-                Cancelar
-              </ion-button>
-            </div>
-          </ion-label>
-        </ion-item>
+                  <ion-icon name="close" slot="start"></ion-icon>
+                  Cancelar
+                </ion-button>
+              </div>
+            </ion-label>
+          </ion-item>
+        </ng-container>
+        <ng-template #emptyPendientes>
+          <div class="ion-padding">No hay pedidos pendientes.</div>
+        </ng-template>
       </ion-card-content>
     </ion-card>
 
     <!-- En preparación -->
-    <ion-card class="mb-4" *ngIf="pedidosPreparando.length > 0">
+    <ion-card class="mb-4">
       <ion-card-header>
         <ion-card-title>En preparación</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-item
-          class="pedido-item"
-          *ngFor="let pedido of pedidosPreparando; let i = index; trackBy: trackById"
+        <ng-container
+          *ngIf="pedidosPreparando.length > 0; else emptyPreparando"
         >
-          <ion-label>
-            <div class="pedido-header">
-              <h3>{{ pedido.id }} - {{ pedido.cliente }}</h3>
-              <ion-badge [color]="getEstadoColor(pedido.estado)">
-                <ion-icon [name]="getEstadoIcon(pedido.estado)"></ion-icon>
-                {{ getEstadoTexto(pedido.estado) }}
-              </ion-badge>
-            </div>
-            <div class="pedido-details">
-              <p><strong>Total:</strong> ${{ pedido.total }}</p>
-              <p><strong>Hora:</strong> {{ pedido.tiempo }}</p>
-            </div>
-            <div class="pedido-actions">
-              <ion-item lines="none">
-                <ion-select
-                  interface="popover"
-                  placeholder="Estado"
-                  [value]="pedido.statusServer || ''"
-                  (ionChange)="changeOrderStatus(pedido, $event.detail.value)"
-                >
-                  <ion-select-option value="EN_PREPARACION"
-                    >En preparación</ion-select-option
+          <ion-item
+            class="pedido-item"
+            *ngFor="let pedido of pedidosPreparando; let i = index; trackBy: trackById"
+          >
+            <ion-label>
+              <div class="pedido-header">
+                <h3>{{ pedido.id }} - {{ pedido.cliente }}</h3>
+                <ion-badge [color]="getEstadoColor(pedido.estado)">
+                  <ion-icon [name]="getEstadoIcon(pedido.estado)"></ion-icon>
+                  {{ getEstadoTexto(pedido.estado) }}
+                </ion-badge>
+              </div>
+              <div class="pedido-details">
+                <p><strong>Total:</strong> ${{ pedido.total }}</p>
+                <p><strong>Hora:</strong> {{ pedido.tiempo }}</p>
+              </div>
+              <div class="pedido-actions">
+                <ion-item lines="none">
+                  <ion-select
+                    interface="popover"
+                    placeholder="Estado"
+                    [value]="pedido.statusServer || ''"
+                    (ionChange)="changeOrderStatus(pedido, $event.detail.value)"
                   >
-                  <ion-select-option value="LISTO">Listo</ion-select-option>
-                  <ion-select-option value="ENTREGADO"
-                    >Entregado</ion-select-option
-                  >
-                </ion-select>
-              </ion-item>
-            </div>
-          </ion-label>
-        </ion-item>
+                    <ion-select-option value="EN_PREPARACION"
+                      >En preparación</ion-select-option
+                    >
+                    <ion-select-option value="LISTO">Listo</ion-select-option>
+                    <ion-select-option value="ENTREGADO"
+                      >Entregado</ion-select-option
+                    >
+                  </ion-select>
+                </ion-item>
+              </div>
+            </ion-label>
+          </ion-item>
+        </ng-container>
+        <ng-template #emptyPreparando>
+          <div class="ion-padding">No hay pedidos en preparación.</div>
+        </ng-template>
       </ion-card-content>
     </ion-card>
 
     <!-- Listos -->
-    <ion-card class="mb-4" *ngIf="pedidosListos.length > 0">
+    <ion-card class="mb-4">
       <ion-card-header>
         <ion-card-title>Listos</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-item
-          class="pedido-item"
-          *ngFor="let pedido of pedidosListos; let i = index; trackBy: trackById"
-        >
-          <ion-label>
-            <div class="pedido-header">
-              <h3>{{ pedido.id }} - {{ pedido.cliente }}</h3>
-              <ion-badge [color]="getEstadoColor(pedido.estado)">
-                <ion-icon [name]="getEstadoIcon(pedido.estado)"></ion-icon>
-                {{ getEstadoTexto(pedido.estado) }}
-              </ion-badge>
-            </div>
-            <div class="pedido-details">
-              <p><strong>Total:</strong> ${{ pedido.total }}</p>
-              <p><strong>Hora:</strong> {{ pedido.tiempo }}</p>
-            </div>
-          </ion-label>
-        </ion-item>
+        <ng-container *ngIf="pedidosListos.length > 0; else emptyListos">
+          <ion-item
+            class="pedido-item"
+            *ngFor="let pedido of pedidosListos; let i = index; trackBy: trackById"
+          >
+            <ion-label>
+              <div class="pedido-header">
+                <h3>{{ pedido.id }} - {{ pedido.cliente }}</h3>
+                <ion-badge [color]="getEstadoColor(pedido.estado)">
+                  <ion-icon [name]="getEstadoIcon(pedido.estado)"></ion-icon>
+                  {{ getEstadoTexto(pedido.estado) }}
+                </ion-badge>
+              </div>
+              <div class="pedido-details">
+                <p><strong>Total:</strong> ${{ pedido.total }}</p>
+                <p><strong>Hora:</strong> {{ pedido.tiempo }}</p>
+              </div>
+            </ion-label>
+          </ion-item>
+        </ng-container>
+        <ng-template #emptyListos>
+          <div class="ion-padding">No hay pedidos listos.</div>
+        </ng-template>
       </ion-card-content>
     </ion-card>
 
     <!-- Entregados -->
-    <ion-card class="mb-4" *ngIf="pedidosEntregados.length > 0">
+    <ion-card class="mb-4">
       <ion-card-header>
         <ion-card-title>Entregados</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-item
-          class="pedido-item"
-          *ngFor="let pedido of pedidosEntregados; let i = index; trackBy: trackById"
+        <ng-container
+          *ngIf="pedidosEntregados.length > 0; else emptyEntregados"
         >
-          <ion-label>
-            <div class="pedido-header">
-              <h3>{{ pedido.id }} - {{ pedido.cliente }}</h3>
-              <ion-badge [color]="getEstadoColor(pedido.estado)">
-                <ion-icon [name]="getEstadoIcon(pedido.estado)"></ion-icon>
-                {{ getEstadoTexto(pedido.estado) }}
-              </ion-badge>
-            </div>
-            <div class="pedido-details">
-              <p><strong>Total:</strong> ${{ pedido.total }}</p>
-              <p><strong>Hora:</strong> {{ pedido.tiempo }}</p>
-            </div>
-          </ion-label>
-        </ion-item>
+          <ion-item
+            class="pedido-item"
+            *ngFor="let pedido of pedidosEntregados; let i = index; trackBy: trackById"
+          >
+            <ion-label>
+              <div class="pedido-header">
+                <h3>{{ pedido.id }} - {{ pedido.cliente }}</h3>
+                <!-- <ion-badge [color]="getEstadoColor(pedido.estado)">
+                  <ion-icon [name]="getEstadoIcon(pedido.estado)"></ion-icon>
+                  {{ getEstadoTexto(pedido.estado) }}
+                </ion-badge> -->
+              </div>
+              <div class="pedido-details">
+                <p><strong>Total:</strong> ${{ pedido.total }}</p>
+                <p><strong>Hora:</strong> {{ pedido.tiempo }}</p>
+              </div>
+            </ion-label>
+          </ion-item>
+        </ng-container>
+        <ng-template #emptyEntregados>
+          <div class="ion-padding">No hay pedidos entregados.</div>
+        </ng-template>
       </ion-card-content>
     </ion-card>
   </ion-list>
