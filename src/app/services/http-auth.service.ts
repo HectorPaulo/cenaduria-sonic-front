@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Capacitor } from '@capacitor/core';
@@ -46,12 +46,15 @@ export class HttpAuthService {
 
   register(payload: any, adminToken?: string | null): Observable<any> {
     const url = `${environment.BASE_URL}/api/auth/register`;
-    const headers: any = {};
+    // Ensure JSON content type and attach Authorization if provided
+    let headersObj: any = { 'Content-Type': 'application/json' };
     if (adminToken) {
-      headers.Authorization = `Bearer ${adminToken}`;
+      headersObj = { ...headersObj, Authorization: `Bearer ${adminToken}` };
     }
+    const headers = new HttpHeaders(headersObj);
     console.debug('[HttpAuthService] POST register', url, {
       hasToken: !!adminToken,
+      payloadPreview: { username: payload?.username, email: payload?.email },
     });
     return this.http.post<any>(url, payload, { headers });
   }

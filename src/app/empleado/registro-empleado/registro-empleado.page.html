@@ -5,18 +5,18 @@
     <ion-card mode="ios">
       <ion-card-header>
         <ion-card-subtitle
-        >Completa los datos del nuevo empleado</ion-card-subtitle
+          >Completa los datos del nuevo empleado</ion-card-subtitle
         >
         <ion-card-title>Registrar Empleado</ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <form [formGroup]="empleadoForm" (ngSubmit)="onSubmit()">
           <ion-item>
-            <ion-label position="floating">Nombre completo</ion-label>
-            <ion-input formControlName="nombre"></ion-input>
+            <ion-label position="floating">Usuario (username)</ion-label>
+            <ion-input formControlName="username"></ion-input>
           </ion-item>
-          <ion-text color="danger" *ngIf="isFieldInvalid('nombre')"
-            >{{ getError('nombre') }}</ion-text
+          <ion-text color="danger" *ngIf="isFieldInvalid('username')"
+            >{{ getError('username') }}</ion-text
           >
 
           <ion-item>
@@ -25,22 +25,6 @@
           </ion-item>
           <ion-text color="danger" *ngIf="isFieldInvalid('email')"
             >{{ getError('email') }}</ion-text
-          >
-
-          <ion-item>
-            <ion-label position="floating">Teléfono</ion-label>
-            <ion-input type="tel" formControlName="telefono"></ion-input>
-          </ion-item>
-          <ion-text color="danger" *ngIf="isFieldInvalid('telefono')"
-            >{{ getError('telefono') }}</ion-text
-          >
-
-          <ion-item>
-            <ion-label position="floating">Puesto</ion-label>
-            <ion-input formControlName="puesto"></ion-input>
-          </ion-item>
-          <ion-text color="danger" *ngIf="isFieldInvalid('puesto')"
-            >{{ getError('puesto') }}</ion-text
           >
 
           <ion-item>
@@ -68,7 +52,9 @@
               type="submit"
               [disabled]="!empleadoForm.valid || submitting"
             >
-              <ng-container *ngIf="!submitting">Registrar Empleado</ng-container>
+              <ng-container *ngIf="!submitting"
+                >Registrar Empleado</ng-container
+              >
               <ng-container *ngIf="submitting">Registrando...</ng-container>
             </ion-button>
             <ion-button
