@@ -47,8 +47,7 @@ interface Pedido {
   templateUrl: './pedidos.page.html',
   styleUrls: ['./pedidos.page.scss'],
   standalone: true,
-  imports: [IonIcon, 
-    IonFab,
+  imports: [
     IonRefresherContent,
     IonRefresher,
     IonSpinner,
@@ -59,15 +58,11 @@ interface Pedido {
     IonCardContent,
     IonCardTitle,
     IonCardHeader,
-    IonAvatar,
-    IonGrid,
-    IonRow,
     IonButton,
     CommonModule,
     FormsModule,
     HeaderComponent,
-    FabbtnComponent,
-  ],
+    FabbtnComponent],
 })
 export class PedidosPage implements OnInit {
   doRefresh(event: RefresherCustomEvent) {

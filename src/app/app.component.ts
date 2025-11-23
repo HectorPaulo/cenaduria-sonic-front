@@ -108,14 +108,14 @@ export class AppComponent implements OnInit {
       icon: 'speedometer',
     },
     {
+      title: 'Menu',
+      url: '/empleado/menu',
+      icon: 'restaurant',
+    },
+    {
       title: 'Pedidos Pendientes',
       url: '/empleado/pedidos',
       icon: 'clipboard',
-    },
-    {
-      title: 'Registro de Empleado',
-      url: '/empleado/registro-empleado',
-      icon: 'cube',
     },
     {
       title: 'Perfil',
@@ -123,9 +123,9 @@ export class AppComponent implements OnInit {
       icon: 'person',
     },
     {
-      title: 'Menu',
-      url: '/empleado/menu',
-      icon: 'restaurant',
+      title: 'Registro de Empleado',
+      url: '/empleado/registro-empleado',
+      icon: 'cube',
     },
   ];
 
@@ -180,7 +180,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Suscribirse a cambios en el estado de autenticación
     this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
       this.currentRole = user ? user.role : null;

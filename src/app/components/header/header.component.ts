@@ -6,7 +6,7 @@ import { IonTitle, IonButtons, IonToolbar, IonHeader, IonMenuButton, IonGrid, Io
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  imports: [IonRow, IonGrid, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButton],
+  imports: [IonRow, IonGrid, IonHeader, IonToolbar, IonButtons, IonMenuButton],
 })
 export class HeaderComponent implements OnInit {
   username: string = 'Sonic el Erizo';
