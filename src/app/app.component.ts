@@ -38,10 +38,8 @@ import {
   speedometer,
   restaurant,
 } from 'ionicons/icons';
-import { ThemeToggleComponent } from './components/theme-toggle/theme-toggle.component';
 import { ThemeService } from './services/theme.service';
 import { AuthService, UserRole } from './services/auth.service';
-import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -108,24 +106,14 @@ export class AppComponent implements OnInit {
       icon: 'speedometer',
     },
     {
-      title: 'Menu',
-      url: '/empleado/menu',
+      title: 'Menú',
+      url: '/cliente/menu',
       icon: 'restaurant',
-    },
-    {
-      title: 'Pedidos Pendientes',
-      url: '/empleado/pedidos',
-      icon: 'clipboard',
     },
     {
       title: 'Perfil',
       url: '/empleado/perfil',
       icon: 'person',
-    },
-    {
-      title: 'Registro de Empleado',
-      url: '/empleado/registro-empleado',
-      icon: 'cube',
     },
   ];
 

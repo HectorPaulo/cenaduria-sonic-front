@@ -23,6 +23,7 @@ import {
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth.service';
 import { MenuService, MenuItem } from '../../services/menu.service';
+import { PedidosService } from 'src/app/services/empleados/pedidos-service';
 import { addIcons } from 'ionicons';
 import {
   receipt,
@@ -64,10 +65,13 @@ export class DashboardPage implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private menuService = inject(MenuService);
+  private pedidosService = inject(PedidosService);
 
   user = this.authService.getCurrentUser();
 
   products: MenuItem[] = [];
+  pendingOrders = 0;
+  activeProductsCount = 0;
 
   doRefresh($event: IonRefresherCustomEvent<RefresherEventDetail>) {
     this.menuService.loadActive().subscribe({
@@ -98,8 +102,23 @@ export class DashboardPage implements OnInit {
     this.menuService.loadActive().subscribe({
       next: () => {
         this.products = this.menuService.getItems();
+        this.activeProductsCount = this.products.length;
       },
       error: (e) => console.error('[EmpleadoDashboard] loadActive failed', e),
+    });
+
+    // cargar número de pedidos pendientes (no inventado)
+    this.pedidosService.getOrdersByStatusPaged('PENDIENTE').subscribe({
+      next: (res: any) => {
+        const list = Array.isArray(res)
+          ? res
+          : res?.content || res?.data || res || [];
+        this.pendingOrders = Array.isArray(list) ? list.length : 0;
+      },
+      error: (err) => {
+        console.error('[EmpleadoDashboard] load pending orders failed', err);
+        this.pendingOrders = 0;
+      },
     });
   }
 

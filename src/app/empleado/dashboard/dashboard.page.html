@@ -39,6 +39,25 @@
     </ion-button>
   </div>
 
+  <!-- Real quick-stats (no invented data) -->
+  <div style="display: flex; gap: 12px; margin: 12px 0; flex-wrap: wrap">
+    <ion-card style="flex: 1; min-width: 180px">
+      <ion-card-content>
+        <h3>Productos activos</h3>
+        <p style="font-size: 24px; margin: 6px 0">{{ activeProductsCount }}</p>
+        <p class="muted">Contador real de productos visibles en el menú</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card style="flex: 1; min-width: 180px">
+      <ion-card-content>
+        <h3>Pedidos pendientes</h3>
+        <p style="font-size: 24px; margin: 6px 0">{{ pendingOrders }}</p>
+        <p class="muted">Órdenes con estado pendiente</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
   <ion-card>
     <ion-card-header>
       <ion-card-title>Productos Activos</ion-card-title>

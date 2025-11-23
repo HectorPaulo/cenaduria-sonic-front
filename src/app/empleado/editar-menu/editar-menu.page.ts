@@ -20,14 +20,13 @@ import {
   IonButton,
   IonCard,
   IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonButtons,
   IonToggle,
   ToastController,
+  IonIcon,
 } from '@ionic/angular/standalone';
 import { MenuService, MenuItem } from '../../services/menu.service';
 
@@ -44,11 +43,11 @@ import { MenuService, MenuItem } from '../../services/menu.service';
     IonItem,
     IonLabel,
     IonInput,
+    IonIcon,
     IonButton,
     IonCard,
     IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
+
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -62,6 +61,7 @@ export class EditarMenuPage implements OnInit, OnDestroy {
   editingId: string | null = null;
   sub: Subscription | null = null;
   selectedFile: File | null = null;
+  isFormOpen = false;
 
   constructor(
     private fb: FormBuilder,
@@ -87,13 +87,27 @@ export class EditarMenuPage implements OnInit, OnDestroy {
     }
 
     this.sub = this.menuService.items$.subscribe((list) => (this.items = list));
+    // load active products initially
     this.menuService
-      .loadAll()
+      .loadActive()
       .subscribe({ next: () => {}, error: (e) => console.error(e) });
   }
 
   ngOnDestroy() {
     this.sub?.unsubscribe();
+  }
+
+  openAdd() {
+    this.editingId = null;
+    this.form.reset({
+      nombre: '',
+      descripcion: '',
+      precio: 0,
+      disponible: true,
+      categoria: 1,
+    });
+    this.selectedFile = null;
+    this.isFormOpen = true;
   }
 
   async save() {
@@ -139,6 +153,9 @@ export class EditarMenuPage implements OnInit, OnDestroy {
         });
         await t.present();
       }
+      // refresh the list after save
+      await firstValueFrom(this.menuService.loadActive());
+      this.isFormOpen = false;
     } catch (err) {
       console.error('[EditarMenu] save failed', err);
       const t = await this.toastCtrl.create({
@@ -167,6 +184,7 @@ export class EditarMenuPage implements OnInit, OnDestroy {
       disponible: !!item.disponible,
       categoria: Number(item.categoria) || 1,
     });
+    this.isFormOpen = true;
   }
 
   async remove(item: MenuItem) {
@@ -181,20 +199,69 @@ export class EditarMenuPage implements OnInit, OnDestroy {
           handler: async () => {
             try {
               await firstValueFrom(this.menuService.deleteRemote(item.id));
+              // refresh active products
+              await firstValueFrom(this.menuService.loadActive());
               const t = await this.toastCtrl.create({
                 message: 'Plato eliminado',
                 duration: 1500,
                 color: 'warning',
               });
               await t.present();
-            } catch (err) {
+            } catch (err: any) {
               console.error('[EditarMenu] delete failed', err);
-              const t = await this.toastCtrl.create({
-                message: 'Error al eliminar',
-                duration: 2000,
-                color: 'danger',
-              });
-              await t.present();
+              // If server returns conflict (409), offer to deactivate instead
+              const status = err?.status || err?.error?.status;
+              if (status === 409) {
+                const ask = await this.alertCtrl.create({
+                  header: 'No se pudo eliminar',
+                  message:
+                    'El producto no se puede eliminar por restricciones del servidor. ¿Desea desactivarlo en su lugar? (lo ocultará del menú)',
+                  buttons: [
+                    { text: 'Cancelar', role: 'cancel' },
+                    {
+                      text: 'Desactivar',
+                      handler: async () => {
+                        try {
+                          await firstValueFrom(
+                            this.menuService.updateRemote(item.id, {
+                              disponible: false,
+                            })
+                          );
+                          await firstValueFrom(this.menuService.loadActive());
+                          const t2 = await this.toastCtrl.create({
+                            message: 'Producto desactivado',
+                            duration: 1500,
+                            color: 'warning',
+                          });
+                          await t2.present();
+                        } catch (e: any) {
+                          console.error('[EditarMenu] deactivate failed', e);
+                          const errAlert2 = await this.alertCtrl.create({
+                            header: 'Error',
+                            message:
+                              e?.error?.message ||
+                              e?.message ||
+                              'No se pudo desactivar',
+                            buttons: ['OK'],
+                          });
+                          await errAlert2.present();
+                        }
+                      },
+                    },
+                  ],
+                });
+                await ask.present();
+              } else {
+                // show backend message if available for other errors
+                const serverMsg =
+                  err?.error?.message || err?.message || 'Error al eliminar';
+                const errAlert = await this.alertCtrl.create({
+                  header: 'No se pudo eliminar',
+                  message: serverMsg,
+                  buttons: ['OK'],
+                });
+                await errAlert.present();
+              }
             }
           },
         },
