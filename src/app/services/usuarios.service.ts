@@ -20,7 +20,6 @@ export class Usuarios {
   constructor(private http: HttpClient) {}
 
   getUserData(username: string): Observable<UsuarioResponse> {
-    // kept for backward compatibility; ignores username and fetches current profile
     return this.getProfile();
   }
 

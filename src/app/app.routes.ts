@@ -91,11 +91,11 @@ export const routes: Routes = [
       },
       {
         path: 'registro-empleado',
-        loadComponent: () => 
+        loadComponent: () =>
           import('./empleado/registro-empleado/registro-empleado.page').then(
             (m) => m.RegistroEmpleadoPage
           ),
-      }
+      },
     ],
   },
 
@@ -126,7 +126,7 @@ export const routes: Routes = [
         path: 'perfil',
         loadComponent: () =>
           import('./perfil/perfil.page').then((m) => m.PerfilPage),
-      },
+      }
     ],
   },
 

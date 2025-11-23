@@ -38,7 +38,16 @@
 
         <ion-item>
           <ion-label position="floating">Categoría</ion-label>
-          <ion-input formControlName="categoria"></ion-input>
+          <ion-input type="number" formControlName="categoria"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Imagen (opcional)</ion-label>
+          <input
+            type="file"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+          />
         </ion-item>
 
         <div class="actions">
@@ -62,6 +71,13 @@
       <ion-label>
         <h3>{{ it.nombre }}</h3>
         <p class="muted">{{ it.descripcion }}</p>
+        <p *ngIf="it.imagen">
+          <img
+            [src]="it.imagen"
+            alt="{{it.nombre}}"
+            style="height: 40px; border-radius: 4px; object-fit: cover"
+          />
+        </p>
         <p class="price">${{ it.precio | number: '1.2-2' }}</p>
       </ion-label>
       <ion-button fill="clear" color="primary" (click)="edit(it)">

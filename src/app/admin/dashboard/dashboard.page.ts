@@ -3,9 +3,6 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {
   IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
   IonCard,
   IonCardContent,
   IonCardHeader,
@@ -15,8 +12,13 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonBadge,
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth.service';
+import { MenuService, MenuItem } from '../../services/menu.service';
 import { addIcons } from 'ionicons';
 import {
   people,
@@ -28,6 +30,8 @@ import {
   cube,
   cash,
   person,
+  add,
+  pencil,
 } from 'ionicons/icons';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FabbtnComponent } from 'src/app/components/fabbtn/fabbtn.component';
@@ -47,41 +51,28 @@ import { RefresherCustomEvent } from '@ionic/core';
     IonCardTitle,
     IonButton,
     IonIcon,
-    IonGrid,
-    IonRow,
-    IonCol,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonBadge,
     HeaderComponent,
-    FabbtnComponent,
   ],
 })
 export class AdminDashboardPage implements OnInit {
+  editarMenu() {
+    this.router.navigate(['/empleado/editar-menu']);
+  }
   private authService = inject(AuthService);
   private router = inject(Router);
+  private menuService = inject(MenuService);
 
   user = this.authService.getCurrentUser();
-
-  // Estadísticas generales del sistema
-  stats = {
-    usuariosActivos: 145,
-    pedidosHoy: 87,
-    ventasHoy: 3456.75,
-    inventarioBajo: 5,
-    empleadosActivos: 8,
-    clientesNuevos: 12,
-  };
-
-  ventasSemana = [
-    { dia: 'Lun', ventas: 2800 },
-    { dia: 'Mar', ventas: 3200 },
-    { dia: 'Mié', ventas: 2950 },
-    { dia: 'Jue', ventas: 3800 },
-    { dia: 'Vie', ventas: 4200 },
-    { dia: 'Sáb', ventas: 5100 },
-    { dia: 'Dom', ventas: 3456 },
-  ];
+  products: MenuItem[] = [];
 
   constructor() {
     addIcons({
+      pencil,
+      add,
       logOut,
       people,
       receipt,
@@ -97,7 +88,13 @@ export class AdminDashboardPage implements OnInit {
   ngOnInit() {
     if (!this.user) {
       this.router.navigate(['/login']);
+      return;
     }
+
+    this.menuService.loadActive().subscribe({
+      next: () => (this.products = this.menuService.getItems()),
+      error: (e) => console.error('[AdminDashboard] loadActive failed', e),
+    });
   }
 
   doRefresh(event: RefresherCustomEvent) {

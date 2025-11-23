@@ -409,10 +409,6 @@ export class PerfilPage implements OnInit {
     await alert.present();
   }
 
-  editarMenu() {
-    this.router.navigate(['/empleado/editar-menu']);
-  }
-
   // * Métodos auxiliares para mostrar mensajes
   private async mostrarError(mensaje: string) {
     const alert = await this.alertController.create({

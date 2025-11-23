@@ -16,6 +16,24 @@
 
         <ion-card-content>
           <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+            <!-- Username -->
+            <ion-item [class.error-item]="isFieldInvalid('username')">
+              <ion-icon name="person" slot="start" color="primary"></ion-icon>
+              <ion-input
+                formControlName="username"
+                label="Usuario (username)"
+                labelPlacement="floating"
+                placeholder="usuario_ejemplo"
+              ></ion-input>
+            </ion-item>
+            <ion-text
+              color="danger"
+              class="error-text"
+              *ngIf="isFieldInvalid('username')"
+            >
+              {{ getUsernameErrorMessage() }}
+            </ion-text>
+
             <!-- Email -->
             <ion-item [class.error-item]="isFieldInvalid('email')">
               <ion-icon name="mail" slot="start" color="primary"></ion-icon>

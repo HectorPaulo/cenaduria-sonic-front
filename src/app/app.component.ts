@@ -37,12 +37,11 @@ import {
   logOut,
   speedometer,
   restaurant,
-  documentOutline,
 } from 'ionicons/icons';
 import { ThemeToggleComponent } from './components/theme-toggle/theme-toggle.component';
 import { ThemeService } from './services/theme.service';
 import { AuthService, UserRole } from './services/auth.service';
-import { Icon } from 'ionicons/dist/types/components/icon/icon';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -65,7 +64,6 @@ import { Icon } from 'ionicons/dist/types/components/icon/icon';
     IonLabel,
     IonRouterLink,
     IonRouterOutlet,
-    ThemeToggleComponent,
   ],
 })
 export class AppComponent implements OnInit {
@@ -75,7 +73,6 @@ export class AppComponent implements OnInit {
   public currentUser: any = null;
   public currentRole: UserRole | null = null;
 
-  // Menús por rol
   public clientePages = [
     {
       title: 'Inicio',
@@ -125,6 +122,11 @@ export class AppComponent implements OnInit {
       url: '/empleado/perfil',
       icon: 'person',
     },
+    {
+      title: 'Menu',
+      url: '/empleado/menu',
+      icon: 'restaurant',
+    },
   ];
 
   public adminPages = [
@@ -134,19 +136,14 @@ export class AppComponent implements OnInit {
       icon: 'speedometer',
     },
     {
-      title: 'Usuarios',
-      url: '/admin/usuarios',
-      icon: 'people',
-    },
-    {
-      title: 'Reportes',
-      url: '/admin/reportes',
-      icon: 'pieChart'
-    },
-    {
       title: 'Perfil',
       url: '/admin/perfil',
       icon: 'person',
+    },
+    {
+      title: 'Menu',
+      url: '/admin/menu',
+      icon: 'restaurant',
     },
   ];
 
@@ -190,7 +187,6 @@ export class AppComponent implements OnInit {
     });
   }
 
-  // Obtener las páginas del menú según el rol actual
   get currentMenuPages() {
     switch (this.currentRole) {
       case UserRole.CLIENTE:
@@ -204,7 +200,6 @@ export class AppComponent implements OnInit {
     }
   }
 
-  // Obtener el nombre del rol para mostrar
   get roleName() {
     switch (this.currentRole) {
       case UserRole.CLIENTE:
@@ -218,13 +213,11 @@ export class AppComponent implements OnInit {
     }
   }
 
-  // Método para cerrar sesión
   async logout() {
     await this.authService.logout();
     this.router.navigate(['/login']);
   }
 
-  // Verificar si el usuario está logueado
   get isLoggedIn() {
     return this.currentUser !== null;
   }

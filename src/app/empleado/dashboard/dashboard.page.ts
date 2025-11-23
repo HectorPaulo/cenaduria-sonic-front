@@ -3,9 +3,6 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {
   IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
   IonCard,
   IonCardContent,
   IonCardHeader,
@@ -17,9 +14,15 @@ import {
   IonCol,
   IonBadge,
   IonItem,
-  IonLabel, IonCardSubtitle, IonRefresher, IonRefresherContent, 
-RefresherEventDetail} from '@ionic/angular/standalone';
+  IonLabel,
+  IonList,
+  IonCardSubtitle,
+  IonRefresher,
+  IonRefresherContent,
+  RefresherEventDetail,
+} from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth.service';
+import { MenuService, MenuItem } from '../../services/menu.service';
 import { addIcons } from 'ionicons';
 import {
   receipt,
@@ -28,17 +31,22 @@ import {
   statsChart,
   logOut,
   notifications,
+  person,
 } from 'ionicons/icons';
-import { HeaderComponent } from "src/app/components/header/header.component";
+import { HeaderComponent } from 'src/app/components/header/header.component';
 import { IonRefresherCustomEvent } from '@ionic/core';
-import { FabbtnComponent } from "src/app/components/fabbtn/fabbtn.component";
+import { FabbtnComponent } from 'src/app/components/fabbtn/fabbtn.component';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
-  imports: [IonRefresherContent, IonRefresher, IonCardSubtitle,
+  imports: [
+    IonRefresherContent,
+    IonRefresher,
+    IonCardTitle,
+    IonList,
     CommonModule,
     IonContent,
     IonCard,
@@ -46,50 +54,53 @@ import { FabbtnComponent } from "src/app/components/fabbtn/fabbtn.component";
     IonCardHeader,
     IonButton,
     IonIcon,
-    IonGrid,
-    IonRow,
-    IonCol,
     IonBadge,
     IonItem,
     IonLabel,
-    HeaderComponent, FabbtnComponent],
+    HeaderComponent,
+  ],
 })
 export class DashboardPage implements OnInit {
-doRefresh($event: IonRefresherCustomEvent<RefresherEventDetail>) {
-throw new Error('Method not implemented.');
-}
   private authService = inject(AuthService);
   private router = inject(Router);
+  private menuService = inject(MenuService);
 
   user = this.authService.getCurrentUser();
 
-  stats = {
-    pedidosPendientes: 8,
-    pedidosCompletados: 24,
-    inventarioBajo: 3,
-    ventasHoy: 1250,
-  };
+  products: MenuItem[] = [];
 
-  pedidosRecientes = [
-    { id: '001', cliente: 'Juan Pérez', estado: 'Pendiente', total: 125.5 },
-    {
-      id: '002',
-      cliente: 'María García',
-      estado: 'En preparación',
-      total: 89.0,
-    },
-    { id: '003', cliente: 'Carlos López', estado: 'Listo', total: 156.75 },
-    { id: '004', cliente: 'Daniel Santiago', estado: 'Listo', total: 125.5 },
-  ];
+  doRefresh($event: IonRefresherCustomEvent<RefresherEventDetail>) {
+    this.menuService.loadActive().subscribe({
+      next: () => $event.detail.complete(),
+      error: () => $event.detail.complete(),
+    });
+  }
 
   constructor() {
-    addIcons({ receipt, cube, people, statsChart, logOut, notifications });
+    addIcons({
+      person,
+      receipt,
+      cube,
+      people,
+      statsChart,
+      logOut,
+      notifications,
+    });
   }
 
   ngOnInit() {
     if (!this.user) {
       this.router.navigate(['/login']);
+      return;
     }
+
+    // cargar productos activos
+    this.menuService.loadActive().subscribe({
+      next: () => {
+        this.products = this.menuService.getItems();
+      },
+      error: (e) => console.error('[EmpleadoDashboard] loadActive failed', e),
+    });
   }
 
   navigateTo(route: string) {
@@ -112,5 +123,13 @@ throw new Error('Method not implemented.');
       default:
         return 'medium';
     }
+  }
+
+  editarMenu() {
+    this.router.navigate(['/empleado/editar-menu']);
+  }
+
+  goToEdit() {
+    this.router.navigate(['/empleado/editar-menu']);
   }
 }

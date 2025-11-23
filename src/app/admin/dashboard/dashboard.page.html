@@ -1,166 +1,50 @@
 <app-header titulo="Dashboard"></app-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <div class="welcome-section">
-    <h2 class="text-lg font-black">¡Bienvenido, {{ user?.nombre }}!</h2>
-    <p>Panel de control administrativo - CenaduriaSonic</p>
+  <div class="welcome-section mt-16">
+    <h2>Bienvenido, {{ user?.nombre }}</h2>
+    <p class="muted">Panel administrativo</p>
   </div>
 
-  <!-- Estadísticas principales -->
-  <ion-grid class="stats-grid">
-    <ion-row>
-      <ion-col size="6" size-md="3">
-        <ion-card mode="ios" class="stat-card users">
-          <ion-card-content>
-            <div class="stat-content">
-              <ion-icon name="people"></ion-icon>
-              <div>
-                <h3>{{ stats.usuariosActivos }}</h3>
-                <p>Usuarios Activos</p>
-              </div>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="6" size-md="3">
-        <ion-card class="stat-card orders" mode="ios">
-          <ion-card-content>
-            <div class="stat-content">
-              <ion-icon name="receipt"></ion-icon>
-              <div>
-                <h3>{{ stats.pedidosHoy }}</h3>
-                <p>Pedidos Hoy</p>
-              </div>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="6" size-md="3">
-        <ion-card class="stat-card sales" mode="ios">
-          <ion-card-content>
-            <div class="stat-content">
-              <ion-icon name="cash"></ion-icon>
-              <div>
-                <h3>${{ stats.ventasHoy }}</h3>
-                <p>Ventas Hoy</p>
-              </div>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-
-      <ion-col size="6" size-md="3">
-        <ion-card class="stat-card inventory" mode="ios">
-          <ion-card-content>
-            <div class="stat-content">
-              <ion-icon name="cube"></ion-icon>
-              <div>
-                <h3>{{ stats.inventarioBajo }}</h3>
-                <p>Stock Bajo</p>
-              </div>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-
-  <!-- Ventas de la semana -->
   <ion-card>
+    <ion-button (click)="editarMenu()" color="tertiary" fill="outline" class="mx-auto my-4 block w-5/6">
+      <ion-icon slot="start" name="pencil" class="text-purple-300"></ion-icon>
+      <ion-label class="text-purple-300">Editar Menú</ion-label>
+    </ion-button>
     <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="trending-up"></ion-icon>
-        Ventas de la Semana
-      </ion-card-title>
+      <ion-card-title>Productos Activos</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <div class="sales-chart">
-        <div class="sales-bar" *ngFor="let venta of ventasSemana">
-          <div class="bar" [style.height.%]="(venta.ventas / 5100) * 100"></div>
-          <span class="day">{{ venta.dia }}</span>
-          <span class="amount">${{ venta.ventas }}</span>
-        </div>
-      </div>
+      <ion-list>
+        @for (p of products; track $index) {
+          <ion-item>
+            @if (p.imagen) {
+            <img
+            [src]="p.imagen"
+            slot="start"
+            alt="{{p.nombre}}"
+            style="
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 12px;
+            "
+            />
+            }
+            <ion-label>
+              <h3>{{ p.nombre }}</h3>
+              <p class="muted">{{ p.descripcion }}</p>
+              <p class="price">${{ p.precio | number:'1.2-2' }}</p>
+            </ion-label>
+            <ion-badge slot="end" color="success">Activo</ion-badge>
+          </ion-item>
+        }
+          <ion-item *ngIf="products.length === 0">
+          <ion-label>No hay productos activos.</ion-label>
+        </ion-item>
+      </ion-list>
     </ion-card-content>
   </ion-card>
 
-  <!-- Acciones rápidas de administración -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Gestión del Sistema</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-grid>
-        <ion-row>
-          <ion-col size="6" size-md="3">
-            <ion-button
-              expand="block"
-              color="primary"
-              (click)="navigateTo('usuarios')"
-            >
-              <ion-icon name="people" slot="start"></ion-icon>
-              Usuarios
-            </ion-button>
-          </ion-col>
-          <ion-col size="6" size-md="3">
-            <ion-button
-              expand="block"
-              color="success"
-              (click)="navigateTo('reportes')"
-            >
-              <ion-icon name="stats-chart" slot="start"></ion-icon>
-              Reportes
-            </ion-button>
-          </ion-col>
-          <!-- <ion-col size="6" size-md="3">
-            <ion-button
-              expand="block"
-              color="warning"
-              (click)="navigateTo('configuracion')"
-            >
-              <ion-icon name="settings" slot="start"></ion-icon>
-              Configuración
-            </ion-button>
-          </ion-col> -->
-          <ion-col size="6" size-md="3">
-            <ion-button
-              expand="block"
-              color="tertiary"
-              (click)="navigateTo('perfil')"
-            >
-              <ion-icon name="person" slot="start"></ion-icon>
-              Mi Perfil
-            </ion-button>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Información adicional -->
-  <ion-grid>
-    <ion-row>
-      <ion-col size="6">
-        <ion-card class="info-card">
-          <ion-card-content>
-            <h4>Empleados Activos</h4>
-            <div class="info-number">{{ stats.empleadosActivos }}</div>
-            <p>Personal trabajando hoy</p>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <ion-col size="6">
-        <ion-card class="info-card">
-          <ion-card-content>
-            <h4>Clientes Nuevos</h4>
-            <div class="info-number">{{ stats.clientesNuevos }}</div>
-            <p>Registrados esta semana</p>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-  <app-fabbtn></app-fabbtn>
 </ion-content>

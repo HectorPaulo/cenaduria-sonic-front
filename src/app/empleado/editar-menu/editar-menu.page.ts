@@ -8,6 +8,9 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { AuthService, UserRole } from '../../services/auth.service';
+import { AlertController } from '@ionic/angular/standalone';
+import { firstValueFrom } from 'rxjs';
 import {
   IonContent,
   IonList,
@@ -58,24 +61,35 @@ export class EditarMenuPage implements OnInit, OnDestroy {
   form: FormGroup;
   editingId: string | null = null;
   sub: Subscription | null = null;
+  selectedFile: File | null = null;
 
   constructor(
     private fb: FormBuilder,
     private menuService: MenuService,
     private toastCtrl: ToastController,
-    private router: Router
+    private router: Router,
+    private auth: AuthService,
+    private alertCtrl: AlertController
   ) {
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       descripcion: [''],
       precio: [0, [Validators.required, Validators.min(0.01)]],
       disponible: [true],
-      categoria: ['comida'],
+      categoria: [1, [Validators.required]],
     });
   }
 
   ngOnInit() {
+    if (!this.auth.hasAnyRole([UserRole.EMPLEADO, UserRole.SYSADMIN])) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     this.sub = this.menuService.items$.subscribe((list) => (this.items = list));
+    this.menuService
+      .loadAll()
+      .subscribe({ next: () => {}, error: (e) => console.error(e) });
   }
 
   ngOnDestroy() {
@@ -89,21 +103,48 @@ export class EditarMenuPage implements OnInit, OnDestroy {
     }
 
     const val = this.form.value;
-    if (this.editingId) {
-      this.menuService.update(this.editingId, val);
-      this.editingId = null;
+    try {
+      if (this.editingId) {
+        await firstValueFrom(
+          this.menuService.updateRemote(this.editingId, {
+            nombre: val.nombre,
+            descripcion: val.descripcion,
+            precio: val.precio,
+            disponible: val.disponible,
+            categoria: val.categoria,
+          })
+        );
+        this.editingId = null;
+        const t = await this.toastCtrl.create({
+          message: 'Plato actualizado',
+          duration: 1500,
+          color: 'success',
+        });
+        await t.present();
+      } else {
+        await firstValueFrom(
+          this.menuService.addRemote({
+            nombre: val.nombre,
+            descripcion: val.descripcion,
+            precio: val.precio,
+            disponible: val.disponible,
+            categoria: val.categoria,
+            file: this.selectedFile,
+          })
+        );
+        const t = await this.toastCtrl.create({
+          message: 'Plato añadido',
+          duration: 1500,
+          color: 'success',
+        });
+        await t.present();
+      }
+    } catch (err) {
+      console.error('[EditarMenu] save failed', err);
       const t = await this.toastCtrl.create({
-        message: 'Plato actualizado',
-        duration: 1500,
-        color: 'success',
-      });
-      await t.present();
-    } else {
-      this.menuService.add(val);
-      const t = await this.toastCtrl.create({
-        message: 'Plato añadido',
-        duration: 1500,
-        color: 'success',
+        message: 'Error al guardar. Revisa la consola.',
+        duration: 2500,
+        color: 'danger',
       });
       await t.present();
     }
@@ -112,8 +153,9 @@ export class EditarMenuPage implements OnInit, OnDestroy {
       descripcion: '',
       precio: 0,
       disponible: true,
-      categoria: 'comida',
+      categoria: 1,
     });
+    this.selectedFile = null;
   }
 
   edit(item: MenuItem) {
@@ -123,18 +165,42 @@ export class EditarMenuPage implements OnInit, OnDestroy {
       descripcion: item.descripcion || '',
       precio: item.precio || 0,
       disponible: !!item.disponible,
-      categoria: item.categoria || 'comida',
+      categoria: Number(item.categoria) || 1,
     });
   }
 
   async remove(item: MenuItem) {
-    this.menuService.remove(item.id);
-    const t = await this.toastCtrl.create({
-      message: 'Plato eliminado',
-      duration: 1500,
-      color: 'warning',
+    const alert = await this.alertCtrl.create({
+      header: 'Confirmar',
+      message: `¿Eliminar ${item.nombre}?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await firstValueFrom(this.menuService.deleteRemote(item.id));
+              const t = await this.toastCtrl.create({
+                message: 'Plato eliminado',
+                duration: 1500,
+                color: 'warning',
+              });
+              await t.present();
+            } catch (err) {
+              console.error('[EditarMenu] delete failed', err);
+              const t = await this.toastCtrl.create({
+                message: 'Error al eliminar',
+                duration: 2000,
+                color: 'danger',
+              });
+              await t.present();
+            }
+          },
+        },
+      ],
     });
-    await t.present();
+    await alert.present();
   }
 
   cancelEdit() {
@@ -144,8 +210,15 @@ export class EditarMenuPage implements OnInit, OnDestroy {
       descripcion: '',
       precio: 0,
       disponible: true,
-      categoria: 'comida',
+      categoria: 1,
     });
+    this.selectedFile = null;
+  }
+
+  onFileSelected(ev: any) {
+    const f = ev?.target?.files?.[0] as File | undefined;
+    if (f) this.selectedFile = f;
+    else this.selectedFile = null;
   }
 
   back() {
