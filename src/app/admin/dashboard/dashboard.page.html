@@ -7,7 +7,12 @@
   </div>
 
   <ion-card>
-    <ion-button (click)="editarMenu()" color="tertiary" fill="outline" class="mx-auto my-4 block w-5/6">
+    <ion-button
+      (click)="editarMenu()"
+      color="tertiary"
+      fill="outline"
+      class="mx-auto my-4 block w-5/6"
+    >
       <ion-icon slot="start" name="pencil" class="text-purple-300"></ion-icon>
       <ion-label class="text-purple-300">Editar Menú</ion-label>
     </ion-button>
@@ -17,34 +22,32 @@
     <ion-card-content>
       <ion-list>
         @for (p of products; track $index) {
-          <ion-item>
-            @if (p.imagen) {
-            <img
-            [src]="p.imagen"
+        <ion-item>
+          @if (p.imageUrl) {
+          <img
+            [src]="p.imageUrl"
             slot="start"
-            alt="{{p.nombre}}"
+            alt="{{p.name}}"
             style="
-            width: 56px;
-            height: 56px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-right: 12px;
+              width: 56px;
+              height: 56px;
+              object-fit: cover;
+              border-radius: 6px;
+              margin-right: 12px;
             "
-            />
-            }
-            <ion-label>
-              <h3>{{ p.nombre }}</h3>
-              <p class="muted">{{ p.descripcion }}</p>
-              <p class="price">${{ p.precio | number:'1.2-2' }}</p>
-            </ion-label>
-            <ion-badge slot="end" color="success">Activo</ion-badge>
-          </ion-item>
+          />
+          }
+          <ion-label>
+            <h3>{{ p.name }}</h3>
+            <p class="price">${{ p.price | number:'1.2-2' }}</p>
+          </ion-label>
+          <ion-badge slot="end" color="success">Activo</ion-badge>
+        </ion-item>
         }
-          <ion-item *ngIf="products.length === 0">
+        <ion-item *ngIf="products.length === 0">
           <ion-label>No hay productos activos.</ion-label>
         </ion-item>
       </ion-list>
     </ion-card-content>
   </ion-card>
-
 </ion-content>

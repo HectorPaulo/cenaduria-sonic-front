@@ -27,8 +27,12 @@ import {
   IonToggle,
   ToastController,
   IonIcon,
+  IonSelect,
+  IonSelectOption,
 } from '@ionic/angular/standalone';
-import { MenuService, MenuItem } from '../../services/menu.service';
+import { MenuService } from '../../services/menu.service';
+import { Alimento } from '../../Types/Alimento';
+import { Category } from '../../Types/Category';
 
 @Component({
   selector: 'app-editar-menu',
@@ -53,12 +57,15 @@ import { MenuService, MenuItem } from '../../services/menu.service';
     IonTitle,
     IonButtons,
     IonToggle,
+    IonSelect,
+    IonSelectOption,
   ],
 })
 export class EditarMenuPage implements OnInit, OnDestroy {
-  items: MenuItem[] = [];
+  items: Alimento[] = [];
+  categories: Category[] = [];
   form: FormGroup;
-  editingId: string | null = null;
+  editingId: number | null = null;
   sub: Subscription | null = null;
   selectedFile: File | null = null;
   isFormOpen = false;
@@ -72,11 +79,10 @@ export class EditarMenuPage implements OnInit, OnDestroy {
     private alertCtrl: AlertController
   ) {
     this.form = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(2)]],
-      descripcion: [''],
-      precio: [0, [Validators.required, Validators.min(0.01)]],
-      disponible: [true],
-      categoria: [1, [Validators.required]],
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      price: [0, [Validators.required, Validators.min(0.01)]],
+      active: [true],
+      categoryId: [null, [Validators.required]],
     });
   }
 
@@ -89,8 +95,14 @@ export class EditarMenuPage implements OnInit, OnDestroy {
     this.sub = this.menuService.items$.subscribe((list) => (this.items = list));
     // load active products initially
     this.menuService
-      .loadActive()
+      .loadAll()
       .subscribe({ next: () => {}, error: (e) => console.error(e) });
+
+    // load categories
+    this.menuService.getCategories().subscribe({
+      next: (cats) => (this.categories = cats),
+      error: (e) => console.error('[EditarMenu] load categories failed', e),
+    });
   }
 
   ngOnDestroy() {
@@ -100,11 +112,10 @@ export class EditarMenuPage implements OnInit, OnDestroy {
   openAdd() {
     this.editingId = null;
     this.form.reset({
-      nombre: '',
-      descripcion: '',
-      precio: 0,
-      disponible: true,
-      categoria: 1,
+      name: '',
+      price: 0,
+      active: true,
+      categoryId: null,
     });
     this.selectedFile = null;
     this.isFormOpen = true;
@@ -119,15 +130,23 @@ export class EditarMenuPage implements OnInit, OnDestroy {
     const val = this.form.value;
     try {
       if (this.editingId) {
+        // 1. Update text fields
         await firstValueFrom(
           this.menuService.updateRemote(this.editingId, {
-            nombre: val.nombre,
-            descripcion: val.descripcion,
-            precio: val.precio,
-            disponible: val.disponible,
-            categoria: val.categoria,
+            name: val.name,
+            price: val.price,
+            active: val.active,
+            categoryId: val.categoryId,
           })
         );
+
+        // 2. If file selected, update image
+        if (this.selectedFile) {
+          await firstValueFrom(
+            this.menuService.updateImage(this.editingId, this.selectedFile)
+          );
+        }
+
         this.editingId = null;
         const t = await this.toastCtrl.create({
           message: 'Plato actualizado',
@@ -138,11 +157,10 @@ export class EditarMenuPage implements OnInit, OnDestroy {
       } else {
         await firstValueFrom(
           this.menuService.addRemote({
-            nombre: val.nombre,
-            descripcion: val.descripcion,
-            precio: val.precio,
-            disponible: val.disponible,
-            categoria: val.categoria,
+            name: val.name,
+            price: val.price,
+            active: val.active,
+            categoryId: val.categoryId,
             file: this.selectedFile,
           })
         );
@@ -154,43 +172,52 @@ export class EditarMenuPage implements OnInit, OnDestroy {
         await t.present();
       }
       // refresh the list after save
-      await firstValueFrom(this.menuService.loadActive());
+      await firstValueFrom(this.menuService.loadAll());
       this.isFormOpen = false;
-    } catch (err) {
+    } catch (err: any) {
       console.error('[EditarMenu] save failed', err);
+      let msg = 'Error al guardar. Revisa la consola.';
+
+      // Handle validation errors (e.g. invalid image format)
+      if (err?.error?.validationErrors) {
+        const errors = Object.values(err.error.validationErrors).join('. ');
+        msg = errors;
+      } else if (err?.error?.message) {
+        msg = err.error.message;
+      }
+
       const t = await this.toastCtrl.create({
-        message: 'Error al guardar. Revisa la consola.',
-        duration: 2500,
+        message: msg,
+        duration: 4000,
         color: 'danger',
       });
       await t.present();
     }
     this.form.reset({
-      nombre: '',
-      descripcion: '',
-      precio: 0,
-      disponible: true,
-      categoria: 1,
+      name: '',
+      price: 0,
+      active: true,
+      categoryId: null,
     });
     this.selectedFile = null;
   }
 
-  edit(item: MenuItem) {
+  edit(item: Alimento) {
+    console.log('Editing item:', item);
     this.editingId = item.id;
     this.form.setValue({
-      nombre: item.nombre || '',
-      descripcion: item.descripcion || '',
-      precio: item.precio || 0,
-      disponible: !!item.disponible,
-      categoria: Number(item.categoria) || 1,
+      name: item.name || '',
+      price: item.price || 0,
+      active: !!item.active,
+      categoryId: item.category?.id,
     });
     this.isFormOpen = true;
   }
 
-  async remove(item: MenuItem) {
+  async remove(item: Alimento) {
     const alert = await this.alertCtrl.create({
       header: 'Confirmar',
-      message: `¿Eliminar ${item.nombre}?`,
+      message: `¿Eliminar ${item.name}?`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
@@ -200,7 +227,7 @@ export class EditarMenuPage implements OnInit, OnDestroy {
             try {
               await firstValueFrom(this.menuService.deleteRemote(item.id));
               // refresh active products
-              await firstValueFrom(this.menuService.loadActive());
+              await firstValueFrom(this.menuService.loadAll());
               const t = await this.toastCtrl.create({
                 message: 'Plato eliminado',
                 duration: 1500,
@@ -224,10 +251,10 @@ export class EditarMenuPage implements OnInit, OnDestroy {
                         try {
                           await firstValueFrom(
                             this.menuService.updateRemote(item.id, {
-                              disponible: false,
+                              active: false,
                             })
                           );
-                          await firstValueFrom(this.menuService.loadActive());
+                          await firstValueFrom(this.menuService.loadAll());
                           const t2 = await this.toastCtrl.create({
                             message: 'Producto desactivado',
                             duration: 1500,
@@ -273,11 +300,10 @@ export class EditarMenuPage implements OnInit, OnDestroy {
   cancelEdit() {
     this.editingId = null;
     this.form.reset({
-      nombre: '',
-      descripcion: '',
-      precio: 0,
-      disponible: true,
-      categoria: 1,
+      name: '',
+      price: 0,
+      active: true,
+      categoryId: null,
     });
     this.selectedFile = null;
   }

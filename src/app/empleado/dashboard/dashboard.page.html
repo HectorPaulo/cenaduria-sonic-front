@@ -66,10 +66,10 @@
       <ion-list>
         <ion-item *ngFor="let p of products">
           <img
-            *ngIf="p.imagen"
-            [src]="p.imagen"
+            *ngIf="p.imageUrl"
+            [src]="p.imageUrl"
             slot="start"
-            alt="{{p.nombre}}"
+            alt="{{p.name}}"
             style="
               width: 56px;
               height: 56px;
@@ -79,9 +79,8 @@
             "
           />
           <ion-label>
-            <h3>{{ p.nombre }}</h3>
-            <p class="muted">{{ p.descripcion }}</p>
-            <p class="price">${{ p.precio | number:'1.2-2' }}</p>
+            <h3>{{ p.name }}</h3>
+            <p class="price">${{ p.price | number:'1.2-2' }}</p>
           </ion-label>
           <ion-badge slot="end" color="success">Activo</ion-badge>
         </ion-item>

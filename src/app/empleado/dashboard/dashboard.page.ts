@@ -22,7 +22,8 @@ import {
   RefresherEventDetail,
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth.service';
-import { MenuService, MenuItem } from '../../services/menu.service';
+import { MenuService } from '../../services/menu.service';
+import { Alimento } from '../../Types/Alimento';
 import { PedidosService } from 'src/app/services/empleados/pedidos-service';
 import { addIcons } from 'ionicons';
 import {
@@ -69,7 +70,7 @@ export class DashboardPage implements OnInit {
 
   user = this.authService.getCurrentUser();
 
-  products: MenuItem[] = [];
+  products: Alimento[] = [];
   pendingOrders = 0;
   activeProductsCount = 0;
 

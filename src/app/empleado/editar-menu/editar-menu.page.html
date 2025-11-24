@@ -49,27 +49,33 @@
         <form [formGroup]="form" (ngSubmit)="save()">
           <ion-item>
             <ion-label position="floating">Nombre</ion-label>
-            <ion-input formControlName="nombre"></ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-label position="floating">Descripción</ion-label>
-            <ion-input formControlName="descripcion"></ion-input>
+            <ion-input formControlName="name"></ion-input>
           </ion-item>
 
           <ion-item>
             <ion-label position="floating">Precio</ion-label>
-            <ion-input type="number" formControlName="precio"></ion-input>
+            <ion-input type="number" formControlName="price"></ion-input>
           </ion-item>
 
           <ion-item>
             <ion-label>Disponible</ion-label>
-            <ion-toggle slot="end" formControlName="disponible"></ion-toggle>
+            <ion-toggle slot="end" formControlName="active"></ion-toggle>
           </ion-item>
 
           <ion-item>
-            <ion-label position="floating">Categoría (ID)</ion-label>
-            <ion-input type="number" formControlName="categoria"></ion-input>
+            <ion-select
+              label="Categoría"
+              label-placement="floating"
+              formControlName="categoryId"
+              interface="popover"
+            >
+              <ion-select-option
+                *ngFor="let cat of categories"
+                [value]="cat.id"
+              >
+                {{ cat.name }}
+              </ion-select-option>
+            </ion-select>
           </ion-item>
 
           <ion-item>
@@ -100,16 +106,15 @@
   <ion-list>
     <ion-item *ngFor="let it of items">
       <ion-label>
-        <h3>{{ it.nombre }}</h3>
-        <p class="muted">{{ it.descripcion }}</p>
-        <p *ngIf="it.imagen">
+        <h3>{{ it.name }}</h3>
+        <p *ngIf="it.imageUrl">
           <img
-            [src]="it.imagen"
-            alt="{{it.nombre}}"
+            [src]="it.imageUrl"
+            alt="{{it.name}}"
             style="height: 40px; border-radius: 4px; object-fit: cover"
           />
         </p>
-        <p class="price">${{ it.precio | number: '1.2-2' }}</p>
+        <p class="price">${{ it.price | number: '1.2-2' }}</p>
       </ion-label>
       <ion-button fill="clear" color="primary" (click)="edit(it)">
         Editar

@@ -18,7 +18,8 @@ import {
   IonBadge,
 } from '@ionic/angular/standalone';
 import { AuthService } from '../../services/auth.service';
-import { MenuService, MenuItem } from '../../services/menu.service';
+import { MenuService } from '../../services/menu.service';
+import { Alimento } from '../../Types/Alimento';
 import { addIcons } from 'ionicons';
 import {
   people,
@@ -67,7 +68,7 @@ export class AdminDashboardPage implements OnInit {
   private menuService = inject(MenuService);
 
   user = this.authService.getCurrentUser();
-  products: MenuItem[] = [];
+  products: Alimento[] = [];
 
   constructor() {
     addIcons({

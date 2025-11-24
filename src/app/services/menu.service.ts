@@ -3,55 +3,29 @@ import { BehaviorSubject, Observable, tap, catchError, of } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
-
-export interface MenuItem {
-  id: string;
-  nombre: string;
-  descripcion?: string;
-  precio: number;
-  disponible?: boolean;
-  categoria?: string;
-  imagen?: string;
-}
+import { Alimento } from '../Types/Alimento';
 
 @Injectable({ providedIn: 'root' })
 export class MenuService {
   private http = inject(HttpClient);
   private auth = inject(AuthService);
 
-  private _items = new BehaviorSubject<MenuItem[]>([
-    {
-      id: 'p1',
-      nombre: 'Albóndigas Clásicas',
-      descripcion: 'Jugosas albóndigas con salsa casera',
-      precio: 8.99,
-      disponible: true,
-      categoria: 'comida',
-    },
-    {
-      id: 'p2',
-      nombre: 'Hamburguesa con Queso',
-      descripcion: 'Carne, queso y aderezos',
-      precio: 7.99,
-      disponible: true,
-      categoria: 'comida',
-    },
-  ]);
+  private _items = new BehaviorSubject<Alimento[]>([]);
 
-  get items$(): Observable<MenuItem[]> {
+  get items$(): Observable<Alimento[]> {
     return this._items.asObservable();
   }
 
-  getItems(): MenuItem[] {
+  getItems(): Alimento[] {
     return this._items.getValue();
   }
+
   // Load all products from backend and populate the BehaviorSubject
   loadAll() {
-    const url = `${environment.BASE_URL}/api/products`;
-    return this.http.get<any[]>(url).pipe(
+    const url = `${environment.BASE_URL}/api/products/all`;
+    return this.http.get<Alimento[]>(url).pipe(
       tap((list) => {
-        const mapped = (list || []).map((p) => this.mapToMenuItem(p));
-        this._items.next(mapped);
+        this._items.next(list || []);
       }),
       catchError((err) => {
         console.error('[MenuService] loadAll failed', err);
@@ -67,10 +41,9 @@ export class MenuService {
     const headers = token
       ? new HttpHeaders({ Authorization: `Bearer ${token}` })
       : undefined;
-    return this.http.get<any[]>(url, { headers }).pipe(
+    return this.http.get<Alimento[]>(url, { headers }).pipe(
       tap((list) => {
-        const mapped = (list || []).map((p) => this.mapToMenuItem(p));
-        this._items.next(mapped);
+        this._items.next(list || []);
       }),
       catchError((err) => {
         console.error('[MenuService] loadActive failed', err);
@@ -81,20 +54,18 @@ export class MenuService {
 
   // Create product (multipart/form-data)
   addRemote(payload: {
-    nombre: string;
-    descripcion?: string;
-    precio: number;
-    disponible?: boolean;
-    categoria?: string | number;
+    name: string;
+    price: number;
+    active: boolean;
+    categoryId: number;
     file?: File | null;
   }) {
     const url = `${environment.BASE_URL}/api/products`;
     const fd = new FormData();
-    fd.append('name', payload.nombre);
-    fd.append('price', String(payload.precio));
-    fd.append('active', String(!!payload.disponible));
-    const catId = Number(payload.categoria) || 1;
-    fd.append('categoryId', String(catId));
+    fd.append('name', payload.name);
+    fd.append('price', String(payload.price));
+    fd.append('active', String(payload.active));
+    fd.append('categoryId', String(payload.categoryId));
     if (payload.file) {
       fd.append('image', payload.file, payload.file.name);
     }
@@ -104,9 +75,8 @@ export class MenuService {
       ? new HttpHeaders({ Authorization: `Bearer ${token}` })
       : undefined;
 
-    return this.http.post<any>(url, fd, { headers }).pipe(
-      tap((res) => {
-        const added = this.mapToMenuItem(res);
+    return this.http.post<Alimento>(url, fd, { headers }).pipe(
+      tap((added) => {
         this._items.next([...this.getItems(), added]);
       }),
       catchError((err) => {
@@ -118,15 +88,19 @@ export class MenuService {
 
   // Update product (JSON PUT)
   updateRemote(
-    id: string,
-    changes: Partial<MenuItem> & { categoria?: string | number }
+    id: number,
+    changes: Partial<Alimento> & { categoryId?: number }
   ) {
     const url = `${environment.BASE_URL}/api/products/${id}`;
+
+    // Extract categoryId from either the explicit field or the Alimento category object
+    const catId = changes.categoryId ?? changes.category?.id;
+
     const body: any = {
-      name: changes.nombre,
-      price: changes.precio,
-      active: changes.disponible,
-      categoryId: Number(changes.categoria) || undefined,
+      name: changes.name,
+      price: changes.price,
+      active: changes.active,
+      categoryId: catId,
     };
 
     const token = this.auth.getCurrentToken();
@@ -137,11 +111,10 @@ export class MenuService {
         })
       : new HttpHeaders({ 'Content-Type': 'application/json' });
 
-    return this.http.put<any>(url, body, { headers }).pipe(
-      tap((res) => {
-        const updated = this.mapToMenuItem(res);
+    return this.http.put<Alimento>(url, body, { headers }).pipe(
+      tap((updated) => {
         const items = this.getItems().map((it) =>
-          it.id === id ? { ...it, ...updated } : it
+          it.id === id ? updated : it
         );
         this._items.next(items);
       }),
@@ -152,8 +125,33 @@ export class MenuService {
     );
   }
 
+  // Update product image (PATCH multipart/form-data)
+  updateImage(id: number, file: File) {
+    const url = `${environment.BASE_URL}/api/products/${id}/image`;
+    const fd = new FormData();
+    fd.append('image', file, file.name);
+
+    const token = this.auth.getCurrentToken();
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : undefined;
+
+    return this.http.patch<Alimento>(url, fd, { headers }).pipe(
+      tap((updated) => {
+        const items = this.getItems().map((it) =>
+          it.id === id ? updated : it
+        );
+        this._items.next(items);
+      }),
+      catchError((err) => {
+        console.error('[MenuService] updateImage failed', err);
+        throw err;
+      })
+    );
+  }
+
   // Delete product
-  deleteRemote(id: string) {
+  deleteRemote(id: number) {
     const url = `${environment.BASE_URL}/api/products/${id}`;
     const token = this.auth.getCurrentToken();
     const headers = token
@@ -171,20 +169,18 @@ export class MenuService {
     );
   }
 
-  /** Map backend product shape to MenuItem used in the app */
-  private mapToMenuItem(p: any): MenuItem {
-    return {
-      id: String(p.id ?? p.productId ?? p._id ?? this._generateId()),
-      nombre: p.name ?? p.nombre ?? 'Sin nombre',
-      descripcion: p.description ?? p.descripcion ?? '',
-      precio: Number(p.price ?? p.precio ?? 0),
-      disponible: p.active ?? p.disponible ?? false,
-      categoria: String(p.categoryId ?? p.categoria ?? ''),
-      imagen: p.imageUrl ?? p.image ?? p.imagen ?? '',
-    } as MenuItem;
-  }
-
-  private _generateId() {
-    return 'm' + Math.random().toString(36).slice(2, 9);
+  // Get categories
+  getCategories() {
+    const url = `${environment.BASE_URL}/api/categories`;
+    const token = this.auth.getCurrentToken();
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : undefined;
+    return this.http.get<any[]>(url, { headers }).pipe(
+      catchError((err) => {
+        console.error('[MenuService] getCategories failed', err);
+        return of([]);
+      })
+    );
   }
 }
