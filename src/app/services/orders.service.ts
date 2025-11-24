@@ -114,6 +114,38 @@ export class OrdersService {
       );
   }
 
+  /**
+   * Crear orden desde items del carrito
+   * Convierte CartItems (productos y promociones) a OrderItemDto
+   */
+  createOrderFromCart(cartItems: any[], tip: number = 0): Observable<any> {
+    const orderItems: OrderItemDto[] = cartItems.map((item) => {
+      if (item.type === 'PROMOTION') {
+        return {
+          type: 'PROMOTION',
+          promotionId: item.promotionId || Number(item.id),
+          productId: null,
+          quantity: item.cantidad || 1,
+        };
+      } else {
+        return {
+          type: 'PRODUCT',
+          productId: item.productId || Number(item.id),
+          promotionId: null,
+          quantity: item.cantidad || 1,
+        };
+      }
+    });
+
+    const payload: CreateOrderDto = {
+      tip: tip > 0 ? tip : undefined,
+      items: orderItems,
+    };
+
+    console.log('[OrdersService] createOrderFromCart payload:', payload);
+    return this.createOrder(payload);
+  }
+
   getMyOrders(): Observable<any> {
     const url = `${environment.BASE_URL}/api/orders/my-orders`;
     const token =

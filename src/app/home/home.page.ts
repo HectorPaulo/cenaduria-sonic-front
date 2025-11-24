@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -13,17 +13,30 @@ import {
   IonLabel,
   IonRefresher,
   IonRefresherContent,
+  IonButton,
+  IonIcon,
+  IonSpinner,
+  LoadingController,
+  ToastController,
+  ModalController,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { restaurant, receipt, pricetag, add, cart } from 'ionicons/icons';
 import { HeaderComponent } from '../components/header/header.component';
 import { RouterLink } from '@angular/router';
-import Promocion from '../Types/Promocion';
 import { RefresherCustomEvent } from '@ionic/core/components';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
 import { Subscription } from 'rxjs';
 import { Alimento } from '../Types/Alimento';
 import { ComidasService } from '../services/comidas.service';
 import Recomendacion from '../Types/Recomendacion';
-import { PromosService } from '../services/promos.service';
+import {
+  PromotionsService,
+  PromotionSummaryResponse,
+  PromotionDetailResponse,
+} from '../services/promotions.service';
+import { CartService } from '../services/cart.service';
+import { PromotionDetailModalComponent } from './components/promotion-detail-modal/promotion-detail-modal.component';
 
 @Component({
   selector: 'app-home',
@@ -42,6 +55,9 @@ import { PromosService } from '../services/promos.service';
     IonRow,
     IonGrid,
     IonContent,
+    IonButton,
+    IonIcon,
+    IonSpinner,
     CommonModule,
     FormsModule,
     HeaderComponent,
@@ -49,7 +65,7 @@ import { PromosService } from '../services/promos.service';
     FabbtnComponent,
   ],
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
   private promosSub?: Subscription;
   private itemsSub?: Subscription;
   private categoriesSub?: Subscription;
@@ -58,45 +74,33 @@ export class HomePage implements OnInit {
   todasCategorias: Recomendacion[] = [];
   generarCategorias: any;
 
-  doRefresh(event: RefresherCustomEvent) {
-    setTimeout(() => {
-      // TODO: Implementar la lógica para mandar a llamar a los datos actualizacos
-      event.target.complete();
-    }, 2000);
-  }
-  navigateToTop() {
-    this.content.scrollToTop(500);
-  }
-
-  navigateToBottom() {
-    this.content.scrollToBottom(500);
-  }
-
   @ViewChild(IonContent) content!: IonContent;
 
   menuDestacado: Alimento[] = [];
-  promociones: Promocion[] = [];
+  promociones: PromotionSummaryResponse[] = [];
 
   constructor(
     private comidasService: ComidasService,
-    private promosService: PromosService
-  ) {}
+    private promotionsService: PromotionsService,
+    private cartService: CartService,
+    private loadingController: LoadingController,
+    private toastController: ToastController,
+    private modalController: ModalController
+  ) {
+    addIcons({ restaurant, receipt, pricetag, add, cart });
+  }
+
   ngOnInit() {
-    // Load promotions from API and keep local cache in the service
-    this.promosSub = this.promosService.loadFromApi().subscribe({
-      next: (promos: Promocion[]) => {
+    // Load promotions from API
+    this.promosSub = this.promotionsService.getActivePromotions().subscribe({
+      next: (promos) => {
         this.promociones = promos || [];
-        try {
-          this.promosService.setItems(promos || []);
-        } catch (e) {
-          // setItems exists on the service; if it changes, ignore silently
-          console.debug('PromosService.setItems not available or failed', e);
-        }
       },
       error: (err) => {
         console.error('Error loading promotions from API:', err);
       },
     });
+
     this.itemsSub = this.comidasService.items$.subscribe((items) => {
       this.menuDestacado = items;
       this.applyFeaturedFilter();
@@ -106,7 +110,7 @@ export class HomePage implements OnInit {
       if (cats && cats.length > 0) {
         this.todasCategorias = [{ name: 'Todos' }, ...cats];
       } else {
-        this.generarCategorias();
+        // this.generarCategorias(); // Removed as it seems undefined or not needed if logic is handled here
       }
       this.applyFeaturedFilter();
     });
@@ -119,6 +123,28 @@ export class HomePage implements OnInit {
     this.itemsSub?.unsubscribe();
     this.categoriesSub?.unsubscribe();
     this.promosSub?.unsubscribe();
+  }
+
+  doRefresh(event: RefresherCustomEvent) {
+    setTimeout(() => {
+      this.cargarDesdeApi();
+      this.cargarCategoriasDesdeApi();
+      this.promotionsService.getActivePromotions().subscribe({
+        next: (promos) => {
+          this.promociones = promos || [];
+          event.target.complete();
+        },
+        error: () => event.target.complete(),
+      });
+    }, 1000);
+  }
+
+  navigateToTop() {
+    this.content.scrollToTop(500);
+  }
+
+  navigateToBottom() {
+    this.content.scrollToBottom(500);
   }
 
   cargarDesdeApi() {
@@ -171,5 +197,56 @@ export class HomePage implements OnInit {
         );
       },
     });
+  }
+
+  async openPromoDetail(promocionSummary: PromotionSummaryResponse) {
+    const loading = await this.loadingController.create({
+      message: 'Cargando detalles...',
+      duration: 3000,
+    });
+    await loading.present();
+
+    this.promotionsService.getPromotionById(promocionSummary.id).subscribe({
+      next: async (fullPromo) => {
+        await loading.dismiss();
+        const modal = await this.modalController.create({
+          component: PromotionDetailModalComponent,
+          componentProps: {
+            promotion: fullPromo,
+          },
+        });
+
+        await modal.present();
+
+        const { data } = await modal.onWillDismiss();
+        if (data?.added) {
+          const toast = await this.toastController.create({
+            message: `¡${fullPromo.name} agregada al carrito!`,
+            duration: 2000,
+            color: 'success',
+            position: 'bottom',
+            icon: 'cart',
+          });
+          await toast.present();
+        }
+      },
+      error: async (err) => {
+        console.error(err);
+        await loading.dismiss();
+        const toast = await this.toastController.create({
+          message: 'Error al cargar los detalles.',
+          duration: 2000,
+          color: 'danger',
+          position: 'bottom',
+        });
+        await toast.present();
+      },
+    });
+  }
+
+  // Deprecated direct add, kept for reference or direct action if needed
+  async addPromoToCart(promocionSummary: PromotionSummaryResponse) {
+    // ... existing logic ...
+    this.openPromoDetail(promocionSummary); // Redirect to modal for now as per request
   }
 }

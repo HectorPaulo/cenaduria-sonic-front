@@ -26,6 +26,7 @@ import { addIcons } from 'ionicons';
 import { add, remove, trash, card, cash, wallet, close } from 'ionicons/icons';
 
 interface ItemCarrito {
+  type: 'PRODUCT' | 'PROMOTION';
   id: string;
   nombre: string;
   descripcion: string;
@@ -34,6 +35,8 @@ interface ItemCarrito {
   cantidad: number;
   categoria: 'comida' | 'bebida';
   extras?: string[];
+  productId?: number;
+  promotionId?: number;
 }
 
 interface MetodoPago {
@@ -77,9 +80,9 @@ export class CarritoPage implements OnInit {
   propina: number = 0;
 
   constructor(
-    private alertController: AlertController,
-    private cartService: CartService,
-    private ordersService: OrdersService
+    private readonly alertController: AlertController,
+    private readonly cartService: CartService,
+    private readonly ordersService: OrdersService
   ) {
     addIcons({ close, trash, remove, add, card, cash, wallet });
   }
@@ -87,6 +90,7 @@ export class CarritoPage implements OnInit {
   ngOnInit() {
     this.cartService.items$.subscribe((items) => {
       this.itemsCarrito = items.map((i: any) => ({
+        type: i.type || 'PRODUCT',
         id: i.id,
         nombre: i.nombre,
         descripcion: i.descripcion ?? '',
@@ -95,6 +99,8 @@ export class CarritoPage implements OnInit {
         cantidad: i.cantidad ?? 1,
         categoria: i.categoria === 'bebida' ? 'bebida' : 'comida',
         extras: i.extras ?? [],
+        productId: i.productId,
+        promotionId: i.promotionId,
       }));
       this.calcularTotales();
     });
@@ -219,7 +225,7 @@ export class CarritoPage implements OnInit {
         {
           text: 'Agregar',
           handler: (data) => {
-            this.propina = parseFloat(data.propina) || 0;
+            this.propina = Number.parseFloat(data.propina) || 0;
           },
         },
       ],
@@ -260,14 +266,26 @@ export class CarritoPage implements OnInit {
       return;
     }
 
-    const items: OrderItemDto[] = this.itemsCarrito.map((it) => {
-      const pid = Number(it.id);
-      return {
-        type: 'PRODUCT',
-        productId: Number.isFinite(pid) ? pid : null,
-        promotionId: null,
-        quantity: it.cantidad,
-      } as OrderItemDto;
+    // Obtener los items originales del carrito con su información completa
+    const cartItems = this.cartService.getItems();
+
+    const items: OrderItemDto[] = cartItems.map((item) => {
+      // Verificar si es una promoción o un producto
+      if (item.type === 'PROMOTION') {
+        return {
+          type: 'PROMOTION',
+          promotionId: item.promotionId || Number(item.id),
+          productId: null,
+          quantity: item.cantidad,
+        } as OrderItemDto;
+      } else {
+        return {
+          type: 'PRODUCT',
+          productId: item.productId || Number(item.id),
+          promotionId: null,
+          quantity: item.cantidad,
+        } as OrderItemDto;
+      }
     });
 
     const payload: CreateOrderDto = {

@@ -110,6 +110,13 @@ export const routes: Routes = [
             (m) => m.EstadisticasPage
           ),
       },
+      {
+        path: 'promociones',
+        loadComponent: () =>
+          import('./empleado/promociones/promociones.page').then(
+            (m) => m.PromocionesPage
+          ),
+      },
     ],
   },
 

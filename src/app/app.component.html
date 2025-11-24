@@ -1,4 +1,7 @@
 <ion-app>
+  <!-- Connection Status Indicator -->
+  <app-connection-status></app-connection-status>
+
   <ion-split-pane contentId="main-content">
     <ion-menu contentId="main-content" type="overlay" [disabled]="!isLoggedIn">
       <ion-content>
@@ -8,25 +11,24 @@
           </ion-list-header>
 
           <!-- Mostrar información del usuario solo si está logueado -->
-           @if (isLoggedIn && currentUser) {
-             <div>
-               <ion-note>Hola {{ currentUser.nombre }}!</ion-note>
+          @if (isLoggedIn && currentUser) {
+          <div>
+            <ion-note>Hola {{ currentUser.nombre }}!</ion-note>
             <ion-note>Rol: {{ roleName }}</ion-note>
           </div>
-              }
-              @if (!isLoggedIn) {
-                <div >
-                  <ion-note>¡Bienvenido a Cenaduría Sonic!</ion-note>
-                  <ion-note>Inicia sesión para continuar</ion-note>
-                </div>
-              }
+          } @if (!isLoggedIn) {
+          <div>
+            <ion-note>¡Bienvenido a Cenaduría Sonic!</ion-note>
+            <ion-note>Inicia sesión para continuar</ion-note>
+          </div>
+          }
 
           <!-- Mostrar menús solo si el usuario está logueado -->
-           @if (isLoggedIn) {
-             <div >
+          @if (isLoggedIn) {
+          <div>
             @for (p of currentMenuPages; track p; let i = $index) {
-              <ion-menu-toggle auto-hide="false">
-                <ion-item
+            <ion-menu-toggle auto-hide="false">
+              <ion-item
                 routerDirection="root"
                 [routerLink]="[p.url]"
                 lines="none"
@@ -63,7 +65,7 @@
               </ion-item>
             </ion-menu-toggle>
           </div>
-        }
+          }
         </ion-list>
 
         <!-- * Configuración de tema -->

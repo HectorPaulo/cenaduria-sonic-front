@@ -7,4 +7,5 @@ export interface Alimento {
   imageUrl: string;
   active: boolean;
   category: Category;
+  description?: string;
 }

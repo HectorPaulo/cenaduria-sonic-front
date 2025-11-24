@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonContent,
@@ -21,6 +21,9 @@ import {
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { FabbtnComponent } from 'src/app/components/fabbtn/fabbtn.component';
 import { PedidosService } from 'src/app/services/empleados/pedidos-service';
+import { NotificationService } from 'src/app/services/notification.service';
+import { NotificationType } from 'src/app/Types/websocket.types';
+import { Subscription } from 'rxjs';
 import { RefresherCustomEvent } from '@ionic/core';
 import { addIcons } from 'ionicons';
 import {
@@ -69,23 +72,96 @@ interface OrderView {
     FabbtnComponent,
   ],
 })
-export class MisPedidosPage implements OnInit {
+export class MisPedidosPage implements OnInit, OnDestroy {
   loading = false;
   orders: OrderView[] = [];
   selectedOrder: any = null;
   isModalOpen = false;
+  private notificationSubscription?: Subscription;
 
   currentPage = 0;
   pageSize = 10;
   totalPages = 0;
   totalElements = 0;
 
-  constructor(private readonly pedidosService: PedidosService) {
+  constructor(
+    private readonly pedidosService: PedidosService,
+    private readonly notificationService: NotificationService
+  ) {
     addIcons({ time, restaurant, checkmark, informationCircle, receipt });
   }
 
   ngOnInit() {
     this.loadMyOrders();
+    this.subscribeToNotifications();
+  }
+
+  ngOnDestroy() {
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Subscribe to real-time notifications and update orders
+   */
+  private subscribeToNotifications(): void {
+    this.notificationSubscription =
+      this.notificationService.notifications$.subscribe((notifications) => {
+        if (notifications.length > 0) {
+          const latestNotification = notifications[0];
+
+          // Handle different notification types
+          switch (latestNotification.notificationType) {
+            case NotificationType.ORDER_STATUS_CHANGED:
+              console.log(
+                '[MisPedidos] Order status changed:',
+                latestNotification
+              );
+              this.updateOrderInList(latestNotification.orderId, {
+                status: latestNotification.status,
+              });
+              break;
+
+            case NotificationType.ORDER_ESTIMATED_TIME_CHANGED:
+              console.log(
+                '[MisPedidos] Estimated time changed:',
+                latestNotification
+              );
+              this.updateOrderInList(latestNotification.orderId, {
+                estimatedTime: latestNotification.estimatedTime || 'N/A',
+              });
+              break;
+
+            case NotificationType.ORDER_CANCELLED:
+              console.log('[MisPedidos] Order cancelled:', latestNotification);
+              this.updateOrderInList(latestNotification.orderId, {
+                status: 'CANCELADO',
+              });
+              break;
+          }
+        }
+      });
+  }
+
+  /**
+   * Update a specific order in the list without reloading everything
+   */
+  private updateOrderInList(
+    orderId: number,
+    updates: Partial<OrderView>
+  ): void {
+    const index = this.orders.findIndex((o) => o.id === orderId);
+    if (index !== -1) {
+      this.orders[index] = { ...this.orders[index], ...updates };
+      // Trigger change detection
+      this.orders = [...this.orders];
+
+      // If the modal is open for this order, update it too
+      if (this.selectedOrder?.id === orderId) {
+        this.selectedOrder = { ...this.selectedOrder, ...updates };
+      }
+    }
   }
 
   doRefresh(event: RefresherCustomEvent) {

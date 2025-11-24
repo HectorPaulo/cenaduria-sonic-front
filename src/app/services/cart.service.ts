@@ -3,7 +3,8 @@ import { BehaviorSubject } from 'rxjs';
 import { Alimento } from '../Types/Alimento';
 
 export interface CartItem {
-  id: string;
+  type: 'PRODUCT' | 'PROMOTION'; // Tipo de item
+  id: string; // productId o promotionId
   nombre: string;
   descripcion: string;
   precio: number;
@@ -11,6 +12,9 @@ export interface CartItem {
   cantidad: number;
   categoria?: string;
   extras?: string[];
+  // Para distinguir entre producto y promoción
+  productId?: number;
+  promotionId?: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -55,6 +59,7 @@ export class CartService {
       items[idx].cantidad += quantity;
     } else {
       const newItem: CartItem = {
+        type: 'PRODUCT', // Por defecto es producto
         id,
         nombre:
           (alimento as any).name || (alimento as any).nombre || 'Producto',
@@ -71,6 +76,35 @@ export class CartService {
         categoria:
           (alimento as any).category?.name || (alimento as any).categoria,
         extras: (alimento as any).extras || undefined,
+        productId: Number(id), // Guardar productId
+      };
+      items.push(newItem);
+    }
+    this._items.next(items);
+    this.save();
+  }
+
+  /**
+   * Añadir promoción al carrito
+   */
+  addPromotion(promotion: any, quantity: number = 1) {
+    const id = String(promotion.id ?? Math.random());
+    const items = this.getItems();
+    const idx = items.findIndex(
+      (i) => String(i.id) === id && i.type === 'PROMOTION'
+    );
+    if (idx >= 0) {
+      items[idx].cantidad += quantity;
+    } else {
+      const newItem: CartItem = {
+        type: 'PROMOTION',
+        id,
+        nombre: promotion.name || 'Promoción',
+        descripcion: promotion.description || '',
+        precio: Number(promotion.price ?? 0),
+        imagen: promotion.imageUrl || promotion.image,
+        cantidad: quantity,
+        promotionId: Number(id), // Guardar promotionId
       };
       items.push(newItem);
     }

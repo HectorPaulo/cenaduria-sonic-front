@@ -1,29 +1,14 @@
-.categoria-scroll {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  scroll-behavior: smooth;
+/* Ocultar scrollbar pero permitir scroll */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
-.categoria-btn {
-  transition: all 0.2s ease-in-out;
-
-  &:hover {
-    transform: translateY(-2px);
-  }
-
-  &.active {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  }
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
 
-@media (max-width: 768px) {
-  .categoria-scroll {
-    padding-right: 1rem;
-  }
+ion-content {
+  --background: #000000; /* Fondo negro puro */
+  --color: #ffffff;
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   Router,
@@ -40,6 +40,10 @@ import {
 } from 'ionicons/icons';
 import { ThemeService } from './services/theme.service';
 import { AuthService, UserRole } from './services/auth.service';
+import { WebSocketService } from './services/websocket.service';
+import { NotificationService } from './services/notification.service';
+import { ConnectionStatusComponent } from './components/connection-status/connection-status.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -62,10 +66,14 @@ import { AuthService, UserRole } from './services/auth.service';
     IonLabel,
     IonRouterLink,
     IonRouterOutlet,
+    ConnectionStatusComponent,
   ],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
+  private wsService = inject(WebSocketService);
+  private notificationService = inject(NotificationService);
+  private subscriptions: Subscription[] = [];
 
   public loading = false;
   public currentUser: any = null;
@@ -168,10 +176,85 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.authService.currentUser$.subscribe((user) => {
+    const authSub = this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
       this.currentRole = user ? user.role : null;
+
+      if (user) {
+        this.connectWebSocket(user);
+      } else {
+        this.disconnectWebSocket();
+      }
     });
+    this.subscriptions.push(authSub);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
+    this.disconnectWebSocket();
+  }
+
+  private connectWebSocket(user: any): void {
+    console.log('[App] Connecting WebSocket for user:', user.nombre);
+    this.wsService.connect();
+
+    // Wait for connection to be established before subscribing
+    const connectionCheck = setInterval(() => {
+      if (this.wsService.isConnected()) {
+        console.log('[App] WebSocket connected, subscribing to channels...');
+        clearInterval(connectionCheck);
+        this.subscribeToNotifications(user);
+      }
+    }, 100); // Check every 100ms
+
+    // Timeout after 10 seconds
+    setTimeout(() => {
+      clearInterval(connectionCheck);
+      if (!this.wsService.isConnected()) {
+        console.error('[App] WebSocket connection timeout');
+      }
+    }, 10000);
+  }
+
+  private subscribeToNotifications(user: any): void {
+    const role = user.role;
+    console.log('[App] User role:', role, 'User ID:', user.id);
+
+    if (role === UserRole.EMPLEADO || role === UserRole.SYSADMIN) {
+      console.log('[App] Subscribing to employee notifications...');
+      const empSub = this.wsService
+        .subscribeToEmployeeNotifications()
+        .subscribe((notification) => {
+          if (notification) {
+            console.log(
+              '[App] ✅ Employee notification received:',
+              notification
+            );
+            this.notificationService.addNotification(notification);
+          }
+        });
+      this.subscriptions.push(empSub);
+      console.log('[App] ✅ Employee subscription active');
+    }
+
+    if (user.id) {
+      console.log('[App] Subscribing to user notifications for user:', user.id);
+      const userSub = this.wsService
+        .subscribeToUserNotifications(Number(user.id))
+        .subscribe((notification) => {
+          if (notification) {
+            console.log('[App] ✅ User notification received:', notification);
+            this.notificationService.addNotification(notification);
+          }
+        });
+      this.subscriptions.push(userSub);
+      console.log('[App] ✅ User subscription active');
+    }
+  }
+
+  private disconnectWebSocket(): void {
+    console.log('[App] Disconnecting WebSocket');
+    this.wsService.disconnect();
   }
 
   get currentMenuPages() {
@@ -201,6 +284,7 @@ export class AppComponent implements OnInit {
   }
 
   async logout() {
+    this.disconnectWebSocket();
     await this.authService.logout();
     this.router.navigate(['/login']);
   }

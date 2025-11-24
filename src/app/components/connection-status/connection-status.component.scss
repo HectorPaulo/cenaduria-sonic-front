@@ -1,0 +1,37 @@
+.connection-status {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.status-text {
+  margin-left: 4px;
+}
+
+ion-icon {
+  font-size: 16px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,2533 @@
+{
+  "paths": {
+    "/api/promotions/{id}": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener promoci\u00f3n por ID",
+        "description": "Obtiene una promoci\u00f3n espec\u00edfica con todos sus detalles",
+        "operationId": "getPromotionById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la promoci\u00f3n",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Promoci\u00f3n encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Promoci\u00f3n no encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Actualizar una promoci\u00f3n existente",
+        "description": "Actualiza los datos de una promoci\u00f3n existente. Solo se actualizan los campos proporcionados.",
+        "operationId": "updatePromotion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la promoci\u00f3n",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePromotionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Promoci\u00f3n actualizada correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inv\u00e1lidos",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Promoci\u00f3n no encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionDetailResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflicto con reglas de negocio",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionDetailResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Eliminar promoci\u00f3n",
+        "description": "Elimina permanentemente una promoci\u00f3n del sistema. Solo se pueden eliminar promociones inactivas.",
+        "operationId": "deletePromotion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la promoci\u00f3n",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Promoci\u00f3n eliminada correctamente"
+          },
+          "404": {
+            "description": "Promoci\u00f3n no encontrada"
+          },
+          "409": {
+            "description": "No se puede eliminar promoci\u00f3n activa"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/promotions": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener todas las promociones con paginaci\u00f3n",
+        "description": "Retorna una p\u00e1gina de promociones ordenadas por fecha de creaci\u00f3n descendente",
+        "operationId": "getPromotions",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "P\u00e1gina de promociones obtenida correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagePromotionSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Crear una nueva promoci\u00f3n",
+        "description": "Crea una nueva promoci\u00f3n temporal o recurrente. Las promociones temporales pueden tener fechas de inicio y fin, mientras que las recurrentes requieren reglas semanales.",
+        "operationId": "createPromotion",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePromotionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Promoci\u00f3n creada correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inv\u00e1lidos",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Validaci\u00f3n fallida": {
+                    "description": "Validaci\u00f3n fallida",
+                    "value": {
+                      "error": "VALIDATION_FAILED",
+                      "message": "Las promociones recurrentes deben tener al menos una regla semanal"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Producto no encontrado",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Producto no encontrado": {
+                    "description": "Producto no encontrado",
+                    "value": {
+                      "error": "PRODUCTS_NOT_FOUND",
+                      "message": "Productos no encontrados: [999]"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/promotions/{id}/status": {
+      "patch": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Cambiar estado de la promoci\u00f3n",
+        "description": "Activa o desactiva una promoci\u00f3n",
+        "operationId": "togglePromotionStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la promoci\u00f3n",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Estado cambiado correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No se puede activar promoci\u00f3n expirada",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Promoci\u00f3n expirada": {
+                    "description": "Promoci\u00f3n expirada",
+                    "value": {
+                      "error": "PROMOTION_EXPIRED",
+                      "message": "La promoci\u00f3n con id 123 ya expir\u00f3. Actualiza las fechas para reactivarla."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Promoci\u00f3n no encontrada",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Promoci\u00f3n no encontrada": {
+                    "description": "Promoci\u00f3n no encontrada",
+                    "value": {
+                      "error": "PROMOTION_NOT_FOUND",
+                      "message": "Promoci\u00f3n con id 123 no encontrada."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/promotions/{id}/image": {
+      "patch": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Subir imagen de promoci\u00f3n",
+        "description": "Sube o actualiza la imagen de una promoci\u00f3n existente",
+        "operationId": "uploadPromotionImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID de la promoci\u00f3n",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PromotionImageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Imagen subida correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Imagen inv\u00e1lida / Datos de entrada incorrectos",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Imagen inv\u00e1lida": {
+                    "description": "Imagen inv\u00e1lida",
+                    "value": {
+                      "error": "INVALID_IMAGE",
+                      "message": "La imagen no cumple con los requisitos: tama\u00f1o m\u00e1ximo 5MB y tipos permitidos (jpg,png,webp)"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Promoci\u00f3n no encontrada",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Promoci\u00f3n no encontrada": {
+                    "description": "Promoci\u00f3n no encontrada",
+                    "value": {
+                      "error": "PROMOTION_NOT_FOUND",
+                      "message": "Promoci\u00f3n con id 123 no encontrada"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/promotions/type/{type}": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener promociones por tipo",
+        "description": "Retorna promociones filtradas por tipo (TEMPORARY o RECURRING)",
+        "operationId": "getPromotionsByType",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "description": "Tipo de promoci\u00f3n",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "TEMPORARY",
+                "RECURRING"
+              ]
+            },
+            "example": "TEMPORARY"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Promociones por tipo obtenidas correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/start-date/{date}": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener promociones por fecha de inicio",
+        "description": "Retorna promociones que inicien en una fecha espec\u00edfica",
+        "operationId": "getPromotionsByStartDate",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "description": "Fecha de inicio",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2024-10-20"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Promociones por fecha de inicio obtenidas correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionSummaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/search": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Buscar promociones por nombre",
+        "description": "Busca promociones activas que contengan el texto especificado en su nombre",
+        "operationId": "searchPromotionsByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Texto a buscar en el nombre de la promoci\u00f3n",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "2x1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "B\u00fasqueda realizada correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/products": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener promociones activas por m\u00faltiples productos",
+        "description": "Retorna promociones activas que incluyan cualquiera de los productos especificados",
+        "operationId": "getActivePromotionsByProducts",
+        "parameters": [
+          {
+            "name": "productIds",
+            "in": "query",
+            "description": "IDs de productos separados por coma",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int64"
+              }
+            },
+            "example": "1,2,3"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Promociones por productos obtenidas correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionSummaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/product/{productId}": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener promociones activas por producto",
+        "description": "Retorna promociones activas que incluyan un producto espec\u00edfico",
+        "operationId": "getActivePromotionsByProduct",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "ID del producto",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Promociones por producto obtenidas correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionSummaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/expiring-soon": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener promociones que expiran pronto",
+        "description": "Retorna promociones que expiran dentro de un rango de fechas",
+        "operationId": "getPromotionsExpiringSoon",
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "Fecha de inicio del rango",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2024-10-20"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "Fecha de fin del rango",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2024-10-25"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Promociones que expiran pronto obtenidas correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionSummaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/expired": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener promociones expiradas",
+        "description": "Retorna promociones temporales que ya han expirado",
+        "operationId": "getExpiredPromotions",
+        "responses": {
+          "200": {
+            "description": "Promociones expiradas obtenidas correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionSummaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/end-date/{date}": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener promociones por fecha de fin",
+        "description": "Retorna promociones que terminen en una fecha espec\u00edfica",
+        "operationId": "getPromotionsByEndDate",
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "description": "Fecha de fin",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2024-10-25"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Promociones por fecha de fin obtenidas correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionSummaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/date-range": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener promociones temporales por rango de fechas",
+        "description": "Retorna promociones temporales que se encuentren dentro del rango de fechas especificado",
+        "operationId": "getTemporaryPromotionsByDateRange",
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "Fecha de inicio del rango",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2024-10-01"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "Fecha de fin del rango",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2024-10-31"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Promociones temporales por rango obtenidas correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionSummaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/current": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener promociones v\u00e1lidas actualmente",
+        "description": "Retorna promociones que est\u00e1n v\u00e1lidas en la fecha y hora actual",
+        "operationId": "getCurrentlyValidPromotions",
+        "responses": {
+          "200": {
+            "description": "Promociones v\u00e1lidas obtenidas correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/count/type/{type}": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Contar promociones por tipo",
+        "description": "Retorna el n\u00famero total de promociones de un tipo espec\u00edfico",
+        "operationId": "getPromotionsCountByType",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "description": "Tipo de promoci\u00f3n",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "TEMPORARY",
+                "RECURRING"
+              ]
+            },
+            "example": "TEMPORARY"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conteo realizado correctamente",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Conteo de promociones": {
+                    "description": "Conteo de promociones",
+                    "value": 15
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/count/active/type/{type}": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Contar promociones activas por tipo",
+        "description": "Retorna el n\u00famero de promociones activas de un tipo espec\u00edfico",
+        "operationId": "getActivePromotionsCountByType",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "description": "Tipo de promoci\u00f3n",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "TEMPORARY",
+                "RECURRING"
+              ]
+            },
+            "example": "RECURRING"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conteo de promociones activas realizado correctamente",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Conteo de promociones activas": {
+                    "description": "Conteo de promociones activas",
+                    "value": 12
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/active": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener todas las promociones activas",
+        "description": "Retorna una lista de todas las promociones activas disponibles",
+        "operationId": "getActivePromotions",
+        "responses": {
+          "200": {
+            "description": "Lista de promociones activas obtenida correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionSummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/active/price-desc": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener promociones activas ordenadas por precio descendente",
+        "description": "Retorna promociones activas ordenadas de mayor a menor precio",
+        "operationId": "getActivePromotionsByPriceDesc",
+        "responses": {
+          "200": {
+            "description": "Promociones ordenadas por precio obtenidas correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionSummaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/promotions/active/price-asc": {
+      "get": {
+        "tags": [
+          "Promotions"
+        ],
+        "summary": "Obtener promociones activas ordenadas por precio ascendente",
+        "description": "Retorna promociones activas ordenadas de menor a mayor precio",
+        "operationId": "getActivePromotionsByPriceAsc",
+        "responses": {
+          "200": {
+            "description": "Promociones ordenadas por precio obtenidas correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionSummaryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "LocalTime": {
+        "type": "object",
+        "properties": {
+          "hour": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minute": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "second": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nano": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "Hora de fin",
+        "example": "18:00:00"
+      },
+      "ProductSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico del producto",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del producto",
+            "example": "Taco de Pastor"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen del producto"
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio individual del producto",
+            "example": 25.0
+          }
+        },
+        "description": "DTO con informaci\u00f3n b\u00e1sica de un producto"
+      },
+      "PromotionDetailResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico de la promoci\u00f3n",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la promoci\u00f3n",
+            "example": "2x1 en Tacos"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripci\u00f3n detallada de la promoci\u00f3n"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen de la promoci\u00f3n"
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio total de la promoci\u00f3n",
+            "example": 99.99
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo de promoci\u00f3n",
+            "enum": [
+              "TEMPORARY",
+              "RECURRING"
+            ]
+          },
+          "startsAt": {
+            "type": "string",
+            "description": "Fecha de inicio (solo promociones temporales)",
+            "format": "date"
+          },
+          "endsAt": {
+            "type": "string",
+            "description": "Fecha de fin (solo promociones temporales)",
+            "format": "date"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Estado activo de la promoci\u00f3n"
+          },
+          "currentlyValid": {
+            "type": "boolean",
+            "description": "Indica si la promoci\u00f3n est\u00e1 actualmente v\u00e1lida"
+          },
+          "products": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Productos incluidos en la promoci\u00f3n",
+            "items": {
+              "$ref": "#/components/schemas/ProductSummaryResponse"
+            }
+          },
+          "weeklyRules": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Reglas semanales (solo promociones recurrentes)",
+            "items": {
+              "$ref": "#/components/schemas/WeeklyRuleResponse"
+            }
+          }
+        },
+        "description": "DTO con informaci\u00f3n completa de una promoci\u00f3n"
+      },
+      "WeeklyRuleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico de la regla",
+            "format": "int64",
+            "example": 1
+          },
+          "dayOfWeek": {
+            "type": "string",
+            "description": "D\u00eda de la semana",
+            "example": "TUESDAY",
+            "enum": [
+              "MONDAY",
+              "TUESDAY",
+              "WEDNESDAY",
+              "THURSDAY",
+              "FRIDAY",
+              "SATURDAY",
+              "SUNDAY"
+            ]
+          },
+          "startTime": {
+            "$ref": "#/components/schemas/LocalTime"
+          },
+          "endTime": {
+            "$ref": "#/components/schemas/LocalTime"
+          },
+          "activeNow": {
+            "type": "boolean",
+            "description": "Indica si la regla est\u00e1 activa en este momento"
+          }
+        },
+        "description": "DTO con informaci\u00f3n de una regla semanal"
+      },
+      "CreateWeeklyRuleRequest": {
+        "required": [
+          "dayOfWeek",
+          "endTime",
+          "startTime"
+        ],
+        "type": "object",
+        "properties": {
+          "dayOfWeek": {
+            "type": "string",
+            "description": "D\u00eda de la semana",
+            "example": "TUESDAY",
+            "enum": [
+              "MONDAY",
+              "TUESDAY",
+              "WEDNESDAY",
+              "THURSDAY",
+              "FRIDAY",
+              "SATURDAY",
+              "SUNDAY",
+              "MONDAY",
+              "TUESDAY",
+              "WEDNESDAY",
+              "THURSDAY",
+              "FRIDAY",
+              "SATURDAY",
+              "SUNDAY"
+            ]
+          },
+          "startTime": {
+            "$ref": "#/components/schemas/LocalTime"
+          },
+          "endTime": {
+            "$ref": "#/components/schemas/LocalTime"
+          }
+        },
+        "description": "DTO para crear una regla semanal"
+      },
+      "UpdatePromotionRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nombre de la promoci\u00f3n",
+            "example": "3x2 en Tacos"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripci\u00f3n detallada de la promoci\u00f3n"
+          },
+          "price": {
+            "minimum": 0.01,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Precio total de la promoci\u00f3n",
+            "example": 149.99
+          },
+          "startsAt": {
+            "type": "string",
+            "description": "Fecha de inicio (solo para promociones temporales)",
+            "format": "date"
+          },
+          "endsAt": {
+            "type": "string",
+            "description": "Fecha de fin (solo para promociones temporales)",
+            "format": "date"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Estado activo de la promoci\u00f3n"
+          },
+          "productIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "IDs de los productos incluidos en la promoci\u00f3n",
+            "items": {
+              "type": "integer",
+              "description": "IDs de los productos incluidos en la promoci\u00f3n",
+              "format": "int64"
+            }
+          },
+          "weeklyRules": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Reglas semanales (solo para promociones recurrentes)",
+            "items": {
+              "$ref": "#/components/schemas/CreateWeeklyRuleRequest"
+            }
+          }
+        },
+        "description": "DTO para actualizar una promoci\u00f3n existente"
+      },
+      "ChangePasswordResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "required": [
+          "confirmNewPassword",
+          "currentPassword",
+          "newPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "maxLength": 2147483647,
+            "minLength": 6,
+            "type": "string"
+          },
+          "confirmNewPassword": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateAvatarResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensaje que confirma la actualizaci\u00f3n del avatar.",
+            "example": "Avatar actualizado correctamente"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "description": "URL del nuevo avatar del usuario.",
+            "example": "http://localhost:8081/public/avatars/user123.jpg"
+          },
+          "username": {
+            "type": "string",
+            "description": "Nombre de usuario al que pertenece el avatar actualizado.",
+            "example": "user123"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "Marca de tiempo de la actualizaci\u00f3n del avatar.",
+            "format": "date-time"
+          }
+        },
+        "description": "Respuesta devuelta tras la actualizaci\u00f3n del avatar de un usuario."
+      },
+      "CategoryInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico de la categor\u00eda",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la categor\u00eda",
+            "example": "Hamburguesas"
+          }
+        },
+        "description": "Informaci\u00f3n b\u00e1sica de la categor\u00eda para incluir en respuestas de productos"
+      },
+      "ProductResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico del producto",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del producto",
+            "example": "Hamburguesa Cl\u00e1sica"
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio del producto",
+            "example": 15.99
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen del producto",
+            "example": "http://localhost:8081/public/images/hamburguesa-clasica.jpg"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Indica si el producto est\u00e1 activo",
+            "example": true
+          },
+          "category": {
+            "$ref": "#/components/schemas/CategoryInfo"
+          }
+        },
+        "description": "Respuesta completa que contiene todos los detalles de un producto"
+      },
+      "ProductUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nuevo nombre del producto",
+            "example": "Hamburguesa Deluxe"
+          },
+          "price": {
+            "minimum": 0.01,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Nuevo precio del producto",
+            "example": 18.99
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Estado de activaci\u00f3n del producto",
+            "example": true
+          },
+          "categoryId": {
+            "type": "integer",
+            "description": "ID de la nueva categor\u00eda del producto",
+            "format": "int64",
+            "example": 2
+          }
+        },
+        "description": "Datos para actualizar un producto existente (sin imagen)"
+      },
+      "OrderDetailResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico de la orden",
+            "format": "int64",
+            "example": 1
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserSummaryResponse"
+          },
+          "status": {
+            "type": "string",
+            "description": "Estado actual de la orden",
+            "example": "EN_PREPARACION",
+            "enum": [
+              "PENDIENTE",
+              "EN_PREPARACION",
+              "LISTO",
+              "ENTREGADO",
+              "CANCELADO"
+            ]
+          },
+          "subtotal": {
+            "type": "number",
+            "description": "Subtotal de la orden",
+            "example": 150.0
+          },
+          "tip": {
+            "type": "number",
+            "description": "Propina",
+            "example": 15.0
+          },
+          "total": {
+            "type": "number",
+            "description": "Total de la orden",
+            "example": 165.0
+          },
+          "estimatedTime": {
+            "type": "string",
+            "description": "Tiempo estimado de entrega",
+            "example": "30:00"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Fecha y hora de creaci\u00f3n",
+            "format": "date-time"
+          },
+          "deliveredAt": {
+            "type": "string",
+            "description": "Fecha y hora de entrega",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "description": "Items de la orden",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemResponse"
+            }
+          }
+        },
+        "description": "DTO con informaci\u00f3n completa de una orden"
+      },
+      "OrderItemResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico del item",
+            "format": "int64",
+            "example": 1
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo de item",
+            "example": "PRODUCT",
+            "enum": [
+              "PRODUCT",
+              "PROMOTION"
+            ]
+          },
+          "itemName": {
+            "type": "string",
+            "description": "Nombre del item",
+            "example": "Taco de Pastor"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen del item"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Cantidad",
+            "format": "int32",
+            "example": 2
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Precio unitario",
+            "example": 25.0
+          },
+          "lineTotal": {
+            "type": "number",
+            "description": "Total de la l\u00ednea",
+            "example": 50.0
+          }
+        },
+        "description": "DTO con informaci\u00f3n de un item de orden"
+      },
+      "UserSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico del usuario",
+            "format": "int64",
+            "example": 1
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Nombre completo del usuario",
+            "example": "Juan P\u00e9rez"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email del usuario",
+            "example": "juan.perez@example.com"
+          }
+        },
+        "description": "DTO con informaci\u00f3n b\u00e1sica del usuario"
+      },
+      "CreateOrderItemRequest": {
+        "required": [
+          "quantity",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Tipo de item: PRODUCT o PROMOTION",
+            "example": "PRODUCT",
+            "enum": [
+              "PRODUCT",
+              "PROMOTION",
+              "PRODUCT",
+              "PROMOTION"
+            ]
+          },
+          "productId": {
+            "type": "integer",
+            "description": "ID del producto (requerido si type es PRODUCT)",
+            "format": "int64",
+            "example": 1
+          },
+          "promotionId": {
+            "type": "integer",
+            "description": "ID de la promoci\u00f3n (requerido si type es PROMOTION)",
+            "format": "int64",
+            "example": 1
+          },
+          "quantity": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "Cantidad de items",
+            "format": "int32",
+            "example": 2
+          }
+        },
+        "description": "DTO para crear un item de orden"
+      },
+      "CreateOrderRequest": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "tip": {
+            "minimum": 0.0,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Propina para el servicio",
+            "example": 15.0
+          },
+          "items": {
+            "type": "array",
+            "description": "Items de la orden",
+            "items": {
+              "$ref": "#/components/schemas/CreateOrderItemRequest"
+            }
+          }
+        },
+        "description": "DTO para crear o actualizar una orden.\nSe utiliza tanto para la creaci\u00f3n de una nueva orden como para la actualizaci\u00f3n completa de una orden existente.\nEl identificador de la orden a actualizar se debe enviar en la URL del endpoint (por ejemplo, PUT /orders/{orderId}).\n"
+      },
+      "CategorySimpleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico de la categor\u00eda",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la categor\u00eda",
+            "example": "Bebidas"
+          }
+        },
+        "description": "Respuesta simple que contiene solo informaci\u00f3n b\u00e1sica de la categor\u00eda"
+      },
+      "CategoryUpdateRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nuevo nombre para la categor\u00eda",
+            "example": "Bebidas Fr\u00edas"
+          }
+        },
+        "description": "Datos para actualizar una categor\u00eda existente"
+      },
+      "CreatePromotionRequest": {
+        "required": [
+          "name",
+          "price",
+          "productIds",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nombre de la promoci\u00f3n",
+            "example": "2x1 en Tacos"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripci\u00f3n detallada de la promoci\u00f3n",
+            "example": "Compra un taco y ll\u00e9vate otro gratis"
+          },
+          "price": {
+            "minimum": 0.01,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Precio total de la promoci\u00f3n",
+            "example": 99.99
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo de promoci\u00f3n. TEMPORARY: promoci\u00f3n con fechas espec\u00edficas de inicio y fin. RECURRING: promoci\u00f3n recurrente con horarios semanales",
+            "example": "TEMPORARY",
+            "enum": [
+              "TEMPORARY",
+              "RECURRING",
+              "TEMPORARY",
+              "RECURRING"
+            ]
+          },
+          "startsAt": {
+            "type": "string",
+            "description": "Fecha de inicio (solo para promociones temporales)",
+            "format": "date",
+            "example": "2024-10-20"
+          },
+          "endsAt": {
+            "type": "string",
+            "description": "Fecha de fin (solo para promociones temporales)",
+            "format": "date",
+            "example": "2024-10-25"
+          },
+          "productIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "IDs de los productos incluidos en la promoci\u00f3n",
+            "items": {
+              "type": "integer",
+              "description": "IDs de los productos incluidos en la promoci\u00f3n",
+              "format": "int64"
+            }
+          },
+          "weeklyRules": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Reglas semanales (solo para promociones recurrentes)",
+            "items": {
+              "$ref": "#/components/schemas/CreateWeeklyRuleRequest"
+            }
+          }
+        },
+        "description": "DTO para crear una nueva promoci\u00f3n"
+      },
+      "ProductCreateFormData": {
+        "required": [
+          "categoryId",
+          "image",
+          "name",
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nombre del producto",
+            "example": "Hamburguesa Cl\u00e1sica"
+          },
+          "price": {
+            "minimum": 0.01,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Precio del producto",
+            "example": 15.99
+          },
+          "image": {
+            "type": "string",
+            "format": "binary"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Indica si el producto estar\u00e1 activo al crearlo",
+            "example": true,
+            "default": true
+          },
+          "categoryId": {
+            "type": "integer",
+            "description": "ID de la categor\u00eda a la que pertenece el producto",
+            "format": "int64",
+            "example": 1
+          }
+        },
+        "description": "Datos para crear un producto via multipart/form-data"
+      },
+      "CategoryCreateRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nombre \u00fanico de la categor\u00eda",
+            "example": "Bebidas"
+          }
+        },
+        "description": "Datos requeridos para crear una nueva categor\u00eda"
+      },
+      "RegisterRequest": {
+        "required": [
+          "email",
+          "name",
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "maxLength": 20,
+            "minLength": 3,
+            "pattern": "^[a-zA-Z0-9_]+$",
+            "type": "string",
+            "description": "Nombre de usuario \u00fanico. Solo se permiten letras, n\u00fameros y guiones bajos.",
+            "example": "daniel123"
+          },
+          "email": {
+            "type": "string",
+            "description": "Correo electr\u00f3nico v\u00e1lido del usuario.",
+            "example": "daniel@example.com"
+          },
+          "password": {
+            "maxLength": 100,
+            "minLength": 8,
+            "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$",
+            "type": "string",
+            "description": "Contrase\u00f1a del usuario. Debe contener al menos una letra min\u00fascula, una may\u00fascula,\nun n\u00famero y un car\u00e1cter especial. Longitud m\u00ednima de 8 caracteres.\n",
+            "example": "Abc123$%"
+          },
+          "name": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nombre completo del usuario.",
+            "example": "Daniel Santiago"
+          },
+          "roles": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Conjunto de roles asignados al nuevo usuario.",
+            "example": [
+              "ROLE_USER"
+            ],
+            "items": {
+              "type": "string",
+              "description": "Roles disponibles en el sistema.",
+              "example": "[\"ROLE_USER\"]",
+              "enum": [
+                "ROLE_USER",
+                "ROLE_ADMIN",
+                "ROLE_EMPLOYEE",
+                "ROLE_USER",
+                "ROLE_ADMIN",
+                "ROLE_EMPLOYEE"
+              ]
+            },
+            "enum": [
+              "ROLE_USER",
+              "ROLE_ADMIN",
+              "ROLE_EMPLOYEE"
+            ]
+          }
+        },
+        "description": "Petici\u00f3n para registrar un nuevo usuario en el sistema."
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "Token JWT de acceso generado para el usuario.",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Token JWT de refresco, utilizado para generar nuevos tokens de acceso.",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "tokenType": {
+            "type": "string",
+            "description": "Tipo de token devuelto. Generalmente 'Bearer'.",
+            "example": "Bearer"
+          },
+          "expiresInMs": {
+            "type": "integer",
+            "description": "Tiempo de expiraci\u00f3n del token de acceso en milisegundos.",
+            "format": "int64",
+            "example": 3600000
+          }
+        },
+        "description": "Respuesta devuelta tras un registro, login o refresh exitoso."
+      },
+      "RefreshRequest": {
+        "required": [
+          "refreshToken"
+        ],
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Token de refresco emitido durante el inicio de sesi\u00f3n.",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        },
+        "description": "Petici\u00f3n para refrescar el token JWT de acceso."
+      },
+      "AuthRequest": {
+        "required": [
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Nombre de usuario registrado.",
+            "example": "daniel123"
+          },
+          "password": {
+            "type": "string",
+            "description": "Contrase\u00f1a correspondiente al usuario.",
+            "example": "Abc123$%"
+          }
+        },
+        "description": "Petici\u00f3n para autenticar a un usuario existente."
+      },
+      "PromotionImageRequest": {
+        "type": "object",
+        "properties": {
+          "imageFile": {
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "description": "DTO para subir imagen de promoci\u00f3n"
+      },
+      "ProductImageUpdateRequest": {
+        "required": [
+          "image"
+        ],
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "description": "Datos para actualizar solo la imagen de un producto"
+      },
+      "ProductImageUpdateResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensaje de confirmaci\u00f3n",
+            "example": "Imagen actualizada correctamente"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la nueva imagen",
+            "example": "http://localhost:8081/public/images/hamburguesa-deluxe_12345.jpg"
+          },
+          "productId": {
+            "type": "integer",
+            "description": "ID del producto",
+            "format": "int64",
+            "example": 1
+          },
+          "productName": {
+            "type": "string",
+            "description": "Nombre del producto",
+            "example": "Hamburguesa Cl\u00e1sica"
+          }
+        },
+        "description": "Respuesta tras actualizar la imagen de un producto"
+      },
+      "UpdateOrderTipRequest": {
+        "required": [
+          "tip"
+        ],
+        "type": "object",
+        "properties": {
+          "tip": {
+            "minimum": 0.0,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Nueva propina",
+            "example": 20.0
+          }
+        },
+        "description": "DTO para actualizar la propina de una orden"
+      },
+      "UpdateOrderStatusRequest": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Nuevo estado de la orden",
+            "example": "EN_PREPARACION",
+            "enum": [
+              "PENDIENTE",
+              "EN_PREPARACION",
+              "LISTO",
+              "ENTREGADO",
+              "CANCELADO",
+              "PENDIENTE",
+              "EN_PREPARACION",
+              "LISTO",
+              "ENTREGADO",
+              "CANCELADO"
+            ]
+          }
+        },
+        "description": "DTO para actualizar el estado de una orden"
+      },
+      "UpdateOrderEstimatedTimeRequest": {
+        "required": [
+          "estimatedTime"
+        ],
+        "type": "object",
+        "properties": {
+          "estimatedTime": {
+            "pattern": "^\\d{2}:\\d{2}$",
+            "type": "string",
+            "description": "Tiempo estimado en formato MM:SS",
+            "example": "45:00"
+          }
+        },
+        "description": "DTO para actualizar el tiempo estimado de una orden"
+      },
+      "OrderCancelledResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico de la orden cancelada",
+            "format": "int64",
+            "example": 1
+          },
+          "status": {
+            "type": "string",
+            "description": "Estado final de la orden",
+            "example": "CANCELADO",
+            "enum": [
+              "PENDIENTE",
+              "EN_PREPARACION",
+              "LISTO",
+              "ENTREGADO",
+              "CANCELADO"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensaje de confirmaci\u00f3n",
+            "example": "La orden ha sido cancelada exitosamente"
+          },
+          "cancelledAt": {
+            "type": "string",
+            "description": "Fecha y hora de cancelaci\u00f3n",
+            "format": "date-time"
+          }
+        },
+        "description": "Respuesta cuando el usuario cancela una orden"
+      },
+      "OrderNotificationDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "integer",
+            "description": "ID de la orden",
+            "format": "int64",
+            "example": 1
+          },
+          "userId": {
+            "type": "integer",
+            "description": "ID del usuario due\u00f1o de la orden",
+            "format": "int64",
+            "example": 42
+          },
+          "userName": {
+            "type": "string",
+            "description": "Nombre del usuario",
+            "example": "Juan P\u00e9rez"
+          },
+          "status": {
+            "type": "string",
+            "description": "Estado actual de la orden",
+            "example": "EN_PREPARACION",
+            "enum": [
+              "PENDIENTE",
+              "EN_PREPARACION",
+              "LISTO",
+              "ENTREGADO",
+              "CANCELADO"
+            ]
+          },
+          "total": {
+            "type": "number",
+            "description": "Total de la orden",
+            "example": 250.5
+          },
+          "estimatedTime": {
+            "type": "string",
+            "description": "Tiempo estimado de preparaci\u00f3n",
+            "example": "00:30"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Fecha de creaci\u00f3n de la orden",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Fecha de \u00faltima actualizaci\u00f3n",
+            "format": "date-time"
+          },
+          "notificationType": {
+            "type": "string",
+            "description": "Tipo de notificaci\u00f3n WebSocket",
+            "example": "ORDER_STATUS_CHANGED",
+            "enum": [
+              "ORDER_CREATED",
+              "ORDER_UPDATED",
+              "ORDER_STATUS_CHANGED",
+              "ORDER_ESTIMATED_TIME_CHANGED",
+              "ORDER_CANCELLED"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensaje descriptivo de la notificaci\u00f3n",
+            "example": "Tu orden #1 cambi\u00f3 a estado: EN_PREPARACION"
+          }
+        },
+        "description": "Notificaci\u00f3n de orden enviada por WebSocket"
+      },
+      "WebSocketInfo": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "description": "Endpoint de conexi\u00f3n WebSocket",
+            "example": "ws://localhost:8081/ws"
+          },
+          "protocol": {
+            "type": "string",
+            "description": "Protocolo utilizado",
+            "example": "STOMP over WebSocket with SockJS fallback"
+          },
+          "employeesTopic": {
+            "type": "string",
+            "description": "Topic para empleados",
+            "example": "/topic/orders/employees"
+          },
+          "userTopicPattern": {
+            "type": "string",
+            "description": "Patr\u00f3n del topic para usuarios",
+            "example": "/topic/orders/user/{userId}"
+          },
+          "documentation": {
+            "type": "string",
+            "description": "Descripci\u00f3n del funcionamiento"
+          },
+          "ionicAngularExample": {
+            "type": "string",
+            "description": "Ejemplo de implementaci\u00f3n en Ionic/Angular"
+          }
+        },
+        "description": "Informaci\u00f3n de configuraci\u00f3n WebSocket"
+      },
+      "Pageable": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PagePromotionSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PromotionSummaryResponse"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SortObject"
+            }
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SortObject"
+            }
+          },
+          "unpaged": {
+            "type": "boolean"
+          },
+          "paged": {
+            "type": "boolean"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PromotionSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico de la promoci\u00f3n",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la promoci\u00f3n",
+            "example": "2x1 en Tacos"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen de la promoci\u00f3n"
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio total de la promoci\u00f3n",
+            "example": 99.99
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo de promoci\u00f3n",
+            "enum": [
+              "TEMPORARY",
+              "RECURRING"
+            ]
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Estado activo de la promoci\u00f3n"
+          },
+          "currentlyValid": {
+            "type": "boolean",
+            "description": "Indica si la promoci\u00f3n est\u00e1 actualmente v\u00e1lida"
+          }
+        },
+        "description": "DTO con informaci\u00f3n b\u00e1sica de una promoci\u00f3n"
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "direction": {
+            "type": "string"
+          },
+          "nullHandling": {
+            "type": "string"
+          },
+          "ascending": {
+            "type": "boolean"
+          },
+          "property": {
+            "type": "string"
+          },
+          "ignoreCase": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico del usuario.",
+            "format": "int64",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "description": "Nombre de usuario.",
+            "example": "user123"
+          },
+          "email": {
+            "type": "string",
+            "description": "Correo electr\u00f3nico del usuario.",
+            "example": "usuario@example.com"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre completo del usuario.",
+            "example": "Juan P\u00e9rez"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "description": "URL del avatar del usuario.",
+            "example": "http://localhost:8081/public/avatars/user123.jpg"
+          },
+          "registerDate": {
+            "type": "string",
+            "description": "Fecha de registro del usuario.",
+            "format": "date-time"
+          },
+          "roles": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Roles del usuario.",
+            "example": [
+              "USER"
+            ],
+            "items": {
+              "type": "string",
+              "description": "Roles del usuario.",
+              "example": "[\"USER\"]"
+            }
+          }
+        },
+        "description": "Informaci\u00f3n del perfil del usuario autenticado."
+      },
+      "ProductSearchResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico del producto",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del producto",
+            "example": "Hamburguesa Cl\u00e1sica"
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio del producto",
+            "example": 15.99
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen del producto",
+            "example": "http://localhost:8081/public/images/hamburguesa-clasica.jpg"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Indica si el producto est\u00e1 activo",
+            "example": true
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "Nombre de la categor\u00eda",
+            "example": "Hamburguesas"
+          }
+        },
+        "description": "Respuesta para b\u00fasquedas y filtros de productos"
+      },
+      "OrderSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico de la orden",
+            "format": "int64",
+            "example": 1
+          },
+          "status": {
+            "type": "string",
+            "description": "Estado actual de la orden",
+            "example": "PENDIENTE",
+            "enum": [
+              "PENDIENTE",
+              "EN_PREPARACION",
+              "LISTO",
+              "ENTREGADO",
+              "CANCELADO"
+            ]
+          },
+          "subtotal": {
+            "type": "number",
+            "description": "Subtotal de la orden",
+            "example": 150.0
+          },
+          "tip": {
+            "type": "number",
+            "description": "Propina",
+            "example": 15.0
+          },
+          "total": {
+            "type": "number",
+            "description": "Total de la orden",
+            "example": 165.0
+          },
+          "estimatedTime": {
+            "type": "string",
+            "description": "Tiempo estimado de entrega",
+            "example": "30:00"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Fecha y hora de creaci\u00f3n",
+            "format": "date-time"
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Cantidad total de items",
+            "format": "int32",
+            "example": 5
+          }
+        },
+        "description": "DTO con informaci\u00f3n b\u00e1sica de una orden"
+      },
+      "TopSellingItemResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID del producto o promoci\u00f3n",
+            "format": "int64",
+            "example": 5
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del producto o promoci\u00f3n",
+            "example": "Taco de Pastor"
+          },
+          "totalSold": {
+            "type": "integer",
+            "description": "Cantidad total vendida",
+            "format": "int64",
+            "example": 120
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo de item: PRODUCT o PROMOTION",
+            "example": "PRODUCT",
+            "enum": [
+              "PRODUCT",
+              "PROMOTION"
+            ]
+          }
+        },
+        "description": "DTO para productos o promociones m\u00e1s vendidos"
+      },
+      "OrderStatisticsResponse": {
+        "type": "object",
+        "properties": {
+          "totalOrders": {
+            "type": "integer",
+            "description": "Total de \u00f3rdenes registradas",
+            "format": "int64",
+            "example": 150
+          },
+          "pendingOrders": {
+            "type": "integer",
+            "description": "\u00d3rdenes pendientes",
+            "format": "int64",
+            "example": 20
+          },
+          "completedOrders": {
+            "type": "integer",
+            "description": "\u00d3rdenes completadas",
+            "format": "int64",
+            "example": 110
+          },
+          "cancelledOrders": {
+            "type": "integer",
+            "description": "\u00d3rdenes canceladas",
+            "format": "int64",
+            "example": 20
+          },
+          "totalRevenue": {
+            "type": "number",
+            "description": "Ingresos totales",
+            "example": 25000.0
+          }
+        },
+        "description": "DTO con estad\u00edsticas generales de \u00f3rdenes"
+      },
+      "CategoryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico de la categor\u00eda",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la categor\u00eda",
+            "example": "Bebidas"
+          },
+          "products": {
+            "type": "array",
+            "description": "Lista de productos asociados a esta categor\u00eda",
+            "items": {
+              "type": "string",
+              "description": "Lista de productos asociados a esta categor\u00eda"
+            }
+          }
+        },
+        "description": "Respuesta que contiene los detalles completos de una categor\u00eda"
+      },
+      "CategoryDetailedResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico de la categor\u00eda",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la categor\u00eda",
+            "example": "Bebidas"
+          },
+          "products": {
+            "type": "array",
+            "description": "Lista completa de productos asociados a esta categor\u00eda",
+            "items": {
+              "$ref": "#/components/schemas/ProductSummary"
+            }
+          }
+        },
+        "description": "Respuesta detallada que contiene la categor\u00eda con todos los detalles de sus productos"
+      },
+      "ProductSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico del producto",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del producto",
+            "example": "Coca Cola"
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio del producto",
+            "example": 2.5
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen del producto",
+            "example": "http://localhost:8081/public/product/product123.jpg"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Indica si el producto est\u00e1 activo",
+            "example": true
+          }
+        },
+        "description": "Resumen de un producto para mostrar en las respuestas de categor\u00eda"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "Ingresa el token JWT en el formato: Bearer <token>",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

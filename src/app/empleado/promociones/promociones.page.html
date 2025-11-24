@@ -1,0 +1,338 @@
+<app-header titulo="Gestión de Promociones"></app-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Barra de acciones -->
+  <div class="actions-bar">
+    <ion-button expand="block" color="primary" (click)="openCreateModal()">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Crear Promoción
+    </ion-button>
+
+    <div class="filter-buttons">
+      <ion-button size="small" fill="outline" (click)="loadPromotions()">
+        Todas
+      </ion-button>
+      <ion-button
+        size="small"
+        fill="outline"
+        (click)="filterByType('TEMPORARY')"
+      >
+        Temporales
+      </ion-button>
+      <ion-button
+        size="small"
+        fill="outline"
+        (click)="filterByType('RECURRING')"
+      >
+        Recurrentes
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Búsqueda -->
+  <ion-searchbar
+    [(ngModel)]="searchTerm"
+    (ionInput)="onSearch()"
+    placeholder="Buscar promociones..."
+    animated="true"
+  ></ion-searchbar>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner></ion-spinner>
+    <p>Cargando promociones...</p>
+  </div>
+
+  <!-- Lista de promociones -->
+  <div *ngIf="!loading">
+    <ion-card *ngFor="let promo of promotions" class="promotion-card">
+      <ion-card-header>
+        <div class="card-header-content">
+          <div>
+            <ion-card-title>{{ promo.name }}</ion-card-title>
+            <p class="price">${{ promo.price | number:'1.2-2' }}</p>
+          </div>
+          <div class="badges">
+            <ion-badge [color]="getStatusColor(promo)">
+              {{ getStatusText(promo) }}
+            </ion-badge>
+            <ion-badge color="secondary">{{ promo.type }}</ion-badge>
+          </div>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p *ngIf="promo.description" class="description">
+          {{ promo.description }}
+        </p>
+
+        <div class="promotion-image" *ngIf="promo.imageUrl">
+          <img [src]="promo.imageUrl" [alt]="promo.name" />
+        </div>
+
+        <div class="actions">
+          <ion-button
+            size="small"
+            fill="outline"
+            (click)="openEditModal(promo)"
+          >
+            <ion-icon name="create" slot="start"></ion-icon>
+            Editar
+          </ion-button>
+
+          <ion-button
+            size="small"
+            [color]="promo.active ? 'warning' : 'success'"
+            fill="outline"
+            (click)="toggleStatus(promo)"
+          >
+            <ion-icon
+              [name]="promo.active ? 'close' : 'checkmark'"
+              slot="start"
+            ></ion-icon>
+            {{ promo.active ? 'Desactivar' : 'Activar' }}
+          </ion-button>
+
+          <ion-button
+            size="small"
+            color="danger"
+            fill="outline"
+            (click)="confirmDelete(promo)"
+          >
+            <ion-icon name="trash" slot="start"></ion-icon>
+            Eliminar
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Sin resultados -->
+    <div *ngIf="promotions.length === 0" class="empty-state">
+      <ion-icon name="pricetag" size="large"></ion-icon>
+      <h3>No hay promociones</h3>
+      <p>Crea tu primera promoción para comenzar</p>
+    </div>
+  </div>
+
+  <!-- Modal de Crear/Editar -->
+  <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ isEditMode ? 'Editar' : 'Crear' }} Promoción</ion-title>
+          <ion-button slot="end" fill="clear" (click)="closeModal()">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <form [formGroup]="promotionForm">
+          <!-- Nombre -->
+          <ion-item>
+            <ion-label position="stacked">Nombre *</ion-label>
+            <ion-input
+              formControlName="name"
+              placeholder="Ej: 2x1 en Tacos"
+              maxlength="120"
+            ></ion-input>
+          </ion-item>
+
+          <!-- Descripción -->
+          <ion-item>
+            <ion-label position="stacked">Descripción</ion-label>
+            <ion-textarea
+              formControlName="description"
+              placeholder="Descripción de la promoción"
+              rows="3"
+            ></ion-textarea>
+          </ion-item>
+
+          <!-- Precio -->
+          <ion-item>
+            <ion-label position="stacked">Precio *</ion-label>
+            <ion-input
+              formControlName="price"
+              type="number"
+              step="0.01"
+              placeholder="0.00"
+            ></ion-input>
+          </ion-item>
+
+          <!-- Tipo -->
+          <ion-item>
+            <ion-label position="stacked">Tipo de Promoción *</ion-label>
+            <ion-select formControlName="type" [disabled]="isEditMode">
+              <ion-select-option value="TEMPORARY">Temporal</ion-select-option>
+              <ion-select-option value="RECURRING"
+                >Recurrente</ion-select-option
+              >
+            </ion-select>
+          </ion-item>
+
+          <!-- Fechas (solo para TEMPORARY) -->
+          <div *ngIf="promotionForm.get('type')?.value === 'TEMPORARY'">
+            <ion-item>
+              <ion-label position="stacked">Fecha de Inicio *</ion-label>
+              <ion-input formControlName="startsAt" type="date"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Fecha de Fin *</ion-label>
+              <ion-input formControlName="endsAt" type="date"></ion-input>
+            </ion-item>
+          </div>
+
+          <!-- Reglas semanales (solo para RECURRING) -->
+          <div *ngIf="promotionForm.get('type')?.value === 'RECURRING'">
+            <div class="section-header">
+              <h3>Reglas Semanales</h3>
+              <ion-button size="small" (click)="addWeeklyRule()">
+                <ion-icon name="add" slot="start"></ion-icon>
+                Añadir Regla
+              </ion-button>
+            </div>
+
+            <div
+              *ngFor="let rule of weeklyRules.controls; let i = index"
+              class="weekly-rule"
+            >
+              <div [formGroup]="getWeeklyRuleGroup(i)">
+                <ion-item>
+                  <ion-label position="stacked">Día de la Semana</ion-label>
+                  <ion-select formControlName="dayOfWeek">
+                    <ion-select-option value="MONDAY">Lunes</ion-select-option>
+                    <ion-select-option value="TUESDAY"
+                      >Martes</ion-select-option
+                    >
+                    <ion-select-option value="WEDNESDAY"
+                      >Miércoles</ion-select-option
+                    >
+                    <ion-select-option value="THURSDAY"
+                      >Jueves</ion-select-option
+                    >
+                    <ion-select-option value="FRIDAY"
+                      >Viernes</ion-select-option
+                    >
+                    <ion-select-option value="SATURDAY"
+                      >Sábado</ion-select-option
+                    >
+                    <ion-select-option value="SUNDAY"
+                      >Domingo</ion-select-option
+                    >
+                  </ion-select>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label position="stacked">Hora de Inicio</ion-label>
+                  <ion-input
+                    type="time"
+                    [value]="formatTime(getWeeklyRuleGroup(i).get('startTime')?.value)"
+                    (ionChange)="onTimeChange(i, 'startTime', $event)"
+                  ></ion-input>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label position="stacked">Hora de Fin</ion-label>
+                  <ion-input
+                    type="time"
+                    [value]="formatTime(getWeeklyRuleGroup(i).get('endTime')?.value)"
+                    (ionChange)="onTimeChange(i, 'endTime', $event)"
+                  ></ion-input>
+                </ion-item>
+
+                <ion-button
+                  size="small"
+                  color="danger"
+                  fill="outline"
+                  (click)="removeWeeklyRule(i)"
+                >
+                  <ion-icon name="trash" slot="start"></ion-icon>
+                  Eliminar Regla
+                </ion-button>
+              </div>
+            </div>
+
+            <p *ngIf="weeklyRules.length === 0" class="hint">
+              Añade al menos una regla semanal para promociones recurrentes
+            </p>
+          </div>
+
+          <!-- Productos -->
+          <div class="section-header">
+            <h3>Productos Incluidos *</h3>
+          </div>
+
+          <div class="products-list">
+            <ion-item *ngFor="let product of allProducts">
+              <ion-checkbox
+                slot="start"
+                [checked]="isProductSelected(product.id)"
+                (ionChange)="toggleProduct(product.id, $event)"
+              ></ion-checkbox>
+              <ion-label>
+                <h3>{{ product.name }}</h3>
+                <p>${{ product.price | number:'1.2-2' }}</p>
+              </ion-label>
+              <img
+                *ngIf="product.imageUrl"
+                [src]="product.imageUrl"
+                slot="end"
+                class="product-thumb"
+              />
+            </ion-item>
+          </div>
+
+          <!-- Imagen -->
+          <div class="section-header">
+            <h3>Imagen de Promoción</h3>
+          </div>
+
+          <div class="image-upload">
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="onImageSelected($event)"
+              #fileInput
+              style="display: none"
+            />
+
+            <ion-button
+              expand="block"
+              fill="outline"
+              (click)="fileInput.click()"
+            >
+              <ion-icon name="image" slot="start"></ion-icon>
+              Seleccionar Imagen
+            </ion-button>
+
+            <div *ngIf="imagePreview" class="image-preview">
+              <img [src]="imagePreview" alt="Preview" />
+            </div>
+
+            <p class="hint">Máximo 5MB. Formatos: JPG, PNG, WebP</p>
+          </div>
+
+          <!-- Botones -->
+          <div class="modal-actions">
+            <ion-button expand="block" fill="outline" (click)="closeModal()">
+              Cancelar
+            </ion-button>
+            <ion-button
+              expand="block"
+              color="primary"
+              (click)="savePromotion()"
+              [disabled]="promotionForm.invalid"
+            >
+              {{ isEditMode ? 'Actualizar' : 'Crear' }} Promoción
+            </ion-button>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

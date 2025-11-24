@@ -1,0 +1,8 @@
+<div class="connection-status" *ngIf="shouldShow">
+  <ion-badge [color]="statusColor" class="status-badge">
+    <ion-icon
+      [name]="connectionStatus === 'CONNECTED' ? 'wifi' : 'wifi-outline'"
+    ></ion-icon>
+    <span class="status-text">{{ statusText }}</span>
+  </ion-badge>
+</div>

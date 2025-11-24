@@ -15,6 +15,8 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonChip,
+  IonHeader,
+  IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, cart, search, close, heart } from 'ionicons/icons';
@@ -44,6 +46,8 @@ import { ToastController } from '@ionic/angular';
     IonCardTitle,
     IonCardHeader,
     IonCard,
+    IonHeader,
+    IonToolbar,
     IonRow,
     IonGrid,
     IonContent,

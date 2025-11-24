@@ -18,6 +18,7 @@ export const environment = {
   CORS_ORIGINS: 'http://localhost:8100',
   BASE_URL: 'http://localhost:8081',
   PORT: '8081',
+  WS_URL: 'http://localhost:8081/ws',
   FIREBASE_BUCKET_NAME: 'foodtruck-filestorage.firebasestorage.app',
   FIREBASE_SERVICE_ACCOUNT: 'file:./firebase-credentials.json',
 } as const;

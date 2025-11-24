@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonContent,
@@ -40,8 +40,10 @@ import { RefresherCustomEvent } from '@ionic/core';
 import { FabbtnComponent } from 'src/app/components/fabbtn/fabbtn.component';
 import { AlertController, ToastController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { NotificationService } from 'src/app/services/notification.service';
+import { NotificationType } from 'src/app/Types/websocket.types';
 
 interface PedidoItem {
   name: string;
@@ -98,7 +100,7 @@ interface PedidoView {
     FormsModule,
   ],
 })
-export class PedidosEmpleadoPage implements OnInit {
+export class PedidosEmpleadoPage implements OnInit, OnDestroy {
   selectedSegment: string = 'PENDIENTE';
   pedidos: PedidoView[] = [];
   loading = false;
@@ -114,18 +116,72 @@ export class PedidosEmpleadoPage implements OnInit {
   isModalOpen = false;
 
   changingStatus: Record<string, boolean> = {};
+  private notificationSubscription?: Subscription;
 
   constructor(
     private readonly pedidosService: PedidosService,
     private readonly alertController: AlertController,
     private readonly toastController: ToastController,
-    private readonly modalController: ModalController
+    private readonly modalController: ModalController,
+    private readonly notificationService: NotificationService
   ) {
     addIcons({ close, checkmark, time, restaurant, informationCircle });
   }
 
   ngOnInit() {
     this.loadOrdersBySegment();
+    this.subscribeToNotifications();
+  }
+
+  ngOnDestroy() {
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Subscribe to real-time notifications and reload orders when they arrive
+   */
+  private subscribeToNotifications(): void {
+    this.notificationSubscription =
+      this.notificationService.notifications$.subscribe((notifications) => {
+        if (notifications.length > 0) {
+          const latestNotification = notifications[0];
+
+          // Reload orders when relevant notifications arrive
+          if (
+            latestNotification.notificationType ===
+              NotificationType.ORDER_CREATED ||
+            latestNotification.notificationType ===
+              NotificationType.ORDER_UPDATED
+          ) {
+            console.log(
+              '[PedidosEmpleado] Reloading orders due to notification:',
+              latestNotification
+            );
+            // Only reload if we're on the same status as the notification
+            const notificationStatus = latestNotification.status;
+            if (this.shouldReloadForStatus(notificationStatus)) {
+              this.loadOrdersBySegment();
+            }
+          }
+        }
+      });
+  }
+
+  /**
+   * Check if we should reload based on the notification status
+   */
+  private shouldReloadForStatus(notificationStatus: string): boolean {
+    // Always reload for new orders (PENDIENTE)
+    if (
+      notificationStatus === 'PENDIENTE' &&
+      this.selectedSegment === 'PENDIENTE'
+    ) {
+      return true;
+    }
+    // Reload if the notification status matches our current segment
+    return notificationStatus === this.selectedSegment;
   }
 
   segmentChanged(event: any) {

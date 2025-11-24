@@ -1,0 +1,1686 @@
+{
+  "paths": {
+    "/api/websocket/notification-example": {
+      "get": {
+        "tags": [
+          "WebSocket Documentation"
+        ],
+        "summary": "Ejemplo de estructura de notificaci\u00f3n WebSocket",
+        "description": "Este endpoint muestra la estructura exacta del JSON que recibir\u00e1s por WebSocket.\n\n**Nota:** Este es solo un endpoint de ejemplo para documentaci\u00f3n.\nLas notificaciones reales se env\u00edan autom\u00e1ticamente por WebSocket cuando ocurren eventos en las \u00f3rdenes.\n\n## Tipos de notificaci\u00f3n:\n- **ORDER_CREATED**: Cuando un usuario crea una orden\n- **ORDER_UPDATED**: Cuando un usuario modifica su orden\n- **ORDER_STATUS_CHANGED**: Cuando un empleado cambia el estado de una orden\n- **ORDER_ESTIMATED_TIME_CHANGED**: Cuando un empleado actualiza el tiempo estimado\n- **ORDER_CANCELLED**: Cuando una orden es cancelada\n",
+        "operationId": "getNotificationExample",
+        "responses": {
+          "200": {
+            "description": "Ejemplo de notificaci\u00f3n WebSocket",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderNotificationDto"
+                },
+                "examples": {
+                  "Notificaci\u00f3n para Empleados (Orden Creada)": {
+                    "description": "Notificaci\u00f3n para Empleados (Orden Creada)",
+                    "value": {
+                      "orderId": 1,
+                      "userId": 48,
+                      "userName": "Juan P\u00e9rez",
+                      "status": "PENDIENTE",
+                      "total": 250.5,
+                      "estimatedTime": null,
+                      "createdAt": "2024-10-30T14:30:00",
+                      "updatedAt": "2024-10-30T14:30:00",
+                      "notificationType": "ORDER_CREATED",
+                      "message": "\u00a1Nueva orden! El usuario Juan P\u00e9rez cre\u00f3 la orden #1"
+                    }
+                  },
+                  "Notificaci\u00f3n para Usuario (Estado Cambiado)": {
+                    "description": "Notificaci\u00f3n para Usuario (Estado Cambiado)",
+                    "value": {
+                      "orderId": 1,
+                      "userId": 48,
+                      "userName": "Juan P\u00e9rez",
+                      "status": "EN_PREPARACION",
+                      "total": 250.5,
+                      "estimatedTime": "00:30",
+                      "createdAt": "2024-10-30T14:30:00",
+                      "updatedAt": "2024-10-30T14:35:00",
+                      "notificationType": "ORDER_STATUS_CHANGED",
+                      "message": "Tu orden #1 cambi\u00f3 a estado: EN_PREPARACION"
+                    }
+                  },
+                  "Notificaci\u00f3n para Usuario (Tiempo Estimado)": {
+                    "description": "Notificaci\u00f3n para Usuario (Tiempo Estimado)",
+                    "value": {
+                      "orderId": 1,
+                      "userId": 48,
+                      "userName": "Juan P\u00e9rez",
+                      "status": "EN_PREPARACION",
+                      "total": 250.5,
+                      "estimatedTime": "00:45",
+                      "createdAt": "2024-10-30T14:30:00",
+                      "updatedAt": "2024-10-30T14:40:00",
+                      "notificationType": "ORDER_ESTIMATED_TIME_CHANGED",
+                      "message": "El tiempo estimado de tu orden #1 cambi\u00f3 a: 00:45"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/websocket/info": {
+      "get": {
+        "tags": [
+          "WebSocket Documentation"
+        ],
+        "summary": "Informaci\u00f3n de conexi\u00f3n WebSocket",
+        "description": "# Conexi\u00f3n WebSocket para Notificaciones en Tiempo Real\n\n## Endpoint de Conexi\u00f3n:\n**URL:** `ws://localhost:8081/ws` (o `wss://` en producci\u00f3n con HTTPS)\n\n## Protocolo:\nSe utiliza **STOMP** sobre WebSocket con **SockJS** como fallback.\n\n## Canales de Suscripci\u00f3n:\n\n### 1. Canal para Empleados (reciben notificaciones de cambios hechos por usuarios):\n- **Topic:** `/topic/orders/employees`\n- **Qui\u00e9n se suscribe:** Empleados y administradores\n- **Notificaciones que reciben:**\n  - \u00d3rdenes creadas por usuarios\n  - \u00d3rdenes modificadas por usuarios (cambios en productos/cantidades)\n\n### 2. Canal para Usuarios (reciben notificaciones de cambios hechos por empleados):\n- **Topic:** `/topic/orders/user/{userId}`\n- **Qui\u00e9n se suscribe:** Cada usuario se suscribe a su propio canal (reemplazar {userId} con su ID)\n- **Notificaciones que reciben:**\n  - Cambios de estado en sus \u00f3rdenes\n  - Cambios en tiempo estimado de preparaci\u00f3n\n\n---\n\n## Implementaci\u00f3n en Ionic/Angular\n\n### 1. Instalar dependencias:\n```bash\nnpm install sockjs-client @stomp/stompjs rxjs\n```\n\n### 2. Crear el servicio WebSocket (websocket.service.ts):\n\n```typescript\nimport { Injectable } from '@angular/core';\nimport { Client, StompSubscription } from '@stomp/stompjs';\nimport * as SockJS from 'sockjs-client';\nimport { BehaviorSubject, Observable } from 'rxjs';\n\nexport interface OrderNotification {\n  orderId: number;\n  userId: number;\n  userName: string;\n  status: string;\n  total: number;\n  estimatedTime: string;\n  createdAt: string;\n  updatedAt: string;\n  notificationType: 'ORDER_CREATED' | 'ORDER_UPDATED' | 'ORDER_STATUS_CHANGED' |\n                   'ORDER_ESTIMATED_TIME_CHANGED' | 'ORDER_CANCELLED';\n  message: string;\n}\n\n@Injectable({\n  providedIn: 'root'\n})\nexport class WebSocketService {\n  private client: Client;\n  private connected = new BehaviorSubject<boolean>(false);\n  private employeeNotifications = new BehaviorSubject<OrderNotification | null>(null);\n  private userNotifications = new BehaviorSubject<OrderNotification | null>(null);\n  private subscriptions: StompSubscription[] = [];\n\n  constructor() {\n    this.client = new Client();\n  }\n\n  connect(serverUrl: string = 'http://localhost:8081/ws'): void {\n    this.client.webSocketFactory = () => new SockJS(serverUrl);\n\n    this.client.onConnect = (frame) => {\n      console.log('Conectado a WebSocket:', frame);\n      this.connected.next(true);\n    };\n\n    this.client.onStompError = (frame) => {\n      console.error('Error en WebSocket:', frame);\n      this.connected.next(false);\n    };\n\n    this.client.onWebSocketClose = () => {\n      console.log('WebSocket desconectado');\n      this.connected.next(false);\n    };\n\n    this.client.reconnectDelay = 5000;\n    this.client.activate();\n  }\n\n  disconnect(): void {\n    this.subscriptions.forEach(sub => sub.unsubscribe());\n    this.subscriptions = [];\n    this.client.deactivate();\n    this.connected.next(false);\n  }\n\n  subscribeToEmployeeNotifications(): Observable<OrderNotification | null> {\n    if (this.client.connected) {\n      const subscription = this.client.subscribe('/topic/orders/employees', (message) => {\n        const notification: OrderNotification = JSON.parse(message.body);\n        console.log('Notificaci\u00f3n para empleados:', notification);\n        this.employeeNotifications.next(notification);\n      });\n      this.subscriptions.push(subscription);\n    }\n    return this.employeeNotifications.asObservable();\n  }\n\n  subscribeToUserNotifications(userId: number): Observable<OrderNotification | null> {\n    if (this.client.connected) {\n      const topic = '/topic/orders/user/' + userId;\n      const subscription = this.client.subscribe(topic, (message) => {\n        const notification: OrderNotification = JSON.parse(message.body);\n        console.log('Notificaci\u00f3n para usuario:', notification);\n        this.userNotifications.next(notification);\n      });\n      this.subscriptions.push(subscription);\n    }\n    return this.userNotifications.asObservable();\n  }\n\n  isConnected(): Observable<boolean> {\n    return this.connected.asObservable();\n  }\n}\n```\n\n### 3. Usar en componente de usuario:\n\nVer endpoint /api/websocket/notification-example para ver la estructura completa de las notificaciones.\n\n## Notas Importantes:\n- Conecta solo cuando el usuario entre a la pantalla relevante\n- Desconecta al salir del componente\n- En producci\u00f3n usa wss:// con HTTPS\n- Las notificaciones se reciben en tiempo real\n",
+        "operationId": "getWebSocketInfo",
+        "responses": {
+          "200": {
+            "description": "Informaci\u00f3n de configuraci\u00f3n WebSocket",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebSocketInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "LocalTime": {
+        "type": "object",
+        "properties": {
+          "hour": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minute": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "second": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nano": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "Hora de fin",
+        "example": "18:00:00"
+      },
+      "ProductSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico del producto",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del producto",
+            "example": "Taco de Pastor"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen del producto"
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio individual del producto",
+            "example": 25.0
+          }
+        },
+        "description": "DTO con informaci\u00f3n b\u00e1sica de un producto"
+      },
+      "PromotionDetailResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico de la promoci\u00f3n",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la promoci\u00f3n",
+            "example": "2x1 en Tacos"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripci\u00f3n detallada de la promoci\u00f3n"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen de la promoci\u00f3n"
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio total de la promoci\u00f3n",
+            "example": 99.99
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo de promoci\u00f3n",
+            "enum": [
+              "TEMPORARY",
+              "RECURRING"
+            ]
+          },
+          "startsAt": {
+            "type": "string",
+            "description": "Fecha de inicio (solo promociones temporales)",
+            "format": "date"
+          },
+          "endsAt": {
+            "type": "string",
+            "description": "Fecha de fin (solo promociones temporales)",
+            "format": "date"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Estado activo de la promoci\u00f3n"
+          },
+          "currentlyValid": {
+            "type": "boolean",
+            "description": "Indica si la promoci\u00f3n est\u00e1 actualmente v\u00e1lida"
+          },
+          "products": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Productos incluidos en la promoci\u00f3n",
+            "items": {
+              "$ref": "#/components/schemas/ProductSummaryResponse"
+            }
+          },
+          "weeklyRules": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Reglas semanales (solo promociones recurrentes)",
+            "items": {
+              "$ref": "#/components/schemas/WeeklyRuleResponse"
+            }
+          }
+        },
+        "description": "DTO con informaci\u00f3n completa de una promoci\u00f3n"
+      },
+      "WeeklyRuleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico de la regla",
+            "format": "int64",
+            "example": 1
+          },
+          "dayOfWeek": {
+            "type": "string",
+            "description": "D\u00eda de la semana",
+            "example": "TUESDAY",
+            "enum": [
+              "MONDAY",
+              "TUESDAY",
+              "WEDNESDAY",
+              "THURSDAY",
+              "FRIDAY",
+              "SATURDAY",
+              "SUNDAY"
+            ]
+          },
+          "startTime": {
+            "$ref": "#/components/schemas/LocalTime"
+          },
+          "endTime": {
+            "$ref": "#/components/schemas/LocalTime"
+          },
+          "activeNow": {
+            "type": "boolean",
+            "description": "Indica si la regla est\u00e1 activa en este momento"
+          }
+        },
+        "description": "DTO con informaci\u00f3n de una regla semanal"
+      },
+      "CreateWeeklyRuleRequest": {
+        "required": [
+          "dayOfWeek",
+          "endTime",
+          "startTime"
+        ],
+        "type": "object",
+        "properties": {
+          "dayOfWeek": {
+            "type": "string",
+            "description": "D\u00eda de la semana",
+            "example": "TUESDAY",
+            "enum": [
+              "MONDAY",
+              "TUESDAY",
+              "WEDNESDAY",
+              "THURSDAY",
+              "FRIDAY",
+              "SATURDAY",
+              "SUNDAY",
+              "MONDAY",
+              "TUESDAY",
+              "WEDNESDAY",
+              "THURSDAY",
+              "FRIDAY",
+              "SATURDAY",
+              "SUNDAY"
+            ]
+          },
+          "startTime": {
+            "$ref": "#/components/schemas/LocalTime"
+          },
+          "endTime": {
+            "$ref": "#/components/schemas/LocalTime"
+          }
+        },
+        "description": "DTO para crear una regla semanal"
+      },
+      "UpdatePromotionRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nombre de la promoci\u00f3n",
+            "example": "3x2 en Tacos"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripci\u00f3n detallada de la promoci\u00f3n"
+          },
+          "price": {
+            "minimum": 0.01,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Precio total de la promoci\u00f3n",
+            "example": 149.99
+          },
+          "startsAt": {
+            "type": "string",
+            "description": "Fecha de inicio (solo para promociones temporales)",
+            "format": "date"
+          },
+          "endsAt": {
+            "type": "string",
+            "description": "Fecha de fin (solo para promociones temporales)",
+            "format": "date"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Estado activo de la promoci\u00f3n"
+          },
+          "productIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "IDs de los productos incluidos en la promoci\u00f3n",
+            "items": {
+              "type": "integer",
+              "description": "IDs de los productos incluidos en la promoci\u00f3n",
+              "format": "int64"
+            }
+          },
+          "weeklyRules": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Reglas semanales (solo para promociones recurrentes)",
+            "items": {
+              "$ref": "#/components/schemas/CreateWeeklyRuleRequest"
+            }
+          }
+        },
+        "description": "DTO para actualizar una promoci\u00f3n existente"
+      },
+      "ChangePasswordResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "required": [
+          "confirmNewPassword",
+          "currentPassword",
+          "newPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "maxLength": 2147483647,
+            "minLength": 6,
+            "type": "string"
+          },
+          "confirmNewPassword": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateAvatarResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensaje que confirma la actualizaci\u00f3n del avatar.",
+            "example": "Avatar actualizado correctamente"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "description": "URL del nuevo avatar del usuario.",
+            "example": "http://localhost:8081/public/avatars/user123.jpg"
+          },
+          "username": {
+            "type": "string",
+            "description": "Nombre de usuario al que pertenece el avatar actualizado.",
+            "example": "user123"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "Marca de tiempo de la actualizaci\u00f3n del avatar.",
+            "format": "date-time"
+          }
+        },
+        "description": "Respuesta devuelta tras la actualizaci\u00f3n del avatar de un usuario."
+      },
+      "CategoryInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico de la categor\u00eda",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la categor\u00eda",
+            "example": "Hamburguesas"
+          }
+        },
+        "description": "Informaci\u00f3n b\u00e1sica de la categor\u00eda para incluir en respuestas de productos"
+      },
+      "ProductResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico del producto",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del producto",
+            "example": "Hamburguesa Cl\u00e1sica"
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio del producto",
+            "example": 15.99
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen del producto",
+            "example": "http://localhost:8081/public/images/hamburguesa-clasica.jpg"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Indica si el producto est\u00e1 activo",
+            "example": true
+          },
+          "category": {
+            "$ref": "#/components/schemas/CategoryInfo"
+          }
+        },
+        "description": "Respuesta completa que contiene todos los detalles de un producto"
+      },
+      "ProductUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nuevo nombre del producto",
+            "example": "Hamburguesa Deluxe"
+          },
+          "price": {
+            "minimum": 0.01,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Nuevo precio del producto",
+            "example": 18.99
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Estado de activaci\u00f3n del producto",
+            "example": true
+          },
+          "categoryId": {
+            "type": "integer",
+            "description": "ID de la nueva categor\u00eda del producto",
+            "format": "int64",
+            "example": 2
+          }
+        },
+        "description": "Datos para actualizar un producto existente (sin imagen)"
+      },
+      "OrderDetailResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico de la orden",
+            "format": "int64",
+            "example": 1
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserSummaryResponse"
+          },
+          "status": {
+            "type": "string",
+            "description": "Estado actual de la orden",
+            "example": "EN_PREPARACION",
+            "enum": [
+              "PENDIENTE",
+              "EN_PREPARACION",
+              "LISTO",
+              "ENTREGADO",
+              "CANCELADO"
+            ]
+          },
+          "subtotal": {
+            "type": "number",
+            "description": "Subtotal de la orden",
+            "example": 150.0
+          },
+          "tip": {
+            "type": "number",
+            "description": "Propina",
+            "example": 15.0
+          },
+          "total": {
+            "type": "number",
+            "description": "Total de la orden",
+            "example": 165.0
+          },
+          "estimatedTime": {
+            "type": "string",
+            "description": "Tiempo estimado de entrega",
+            "example": "30:00"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Fecha y hora de creaci\u00f3n",
+            "format": "date-time"
+          },
+          "deliveredAt": {
+            "type": "string",
+            "description": "Fecha y hora de entrega",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "description": "Items de la orden",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemResponse"
+            }
+          }
+        },
+        "description": "DTO con informaci\u00f3n completa de una orden"
+      },
+      "OrderItemResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico del item",
+            "format": "int64",
+            "example": 1
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo de item",
+            "example": "PRODUCT",
+            "enum": [
+              "PRODUCT",
+              "PROMOTION"
+            ]
+          },
+          "itemName": {
+            "type": "string",
+            "description": "Nombre del item",
+            "example": "Taco de Pastor"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen del item"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Cantidad",
+            "format": "int32",
+            "example": 2
+          },
+          "unitPrice": {
+            "type": "number",
+            "description": "Precio unitario",
+            "example": 25.0
+          },
+          "lineTotal": {
+            "type": "number",
+            "description": "Total de la l\u00ednea",
+            "example": 50.0
+          }
+        },
+        "description": "DTO con informaci\u00f3n de un item de orden"
+      },
+      "UserSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico del usuario",
+            "format": "int64",
+            "example": 1
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Nombre completo del usuario",
+            "example": "Juan P\u00e9rez"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email del usuario",
+            "example": "juan.perez@example.com"
+          }
+        },
+        "description": "DTO con informaci\u00f3n b\u00e1sica del usuario"
+      },
+      "CreateOrderItemRequest": {
+        "required": [
+          "quantity",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Tipo de item: PRODUCT o PROMOTION",
+            "example": "PRODUCT",
+            "enum": [
+              "PRODUCT",
+              "PROMOTION",
+              "PRODUCT",
+              "PROMOTION"
+            ]
+          },
+          "productId": {
+            "type": "integer",
+            "description": "ID del producto (requerido si type es PRODUCT)",
+            "format": "int64",
+            "example": 1
+          },
+          "promotionId": {
+            "type": "integer",
+            "description": "ID de la promoci\u00f3n (requerido si type es PROMOTION)",
+            "format": "int64",
+            "example": 1
+          },
+          "quantity": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "Cantidad de items",
+            "format": "int32",
+            "example": 2
+          }
+        },
+        "description": "DTO para crear un item de orden"
+      },
+      "CreateOrderRequest": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "tip": {
+            "minimum": 0.0,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Propina para el servicio",
+            "example": 15.0
+          },
+          "items": {
+            "type": "array",
+            "description": "Items de la orden",
+            "items": {
+              "$ref": "#/components/schemas/CreateOrderItemRequest"
+            }
+          }
+        },
+        "description": "DTO para crear o actualizar una orden.\nSe utiliza tanto para la creaci\u00f3n de una nueva orden como para la actualizaci\u00f3n completa de una orden existente.\nEl identificador de la orden a actualizar se debe enviar en la URL del endpoint (por ejemplo, PUT /orders/{orderId}).\n"
+      },
+      "CategorySimpleResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico de la categor\u00eda",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la categor\u00eda",
+            "example": "Bebidas"
+          }
+        },
+        "description": "Respuesta simple que contiene solo informaci\u00f3n b\u00e1sica de la categor\u00eda"
+      },
+      "CategoryUpdateRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nuevo nombre para la categor\u00eda",
+            "example": "Bebidas Fr\u00edas"
+          }
+        },
+        "description": "Datos para actualizar una categor\u00eda existente"
+      },
+      "CreatePromotionRequest": {
+        "required": [
+          "name",
+          "price",
+          "productIds",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nombre de la promoci\u00f3n",
+            "example": "2x1 en Tacos"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripci\u00f3n detallada de la promoci\u00f3n",
+            "example": "Compra un taco y ll\u00e9vate otro gratis"
+          },
+          "price": {
+            "minimum": 0.01,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Precio total de la promoci\u00f3n",
+            "example": 99.99
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo de promoci\u00f3n. TEMPORARY: promoci\u00f3n con fechas espec\u00edficas de inicio y fin. RECURRING: promoci\u00f3n recurrente con horarios semanales",
+            "example": "TEMPORARY",
+            "enum": [
+              "TEMPORARY",
+              "RECURRING",
+              "TEMPORARY",
+              "RECURRING"
+            ]
+          },
+          "startsAt": {
+            "type": "string",
+            "description": "Fecha de inicio (solo para promociones temporales)",
+            "format": "date",
+            "example": "2024-10-20"
+          },
+          "endsAt": {
+            "type": "string",
+            "description": "Fecha de fin (solo para promociones temporales)",
+            "format": "date",
+            "example": "2024-10-25"
+          },
+          "productIds": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "IDs de los productos incluidos en la promoci\u00f3n",
+            "items": {
+              "type": "integer",
+              "description": "IDs de los productos incluidos en la promoci\u00f3n",
+              "format": "int64"
+            }
+          },
+          "weeklyRules": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Reglas semanales (solo para promociones recurrentes)",
+            "items": {
+              "$ref": "#/components/schemas/CreateWeeklyRuleRequest"
+            }
+          }
+        },
+        "description": "DTO para crear una nueva promoci\u00f3n"
+      },
+      "ProductCreateFormData": {
+        "required": [
+          "categoryId",
+          "image",
+          "name",
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nombre del producto",
+            "example": "Hamburguesa Cl\u00e1sica"
+          },
+          "price": {
+            "minimum": 0.01,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Precio del producto",
+            "example": 15.99
+          },
+          "image": {
+            "type": "string",
+            "format": "binary"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Indica si el producto estar\u00e1 activo al crearlo",
+            "example": true,
+            "default": true
+          },
+          "categoryId": {
+            "type": "integer",
+            "description": "ID de la categor\u00eda a la que pertenece el producto",
+            "format": "int64",
+            "example": 1
+          }
+        },
+        "description": "Datos para crear un producto via multipart/form-data"
+      },
+      "CategoryCreateRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nombre \u00fanico de la categor\u00eda",
+            "example": "Bebidas"
+          }
+        },
+        "description": "Datos requeridos para crear una nueva categor\u00eda"
+      },
+      "RegisterRequest": {
+        "required": [
+          "email",
+          "name",
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "maxLength": 20,
+            "minLength": 3,
+            "pattern": "^[a-zA-Z0-9_]+$",
+            "type": "string",
+            "description": "Nombre de usuario \u00fanico. Solo se permiten letras, n\u00fameros y guiones bajos.",
+            "example": "daniel123"
+          },
+          "email": {
+            "type": "string",
+            "description": "Correo electr\u00f3nico v\u00e1lido del usuario.",
+            "example": "daniel@example.com"
+          },
+          "password": {
+            "maxLength": 100,
+            "minLength": 8,
+            "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$",
+            "type": "string",
+            "description": "Contrase\u00f1a del usuario. Debe contener al menos una letra min\u00fascula, una may\u00fascula,\nun n\u00famero y un car\u00e1cter especial. Longitud m\u00ednima de 8 caracteres.\n",
+            "example": "Abc123$%"
+          },
+          "name": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string",
+            "description": "Nombre completo del usuario.",
+            "example": "Daniel Santiago"
+          },
+          "roles": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Conjunto de roles asignados al nuevo usuario.",
+            "example": [
+              "ROLE_USER"
+            ],
+            "items": {
+              "type": "string",
+              "description": "Roles disponibles en el sistema.",
+              "example": "[\"ROLE_USER\"]",
+              "enum": [
+                "ROLE_USER",
+                "ROLE_ADMIN",
+                "ROLE_EMPLOYEE",
+                "ROLE_USER",
+                "ROLE_ADMIN",
+                "ROLE_EMPLOYEE"
+              ]
+            },
+            "enum": [
+              "ROLE_USER",
+              "ROLE_ADMIN",
+              "ROLE_EMPLOYEE"
+            ]
+          }
+        },
+        "description": "Petici\u00f3n para registrar un nuevo usuario en el sistema."
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "Token JWT de acceso generado para el usuario.",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Token JWT de refresco, utilizado para generar nuevos tokens de acceso.",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "tokenType": {
+            "type": "string",
+            "description": "Tipo de token devuelto. Generalmente 'Bearer'.",
+            "example": "Bearer"
+          },
+          "expiresInMs": {
+            "type": "integer",
+            "description": "Tiempo de expiraci\u00f3n del token de acceso en milisegundos.",
+            "format": "int64",
+            "example": 3600000
+          }
+        },
+        "description": "Respuesta devuelta tras un registro, login o refresh exitoso."
+      },
+      "RefreshRequest": {
+        "required": [
+          "refreshToken"
+        ],
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Token de refresco emitido durante el inicio de sesi\u00f3n.",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        },
+        "description": "Petici\u00f3n para refrescar el token JWT de acceso."
+      },
+      "AuthRequest": {
+        "required": [
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Nombre de usuario registrado.",
+            "example": "daniel123"
+          },
+          "password": {
+            "type": "string",
+            "description": "Contrase\u00f1a correspondiente al usuario.",
+            "example": "Abc123$%"
+          }
+        },
+        "description": "Petici\u00f3n para autenticar a un usuario existente."
+      },
+      "PromotionImageRequest": {
+        "type": "object",
+        "properties": {
+          "imageFile": {
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "description": "DTO para subir imagen de promoci\u00f3n"
+      },
+      "ProductImageUpdateRequest": {
+        "required": [
+          "image"
+        ],
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "description": "Datos para actualizar solo la imagen de un producto"
+      },
+      "ProductImageUpdateResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensaje de confirmaci\u00f3n",
+            "example": "Imagen actualizada correctamente"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la nueva imagen",
+            "example": "http://localhost:8081/public/images/hamburguesa-deluxe_12345.jpg"
+          },
+          "productId": {
+            "type": "integer",
+            "description": "ID del producto",
+            "format": "int64",
+            "example": 1
+          },
+          "productName": {
+            "type": "string",
+            "description": "Nombre del producto",
+            "example": "Hamburguesa Cl\u00e1sica"
+          }
+        },
+        "description": "Respuesta tras actualizar la imagen de un producto"
+      },
+      "UpdateOrderTipRequest": {
+        "required": [
+          "tip"
+        ],
+        "type": "object",
+        "properties": {
+          "tip": {
+            "minimum": 0.0,
+            "exclusiveMinimum": false,
+            "type": "number",
+            "description": "Nueva propina",
+            "example": 20.0
+          }
+        },
+        "description": "DTO para actualizar la propina de una orden"
+      },
+      "UpdateOrderStatusRequest": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Nuevo estado de la orden",
+            "example": "EN_PREPARACION",
+            "enum": [
+              "PENDIENTE",
+              "EN_PREPARACION",
+              "LISTO",
+              "ENTREGADO",
+              "CANCELADO",
+              "PENDIENTE",
+              "EN_PREPARACION",
+              "LISTO",
+              "ENTREGADO",
+              "CANCELADO"
+            ]
+          }
+        },
+        "description": "DTO para actualizar el estado de una orden"
+      },
+      "UpdateOrderEstimatedTimeRequest": {
+        "required": [
+          "estimatedTime"
+        ],
+        "type": "object",
+        "properties": {
+          "estimatedTime": {
+            "pattern": "^\\d{2}:\\d{2}$",
+            "type": "string",
+            "description": "Tiempo estimado en formato MM:SS",
+            "example": "45:00"
+          }
+        },
+        "description": "DTO para actualizar el tiempo estimado de una orden"
+      },
+      "OrderCancelledResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico de la orden cancelada",
+            "format": "int64",
+            "example": 1
+          },
+          "status": {
+            "type": "string",
+            "description": "Estado final de la orden",
+            "example": "CANCELADO",
+            "enum": [
+              "PENDIENTE",
+              "EN_PREPARACION",
+              "LISTO",
+              "ENTREGADO",
+              "CANCELADO"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensaje de confirmaci\u00f3n",
+            "example": "La orden ha sido cancelada exitosamente"
+          },
+          "cancelledAt": {
+            "type": "string",
+            "description": "Fecha y hora de cancelaci\u00f3n",
+            "format": "date-time"
+          }
+        },
+        "description": "Respuesta cuando el usuario cancela una orden"
+      },
+      "OrderNotificationDto": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "integer",
+            "description": "ID de la orden",
+            "format": "int64",
+            "example": 1
+          },
+          "userId": {
+            "type": "integer",
+            "description": "ID del usuario due\u00f1o de la orden",
+            "format": "int64",
+            "example": 42
+          },
+          "userName": {
+            "type": "string",
+            "description": "Nombre del usuario",
+            "example": "Juan P\u00e9rez"
+          },
+          "status": {
+            "type": "string",
+            "description": "Estado actual de la orden",
+            "example": "EN_PREPARACION",
+            "enum": [
+              "PENDIENTE",
+              "EN_PREPARACION",
+              "LISTO",
+              "ENTREGADO",
+              "CANCELADO"
+            ]
+          },
+          "total": {
+            "type": "number",
+            "description": "Total de la orden",
+            "example": 250.5
+          },
+          "estimatedTime": {
+            "type": "string",
+            "description": "Tiempo estimado de preparaci\u00f3n",
+            "example": "00:30"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Fecha de creaci\u00f3n de la orden",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Fecha de \u00faltima actualizaci\u00f3n",
+            "format": "date-time"
+          },
+          "notificationType": {
+            "type": "string",
+            "description": "Tipo de notificaci\u00f3n WebSocket",
+            "example": "ORDER_STATUS_CHANGED",
+            "enum": [
+              "ORDER_CREATED",
+              "ORDER_UPDATED",
+              "ORDER_STATUS_CHANGED",
+              "ORDER_ESTIMATED_TIME_CHANGED",
+              "ORDER_CANCELLED"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensaje descriptivo de la notificaci\u00f3n",
+            "example": "Tu orden #1 cambi\u00f3 a estado: EN_PREPARACION"
+          }
+        },
+        "description": "Notificaci\u00f3n de orden enviada por WebSocket"
+      },
+      "WebSocketInfo": {
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "description": "Endpoint de conexi\u00f3n WebSocket",
+            "example": "ws://localhost:8081/ws"
+          },
+          "protocol": {
+            "type": "string",
+            "description": "Protocolo utilizado",
+            "example": "STOMP over WebSocket with SockJS fallback"
+          },
+          "employeesTopic": {
+            "type": "string",
+            "description": "Topic para empleados",
+            "example": "/topic/orders/employees"
+          },
+          "userTopicPattern": {
+            "type": "string",
+            "description": "Patr\u00f3n del topic para usuarios",
+            "example": "/topic/orders/user/{userId}"
+          },
+          "documentation": {
+            "type": "string",
+            "description": "Descripci\u00f3n del funcionamiento"
+          },
+          "ionicAngularExample": {
+            "type": "string",
+            "description": "Ejemplo de implementaci\u00f3n en Ionic/Angular"
+          }
+        },
+        "description": "Informaci\u00f3n de configuraci\u00f3n WebSocket"
+      },
+      "Pageable": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "size": {
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PagePromotionSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PromotionSummaryResponse"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SortObject"
+            }
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SortObject"
+            }
+          },
+          "unpaged": {
+            "type": "boolean"
+          },
+          "paged": {
+            "type": "boolean"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PromotionSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico de la promoci\u00f3n",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la promoci\u00f3n",
+            "example": "2x1 en Tacos"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen de la promoci\u00f3n"
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio total de la promoci\u00f3n",
+            "example": 99.99
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo de promoci\u00f3n",
+            "enum": [
+              "TEMPORARY",
+              "RECURRING"
+            ]
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Estado activo de la promoci\u00f3n"
+          },
+          "currentlyValid": {
+            "type": "boolean",
+            "description": "Indica si la promoci\u00f3n est\u00e1 actualmente v\u00e1lida"
+          }
+        },
+        "description": "DTO con informaci\u00f3n b\u00e1sica de una promoci\u00f3n"
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "direction": {
+            "type": "string"
+          },
+          "nullHandling": {
+            "type": "string"
+          },
+          "ascending": {
+            "type": "boolean"
+          },
+          "property": {
+            "type": "string"
+          },
+          "ignoreCase": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico del usuario.",
+            "format": "int64",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "description": "Nombre de usuario.",
+            "example": "user123"
+          },
+          "email": {
+            "type": "string",
+            "description": "Correo electr\u00f3nico del usuario.",
+            "example": "usuario@example.com"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre completo del usuario.",
+            "example": "Juan P\u00e9rez"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "description": "URL del avatar del usuario.",
+            "example": "http://localhost:8081/public/avatars/user123.jpg"
+          },
+          "registerDate": {
+            "type": "string",
+            "description": "Fecha de registro del usuario.",
+            "format": "date-time"
+          },
+          "roles": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Roles del usuario.",
+            "example": [
+              "USER"
+            ],
+            "items": {
+              "type": "string",
+              "description": "Roles del usuario.",
+              "example": "[\"USER\"]"
+            }
+          }
+        },
+        "description": "Informaci\u00f3n del perfil del usuario autenticado."
+      },
+      "ProductSearchResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico del producto",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del producto",
+            "example": "Hamburguesa Cl\u00e1sica"
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio del producto",
+            "example": 15.99
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen del producto",
+            "example": "http://localhost:8081/public/images/hamburguesa-clasica.jpg"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Indica si el producto est\u00e1 activo",
+            "example": true
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "Nombre de la categor\u00eda",
+            "example": "Hamburguesas"
+          }
+        },
+        "description": "Respuesta para b\u00fasquedas y filtros de productos"
+      },
+      "OrderSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID \u00fanico de la orden",
+            "format": "int64",
+            "example": 1
+          },
+          "status": {
+            "type": "string",
+            "description": "Estado actual de la orden",
+            "example": "PENDIENTE",
+            "enum": [
+              "PENDIENTE",
+              "EN_PREPARACION",
+              "LISTO",
+              "ENTREGADO",
+              "CANCELADO"
+            ]
+          },
+          "subtotal": {
+            "type": "number",
+            "description": "Subtotal de la orden",
+            "example": 150.0
+          },
+          "tip": {
+            "type": "number",
+            "description": "Propina",
+            "example": 15.0
+          },
+          "total": {
+            "type": "number",
+            "description": "Total de la orden",
+            "example": 165.0
+          },
+          "estimatedTime": {
+            "type": "string",
+            "description": "Tiempo estimado de entrega",
+            "example": "30:00"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Fecha y hora de creaci\u00f3n",
+            "format": "date-time"
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Cantidad total de items",
+            "format": "int32",
+            "example": 5
+          }
+        },
+        "description": "DTO con informaci\u00f3n b\u00e1sica de una orden"
+      },
+      "TopSellingItemResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID del producto o promoci\u00f3n",
+            "format": "int64",
+            "example": 5
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del producto o promoci\u00f3n",
+            "example": "Taco de Pastor"
+          },
+          "totalSold": {
+            "type": "integer",
+            "description": "Cantidad total vendida",
+            "format": "int64",
+            "example": 120
+          },
+          "type": {
+            "type": "string",
+            "description": "Tipo de item: PRODUCT o PROMOTION",
+            "example": "PRODUCT",
+            "enum": [
+              "PRODUCT",
+              "PROMOTION"
+            ]
+          }
+        },
+        "description": "DTO para productos o promociones m\u00e1s vendidos"
+      },
+      "OrderStatisticsResponse": {
+        "type": "object",
+        "properties": {
+          "totalOrders": {
+            "type": "integer",
+            "description": "Total de \u00f3rdenes registradas",
+            "format": "int64",
+            "example": 150
+          },
+          "pendingOrders": {
+            "type": "integer",
+            "description": "\u00d3rdenes pendientes",
+            "format": "int64",
+            "example": 20
+          },
+          "completedOrders": {
+            "type": "integer",
+            "description": "\u00d3rdenes completadas",
+            "format": "int64",
+            "example": 110
+          },
+          "cancelledOrders": {
+            "type": "integer",
+            "description": "\u00d3rdenes canceladas",
+            "format": "int64",
+            "example": 20
+          },
+          "totalRevenue": {
+            "type": "number",
+            "description": "Ingresos totales",
+            "example": 25000.0
+          }
+        },
+        "description": "DTO con estad\u00edsticas generales de \u00f3rdenes"
+      },
+      "CategoryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico de la categor\u00eda",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la categor\u00eda",
+            "example": "Bebidas"
+          },
+          "products": {
+            "type": "array",
+            "description": "Lista de productos asociados a esta categor\u00eda",
+            "items": {
+              "type": "string",
+              "description": "Lista de productos asociados a esta categor\u00eda"
+            }
+          }
+        },
+        "description": "Respuesta que contiene los detalles completos de una categor\u00eda"
+      },
+      "CategoryDetailedResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico de la categor\u00eda",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la categor\u00eda",
+            "example": "Bebidas"
+          },
+          "products": {
+            "type": "array",
+            "description": "Lista completa de productos asociados a esta categor\u00eda",
+            "items": {
+              "$ref": "#/components/schemas/ProductSummary"
+            }
+          }
+        },
+        "description": "Respuesta detallada que contiene la categor\u00eda con todos los detalles de sus productos"
+      },
+      "ProductSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identificador \u00fanico del producto",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del producto",
+            "example": "Coca Cola"
+          },
+          "price": {
+            "type": "number",
+            "description": "Precio del producto",
+            "example": 2.5
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen del producto",
+            "example": "http://localhost:8081/public/product/product123.jpg"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Indica si el producto est\u00e1 activo",
+            "example": true
+          }
+        },
+        "description": "Resumen de un producto para mostrar en las respuestas de categor\u00eda"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "Ingresa el token JWT en el formato: Bearer <token>",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
