@@ -84,7 +84,7 @@ export class AppComponent implements OnInit {
     },
     {
       title: 'Mis Pedidos',
-      url: '/cliente/pedidos',
+      url: '/cliente/mis-pedidos',
       icon: 'clipboard',
     },
     {

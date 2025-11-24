@@ -47,6 +47,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pedidos/pedidos.page').then((m) => m.PedidosPage),
       },
+      {
+        path: 'mis-pedidos',
+        loadComponent: () =>
+          import('./cliente/mis-pedidos/mis-pedidos.page').then(
+            (m) => m.MisPedidosPage
+          ),
+      },
     ],
   },
 
@@ -96,6 +103,13 @@ export const routes: Routes = [
             (m) => m.RegistroEmpleadoPage
           ),
       },
+      {
+        path: 'estadisticas',
+        loadComponent: () =>
+          import('./empleado/estadisticas/estadisticas.page').then(
+            (m) => m.EstadisticasPage
+          ),
+      },
     ],
   },
 
@@ -126,7 +140,7 @@ export const routes: Routes = [
         path: 'perfil',
         loadComponent: () =>
           import('./perfil/perfil.page').then((m) => m.PerfilPage),
-      }
+      },
     ],
   },
 
@@ -143,7 +157,7 @@ export const routes: Routes = [
   },
   {
     path: 'pedidos',
-    redirectTo: 'cliente/pedidos',
+    redirectTo: 'cliente/mis-pedidos',
     pathMatch: 'full',
   },
   {

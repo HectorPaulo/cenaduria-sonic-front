@@ -15,7 +15,7 @@ export class BarraNavegacionComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    addIcons({home, cart, menu, person});
+    addIcons({ home, cart, menu, person });
   }
 
   navigateToHome() {
@@ -33,5 +33,4 @@ export class BarraNavegacionComponent implements OnInit {
   navigateToPerfil() {
     this.router.navigateByUrl('/perfil');
   }
-
 }

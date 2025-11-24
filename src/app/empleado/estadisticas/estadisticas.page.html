@@ -1,0 +1,157 @@
+<app-header titulo="Estadísticas"></app-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-refresher
+    slot="fixed"
+    (ionRefresh)="doRefresh($event)"
+    pullFactor="0.8"
+    pullMin="60"
+    pullMax="120"
+  >
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <app-fabbtn></app-fabbtn>
+
+  <div class="estadisticas-header mt-20 mb-4">
+    <p>Resumen de ventas y productos más populares</p>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="ion-text-center p-4">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <div *ngIf="!loading && statistics">
+    <!-- General Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <!-- Total Orders -->
+      <ion-card>
+        <ion-card-content class="text-center">
+          <ion-icon name="cart" class="text-4xl text-primary mb-2"></ion-icon>
+          <h2 class="text-3xl font-bold">{{ statistics.totalOrders }}</h2>
+          <p class="text-gray-500">Total de Órdenes</p>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Total Revenue -->
+      <ion-card>
+        <ion-card-content class="text-center">
+          <ion-icon name="cash" class="text-4xl text-success mb-2"></ion-icon>
+          <h2 class="text-3xl font-bold">
+            ${{ statistics.totalRevenue | number:'1.2-2' }}
+          </h2>
+          <p class="text-gray-500">Ingresos Totales</p>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Average Order Value -->
+      <ion-card>
+        <ion-card-content class="text-center">
+          <ion-icon
+            name="trending-up"
+            class="text-4xl text-warning mb-2"
+          ></ion-icon>
+          <h2 class="text-3xl font-bold">
+            ${{ statistics.averageOrderValue | number:'1.2-2' }}
+          </h2>
+          <p class="text-gray-500">Promedio por Orden</p>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Orders by Status -->
+    <ion-card class="mb-4">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="stats-chart" class="mr-2"></ion-icon>
+          Órdenes por Estado
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let status of getStatusKeys()">
+            <ion-label>
+              <h3>{{ getStatusLabel(status) }}</h3>
+            </ion-label>
+            <ion-badge [color]="getStatusColor(status)" slot="end">
+              {{ getStatusCount(status) }}
+            </ion-badge>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Top Selling Products -->
+    <ion-card class="mb-4">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="star" class="mr-2"></ion-icon>
+          Productos Más Vendidos
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div
+          *ngIf="topProducts.length === 0"
+          class="text-center p-4 text-gray-500"
+        >
+          No hay datos disponibles
+        </div>
+        <ion-list *ngIf="topProducts.length > 0">
+          <ion-item *ngFor="let product of topProducts; let i = index">
+            <ion-label>
+              <h3>
+                <span class="font-bold text-primary mr-2">#{{ i + 1 }}</span>
+                {{ product.name }}
+              </h3>
+              <p class="text-sm text-gray-500">
+                Cantidad vendida: {{ product.totalQuantity }} | Ingresos: ${{
+                product.totalRevenue | number:'1.2-2' }}
+              </p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Top Selling Promotions -->
+    <ion-card class="mb-4">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="star" class="mr-2"></ion-icon>
+          Promociones Más Vendidas
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div
+          *ngIf="topPromotions.length === 0"
+          class="text-center p-4 text-gray-500"
+        >
+          No hay datos disponibles
+        </div>
+        <ion-list *ngIf="topPromotions.length > 0">
+          <ion-item *ngFor="let promo of topPromotions; let i = index">
+            <ion-label>
+              <h3>
+                <span class="font-bold text-purple-500 mr-2">#{{ i + 1 }}</span>
+                {{ promo.name }}
+              </h3>
+              <p class="text-sm text-gray-500">
+                Cantidad vendida: {{ promo.totalQuantity }} | Ingresos: ${{
+                promo.totalRevenue | number:'1.2-2' }}
+              </p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Empty State -->
+  <div
+    *ngIf="!loading && !statistics"
+    class="ion-text-center p-8 text-gray-500"
+  >
+    <ion-icon name="stats-chart" class="text-6xl mb-4"></ion-icon>
+    <p>No hay estadísticas disponibles</p>
+  </div>
+</ion-content>
