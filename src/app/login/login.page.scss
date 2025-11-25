@@ -1,206 +1,268 @@
-.registro-container {
+.auth-content {
+  --background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+}
+
+.auth-container {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  min-height: 80vh;
-  padding: 20px;
+  align-items: center;
+  padding: 24px;
+  gap: 32px;
 }
 
+// Logo Section
 .logo-section {
   text-align: center;
-  margin-bottom: 2rem;
+  animation: fadeInDown 0.6s ease-out;
+}
 
-  h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: var(--ion-color-primary);
-    margin-bottom: 0.5rem;
+.logo-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.logo-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+// Auth Card
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 32px 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+}
+
+.card-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+// Form
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0 16px;
+  transition: all 0.3s ease;
+
+  &:focus-within {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  &.error {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+  }
+}
+
+.input-icon {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.custom-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 16px 0;
+  font-size: 15px;
+  color: #ffffff;
+  font-family: inherit;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  &:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.08) inset;
+    -webkit-text-fill-color: #ffffff;
+  }
+}
+
+.error-message {
+  font-size: 12px;
+  color: #ef4444;
+  padding-left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &::before {
+    content: '⚠';
+    font-size: 14px;
+  }
+}
+
+// Buttons
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn {
+  width: 100%;
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    transform: translateY(-2px);
+  }
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+.btn-icon {
+  font-size: 18px;
+}
+
+// Footer
+.auth-footer {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  animation: fadeIn 0.6s ease-out 0.4s both;
 
   p {
-    font-size: 1.1rem;
-    color: var(--ion-color-medium);
+    margin: 0;
   }
 }
 
-.form-section {
-  width: 100%;
-  max-width: 500px;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.info-card {
-  border-radius: 10px;
-  margin-bottom: 1rem;
-  border-left: 4px solid var(--ion-color-primary);
-
-  ion-card-header {
-    padding-bottom: 0.5rem;
-
-    ion-card-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+// Responsive
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 16px;
+    gap: 24px;
   }
 
-  .credentials-info {
-    p {
-      margin: 0.5rem 0;
-      font-size: 0.9rem;
-
-      strong {
-        color: var(--ion-color-primary);
-        font-weight: 600;
-      }
-    }
-  }
-}
-
-.registro-card {
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border-top: 4px solid var(--ion-color-primary);
-
-  ion-card-header {
-    text-align: center;
-    padding-bottom: 1rem;
-
-    ion-card-title {
-      font-weight: 600;
-      color: var(--ion-color-primary);
-      font-size: 1.5rem;
-    }
-
-    ion-card-subtitle {
-      color: var(--ion-color-medium);
-      margin-top: 0.5rem;
-    }
+  .auth-card {
+    padding: 24px 20px;
   }
 
-  ion-card-content {
-    padding-top: 0;
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    ion-item {
-      --border-radius: 8px;
-      --background: var(--ion-color-light);
-      --border-color: var(--ion-color-light-shade);
-      margin-bottom: 0.5rem;
-      border-radius: 8px;
-
-      &:focus-within {
-        --border-color: var(--ion-color-primary);
-        --background: var(--ion-color-primary-tint);
-      }
-
-      &.error-item {
-        --border-color: var(--ion-color-danger);
-        --background: var(--ion-color-danger-tint);
-      }
-
-      ion-icon {
-        margin-right: 8px;
-      }
-
-      ion-input {
-        --padding-start: 0;
-      }
-    }
-
-    .error-text {
-      font-size: 0.8rem;
-      margin-left: 16px;
-      margin-bottom: 8px;
-      display: block;
-    }
-
-    .button-section {
-      margin-top: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-
-      .registro-button {
-        --background: var(--ion-color-primary);
-        --background-hover: var(--ion-color-primary-shade);
-        --border-radius: 12px;
-        height: 48px;
-        font-weight: 600;
-        text-transform: none;
-        letter-spacing: 0.5px;
-
-        &:disabled {
-          --background: var(--ion-color-medium);
-          --color: var(--ion-color-medium-contrast);
-          opacity: 0.6;
-        }
-      }
-
-      .login-button {
-        --border-radius: 12px;
-        height: 48px;
-        font-weight: 500;
-        text-transform: none;
-        letter-spacing: 0.5px;
-
-        &:hover {
-          --background: var(--ion-color-light);
-        }
-      }
-    }
-  }
-}
-
-// Responsive design
-@media (min-width: 768px) {
-  .registro-container {
-    padding: 40px;
+  .logo-icon {
+    font-size: 48px;
   }
 
-  .form-section {
-    max-width: 600px;
+  .logo-title {
+    font-size: 28px;
   }
-
-  .logo-section {
-    h1 {
-      font-size: 3rem;
-    }
-
-    p {
-      font-size: 1.2rem;
-    }
-  }
-}
-
-// Input focus animations
-ion-item:focus-within {
-  transform: translateY(-1px);
-  transition: all 0.2s ease;
-}
-
-// Custom scrollbar for content overflow
-ion-content::part(scroll) {
-  scrollbar-width: thin;
-  scrollbar-color: var(--ion-color-primary-tint) transparent;
-}
-
-ion-content::part(scroll)::-webkit-scrollbar {
-  width: 6px;
-}
-
-ion-content::part(scroll)::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-ion-content::part(scroll)::-webkit-scrollbar-thumb {
-  background-color: var(--ion-color-primary-tint);
-  border-radius: 3px;
 }

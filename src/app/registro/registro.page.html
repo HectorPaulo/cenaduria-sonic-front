@@ -1,123 +1,115 @@
-<ion-content [fullscreen]="true" class="ion-padding">
-  <div class="registro-container">
+<ion-content [fullscreen]="true" class="auth-content">
+  <div class="auth-container">
+    <!-- Logo Section -->
     <div class="logo-section">
-      <h1>CenaduriaSonic</h1>
-      <p>Crea tu cuenta</p>
+      <div class="logo-icon">🌮</div>
+      <h1 class="logo-title">Cenaduría Sonic</h1>
+      <p class="logo-subtitle">Únete a nuestra comunidad</p>
     </div>
 
-    <div class="form-section">
-      <ion-card class="registro-card">
-        <ion-card-header>
-          <ion-card-title>Registro de Usuario</ion-card-title>
-          <ion-card-subtitle
-            >Completa tus datos para crear una cuenta</ion-card-subtitle
+    <!-- Register Card -->
+    <div class="auth-card">
+      <div class="card-header">
+        <h2 class="card-title">Crear Cuenta</h2>
+        <p class="card-subtitle">Completa tus datos para registrarte</p>
+      </div>
+
+      <form
+        [formGroup]="registroForm"
+        (ngSubmit)="onSubmit()"
+        class="auth-form"
+      >
+        <!-- Username Field -->
+        <div class="form-group">
+          <div class="input-wrapper" [class.error]="isFieldInvalid('username')">
+            <ion-icon name="person" class="input-icon"></ion-icon>
+            <input
+              formControlName="username"
+              type="text"
+              placeholder="Nombre de usuario"
+              class="custom-input"
+            />
+          </div>
+          @if (isFieldInvalid('username')) {
+          <span class="error-message"> {{ getUsernameErrorMessage() }} </span>
+          }
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-group">
+          <div class="input-wrapper" [class.error]="isFieldInvalid('email')">
+            <ion-icon name="mail" class="input-icon"></ion-icon>
+            <input
+              formControlName="email"
+              type="email"
+              placeholder="Correo electrónico"
+              class="custom-input"
+            />
+          </div>
+          @if (isFieldInvalid('email')) {
+          <span class="error-message"> {{ getEmailErrorMessage() }} </span>
+          }
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <div class="input-wrapper" [class.error]="isFieldInvalid('password')">
+            <ion-icon name="lock-closed" class="input-icon"></ion-icon>
+            <input
+              formControlName="password"
+              type="password"
+              placeholder="Contraseña (mínimo 8 caracteres)"
+              class="custom-input"
+            />
+          </div>
+          @if (isFieldInvalid('password')) {
+          <span class="error-message"> {{ getPasswordErrorMessage() }} </span>
+          }
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="form-group">
+          <div
+            class="input-wrapper"
+            [class.error]="isFieldInvalid('confirmPassword')"
           >
-        </ion-card-header>
+            <ion-icon name="lock-closed" class="input-icon"></ion-icon>
+            <input
+              formControlName="confirmPassword"
+              type="password"
+              placeholder="Confirmar contraseña"
+              class="custom-input"
+            />
+          </div>
+          @if (isFieldInvalid('confirmPassword')) {
+          <span class="error-message">
+            {{ getConfirmPasswordErrorMessage() }}
+          </span>
+          }
+        </div>
 
-        <ion-card-content>
-          <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
-            <!-- Username -->
-            <ion-item [class.error-item]="isFieldInvalid('username')">
-              <ion-icon name="person" slot="start" color="primary"></ion-icon>
-              <ion-input
-                formControlName="username"
-                label="Usuario (username)"
-                labelPlacement="floating"
-                placeholder="usuario_ejemplo"
-              ></ion-input>
-            </ion-item>
-            <ion-text
-              color="danger"
-              class="error-text"
-              *ngIf="isFieldInvalid('username')"
-            >
-              {{ getUsernameErrorMessage() }}
-            </ion-text>
+        <!-- Buttons -->
+        <div class="button-group">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!isFormValid()"
+          >
+            <ion-icon name="person-add" class="btn-icon"></ion-icon>
+            Crear Cuenta
+          </button>
 
-            <!-- Email -->
-            <ion-item [class.error-item]="isFieldInvalid('email')">
-              <ion-icon name="mail" slot="start" color="primary"></ion-icon>
-              <ion-input
-                formControlName="email"
-                label="Correo electrónico"
-                labelPlacement="floating"
-                placeholder="ejemplo@correo.com"
-                type="email"
-              ></ion-input>
-            </ion-item>
-            <ion-text
-              color="danger"
-              class="error-text"
-              *ngIf="isFieldInvalid('email')"
-            >
-              {{ getEmailErrorMessage() }}
-            </ion-text>
+          <button type="button" class="btn btn-secondary" (click)="goToLogin()">
+            <ion-icon name="log-in" class="btn-icon"></ion-icon>
+            Ya tengo cuenta
+          </button>
+        </div>
+      </form>
+    </div>
 
-            <!-- Contraseña -->
-            <ion-item [class.error-item]="isFieldInvalid('password')">
-              <ion-icon name="key" slot="start" color="primary"></ion-icon>
-              <ion-input
-                formControlName="password"
-                label="Contraseña"
-                labelPlacement="floating"
-                placeholder="Mínimo 8 caracteres"
-                type="password"
-              ></ion-input>
-            </ion-item>
-            <ion-text
-              color="danger"
-              class="error-text"
-              *ngIf="isFieldInvalid('password')"
-            >
-              {{ getPasswordErrorMessage() }}
-            </ion-text>
-
-            <!-- Confirmar contraseña -->
-            <ion-item [class.error-item]="isFieldInvalid('confirmPassword')">
-              <ion-icon name="key" slot="start" color="primary"></ion-icon>
-              <ion-input
-                formControlName="confirmPassword"
-                label="Confirmar contraseña"
-                labelPlacement="floating"
-                placeholder="Repite tu contraseña"
-                type="password"
-              ></ion-input>
-            </ion-item>
-            <ion-text
-              color="danger"
-              class="error-text"
-              *ngIf="isFieldInvalid('confirmPassword')"
-            >
-              {{ getConfirmPasswordErrorMessage() }}
-            </ion-text>
-
-            <!-- Botones -->
-            <div class="button-section">
-              <ion-button
-                expand="block"
-                type="submit"
-                class="registro-button"
-                [disabled]="!isFormValid()"
-              >
-                <ion-icon name="person-add" slot="start"></ion-icon>
-                Crear cuenta
-              </ion-button>
-
-              <ion-button
-                expand="block"
-                fill="outline"
-                color="medium"
-                class="login-button"
-                type="button"
-                (click)="goToLogin()"
-              >
-                <ion-icon name="log-in" slot="start"></ion-icon>
-                Ya tengo cuenta
-              </ion-button>
-            </div>
-          </form>
-        </ion-card-content>
-      </ion-card>
+    <!-- Footer -->
+    <div class="auth-footer">
+      <p>© 2025 Cenaduría Sonic</p>
     </div>
   </div>
 </ion-content>

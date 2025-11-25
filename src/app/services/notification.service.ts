@@ -82,15 +82,17 @@ export class NotificationService {
   /**
    * Show toast notification
    */
+  /**
+   * Show toast notification
+   */
   private async showToast(notification: OrderNotification): Promise<void> {
-    const color = this.getToastColor(notification.notificationType);
     const icon = this.getToastIcon(notification.notificationType);
+    const typeClass = this.getToastClass(notification.notificationType);
 
     const toast = await this.toastController.create({
       message: notification.message,
       duration: 5000,
       position: 'top',
-      color: color,
       icon: icon,
       buttons: [
         {
@@ -98,29 +100,29 @@ export class NotificationService {
           role: 'cancel',
         },
       ],
-      cssClass: 'notification-toast',
+      cssClass: `notification-toast ${typeClass}`,
     });
 
     await toast.present();
   }
 
   /**
-   * Get toast color based on notification type
+   * Get toast class based on notification type
    */
-  private getToastColor(type: NotificationType): string {
+  private getToastClass(type: NotificationType): string {
     switch (type) {
       case NotificationType.ORDER_CREATED:
-        return 'success';
+        return 'toast-success';
       case NotificationType.ORDER_UPDATED:
-        return 'primary';
+        return 'toast-primary';
       case NotificationType.ORDER_STATUS_CHANGED:
-        return 'tertiary';
+        return 'toast-tertiary';
       case NotificationType.ORDER_ESTIMATED_TIME_CHANGED:
-        return 'warning';
+        return 'toast-warning';
       case NotificationType.ORDER_CANCELLED:
-        return 'danger';
+        return 'toast-danger';
       default:
-        return 'medium';
+        return 'toast-medium';
     }
   }
 

@@ -4,77 +4,73 @@
 
   <ion-split-pane contentId="main-content">
     <ion-menu contentId="main-content" type="overlay" [disabled]="!isLoggedIn">
-      <ion-content>
-        <ion-list id="inbox-list">
-          <ion-list-header class="text-6xl">
-            <h1 class="">Cenaduría Sonic</h1>
-          </ion-list-header>
+      <ion-content class="sidebar-content">
+        <!-- Header Section -->
+        <div class="sidebar-header">
+          <div class="logo-container">
+            <div class="logo-icon">🌮</div>
+            <h1 class="logo-text">Cenaduría Sonic</h1>
+          </div>
 
-          <!-- Mostrar información del usuario solo si está logueado -->
+          <!-- User Info -->
           @if (isLoggedIn && currentUser) {
-          <div>
-            <ion-note>Hola {{ currentUser.nombre }}!</ion-note>
-            <ion-note>Rol: {{ roleName }}</ion-note>
+          <div class="user-card">
+            <div class="user-avatar">
+              {{ currentUser.nombre?.charAt(0).toUpperCase() || "U" }}
+            </div>
+            <div class="user-info">
+              <div class="user-name">{{ currentUser.nombre }}</div>
+              <div class="user-role">{{ roleName }}</div>
+            </div>
           </div>
-          } @if (!isLoggedIn) {
-          <div>
-            <ion-note>¡Bienvenido a Cenaduría Sonic!</ion-note>
-            <ion-note>Inicia sesión para continuar</ion-note>
-          </div>
-          }
-
-          <!-- Mostrar menús solo si el usuario está logueado -->
-          @if (isLoggedIn) {
-          <div>
-            @for (p of currentMenuPages; track p; let i = $index) {
-            <ion-menu-toggle auto-hide="false">
-              <ion-item
-                routerDirection="root"
-                [routerLink]="[p.url]"
-                lines="none"
-                detail="false"
-                routerLinkActive="selected"
-              >
-                <ion-icon
-                  aria-hidden="true"
-                  slot="start"
-                  [ios]="p.icon"
-                  [md]="p.icon"
-                ></ion-icon>
-                <ion-label>{{ p.title }}</ion-label>
-              </ion-item>
-            </ion-menu-toggle>
-            }
-
-            <!-- Botón de cerrar sesión -->
-            <ion-menu-toggle auto-hide="false">
-              <ion-item
-                button
-                (click)="logout()"
-                lines="none"
-                detail="false"
-                class="logout-item"
-              >
-                <ion-icon
-                  aria-hidden="true"
-                  slot="start"
-                  ios="log-out"
-                  md="log-out"
-                ></ion-icon>
-                <ion-label color="danger">Cerrar Sesión</ion-label>
-              </ion-item>
-            </ion-menu-toggle>
+          } @else {
+          <div class="welcome-card">
+            <div class="welcome-icon">👋</div>
+            <div class="welcome-text">
+              <div class="welcome-title">¡Bienvenido!</div>
+              <div class="welcome-subtitle">Inicia sesión para continuar</div>
+            </div>
           </div>
           }
-        </ion-list>
+        </div>
 
-        <!-- * Configuración de tema -->
-        <!-- <ion-list>
-          <ion-list-header>
-            <h3>Configuración</h3>
-          </ion-list-header>
-          <app-theme-toggle></app-theme-toggle>
-        </ion-list> -->
+        <!-- Navigation Menu -->
+        @if (isLoggedIn) {
+        <div class="sidebar-nav">
+          <div class="nav-section-title">Navegación</div>
+
+          @for (p of currentMenuPages; track p; let i = $index) {
+          <ion-menu-toggle auto-hide="false">
+            <div
+              class="nav-item"
+              routerDirection="root"
+              [routerLink]="[p.url]"
+              routerLinkActive="nav-item-active"
+            >
+              <ion-icon [name]="p.icon" class="nav-icon"></ion-icon>
+              <span class="nav-label">{{ p.title }}</span>
+              <ion-icon name="chevron-forward" class="nav-arrow"></ion-icon>
+            </div>
+          </ion-menu-toggle>
+          }
+
+          <!-- Logout Button -->
+          <div class="nav-divider"></div>
+          <ion-menu-toggle auto-hide="false">
+            <div class="nav-item logout-item" (click)="logout()">
+              <ion-icon name="log-out" class="nav-icon"></ion-icon>
+              <span class="nav-label">Cerrar Sesión</span>
+              <ion-icon name="chevron-forward" class="nav-arrow"></ion-icon>
+            </div>
+          </ion-menu-toggle>
+        </div>
+        }
+
+        <!-- Footer -->
+        <div class="sidebar-footer">
+          <div class="footer-text">Versión 1.0.0</div>
+          <div class="footer-copyright">© 2025 Cenaduría Sonic</div>
+        </div>
       </ion-content>
     </ion-menu>
     <ion-router-outlet id="main-content"></ion-router-outlet>

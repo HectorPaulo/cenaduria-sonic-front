@@ -2,46 +2,130 @@
   display: block;
 }
 
+ion-header {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 ion-toolbar {
   /* Add safe area padding for iOS notch/status bar */
   --padding-top: env(safe-area-inset-top);
-  --min-height: calc(56px + env(safe-area-inset-top));
+  --min-height: calc(64px + env(safe-area-inset-top));
+  --background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  --color: #ffffff;
+  
   height: auto;
   min-height: var(--min-height);
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 16px;
+  position: relative;
 }
 
-/* Title should truncate instead of wrapping and pushing the toolbar */
-.header-title {
-  display: inline-block;
-  max-width: calc(100% - 160px); /* leave room for profile */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* Menu Button Styling */
+.menu-button {
+  --color: #ffffff;
+  --padding-start: 0;
+  --padding-end: 8px;
+  font-size: 24px;
 }
 
-/* Profile area positioned to the right so it doesn't affect title width */
+/* Profile area positioned to the right */
 .profile-area {
   position: absolute;
-  right: 12px;
+  right: 16px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-50%) scale(1.02);
+  }
 }
 
-/* Ensure the avatar doesn't change the toolbar height */
-.profile-area img {
-  width: 40px;
-  height: 40px;
+/* Profile Info */
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.username {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.role {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Avatar Container */
+.avatar-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+  }
 }
 
-/* Optionally add a background to ensure readability when absolute */
-ion-header,
-ion-toolbar {
-  background: var(--ion-color-primary, #fff);
+/* Online Status Indicator */
+.avatar-status {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  background: #10b981;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 360px) {
+  .profile-info {
+    display: none;
+  }
+  
+  .profile-area {
+    padding: 6px;
+  }
 }

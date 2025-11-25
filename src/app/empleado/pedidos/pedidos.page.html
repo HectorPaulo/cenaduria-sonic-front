@@ -1,6 +1,6 @@
-<app-header titulo="Pedidos de los usuarios"></app-header>
+<app-header titulo="Gestión de Pedidos"></app-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true" class="orders-content">
   <ion-refresher
     slot="fixed"
     (ionRefresh)="doRefresh($event)"
@@ -12,276 +12,257 @@
   </ion-refresher>
   <app-fabbtn></app-fabbtn>
 
-  <div class="pedidos-header">
-    <p>Gestiona el estado de los pedidos en tiempo real</p>
-  </div>
-
-  <!-- Segment Filter -->
-  <ion-segment
-    [(ngModel)]="selectedSegment"
-    (ionChange)="segmentChanged($event)"
-    class="mb-4"
-  >
-    <ion-segment-button value="PENDIENTE">
-      <ion-label>Pendientes</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="EN_PREPARACION">
-      <ion-label>En Preparación</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="LISTO">
-      <ion-label>Listos</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="ENTREGADO">
-      <ion-label>Entregados</ion-label>
-    </ion-segment-button>
-  </ion-segment>
-
-  <!-- Loading Spinner -->
-  <div *ngIf="loading" class="ion-text-center p-4">
-    <ion-spinner name="crescent"></ion-spinner>
-  </div>
-
-  <!-- Orders List -->
-  <ion-list *ngIf="!loading">
-    <div *ngIf="pedidos.length === 0" class="ion-text-center p-4 text-gray-500">
-      No hay pedidos en esta categoría.
+  <div class="orders-container">
+    <!-- Header -->
+    <div class="orders-header">
+      <h2 class="header-title">Pedidos</h2>
+      <p class="header-subtitle">
+        Gestiona el estado de los pedidos en tiempo real
+      </p>
     </div>
 
-    <ion-card *ngFor="let pedido of pedidos; trackBy: trackById" class="mb-3">
-      <ion-card-header>
-        <div class="flex justify-between items-center">
-          <div>
-            <ion-card-title
-              >#{{ pedido.id }} - {{ pedido.cliente }}</ion-card-title
-            >
-            <p class="text-sm text-gray-500">{{ pedido.tiempo }}</p>
+    <!-- Status Filter Tabs -->
+    <div class="status-tabs">
+      <button
+        class="status-tab"
+        [class.active]="selectedSegment === 'PENDIENTE'"
+        (click)="segmentChanged({detail: {value: 'PENDIENTE'}})"
+      >
+        <span class="tab-label">Pendientes</span>
+      </button>
+      <button
+        class="status-tab"
+        [class.active]="selectedSegment === 'EN_PREPARACION'"
+        (click)="segmentChanged({detail: {value: 'EN_PREPARACION'}})"
+      >
+        <span class="tab-label">En Preparación</span>
+      </button>
+      <button
+        class="status-tab"
+        [class.active]="selectedSegment === 'LISTO'"
+        (click)="segmentChanged({detail: {value: 'LISTO'}})"
+      >
+        <span class="tab-label">Listos</span>
+      </button>
+      <button
+        class="status-tab"
+        [class.active]="selectedSegment === 'ENTREGADO'"
+        (click)="segmentChanged({detail: {value: 'ENTREGADO'}})"
+      >
+        <span class="tab-label">Entregados</span>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-state">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && pedidos.length === 0" class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h3 class="empty-title">Sin pedidos</h3>
+      <p class="empty-subtitle">No hay pedidos en esta categoría</p>
+    </div>
+
+    <!-- Orders List -->
+    <div *ngIf="!loading && pedidos.length > 0" class="orders-list">
+      @for (pedido of pedidos; track pedido.id) {
+      <div class="order-card">
+        <!-- Card Header -->
+        <div class="order-header">
+          <div class="order-info">
+            <h3 class="order-number">#{{ pedido.id }}</h3>
+            <p class="order-customer">{{ pedido.cliente }}</p>
+            <p class="order-time">{{ pedido.tiempo }}</p>
           </div>
-          <ion-badge [color]="getEstadoColor(pedido.estado)">
-            <ion-icon
-              [name]="getEstadoIcon(pedido.estado)"
-              class="mr-1"
-            ></ion-icon>
+          <ion-badge
+            [color]="getEstadoColor(pedido.estado)"
+            class="order-badge"
+          >
+            <ion-icon [name]="getEstadoIcon(pedido.estado)"></ion-icon>
             {{ getEstadoTexto(pedido.estado) }}
           </ion-badge>
         </div>
-      </ion-card-header>
 
-      <ion-card-content>
         <!-- Order Items -->
-        <div class="pedido-items mb-3">
-          <div
-            *ngFor="let item of pedido.items"
-            class="flex items-center gap-2 mb-2 text-sm"
-          >
+        <div class="order-items">
+          @for (item of pedido.items; track $index) {
+          <div class="order-item">
             <img
               *ngIf="item.imageUrl"
               [src]="item.imageUrl"
-              class="w-10 h-10 rounded object-cover"
+              class="item-image"
               alt="item"
             />
-            <div class="flex-1">
-              <span class="font-bold">{{ item.quantity }}x</span> {{ item.name
-              }}
-              <span
-                *ngIf="item.type === 'PROMOTION'"
-                class="text-xs text-purple-500 ml-1"
-                >(Promo)</span
-              >
+            <div class="item-info">
+              <span class="item-quantity">{{ item.quantity }}x</span>
+              <span class="item-name">{{ item.name }}</span>
+              @if (item.type === 'PROMOTION') {
+              <span class="item-promo">🎁</span>
+              }
             </div>
-            <div class="font-semibold">${{ item.total | number:'1.2-2' }}</div>
+            <span class="item-price">${{ item.total | number:'1.2-2' }}</span>
           </div>
+          }
         </div>
 
-        <!-- Total -->
-        <div class="border-t pt-2 mb-3">
-          <p class="text-right text-lg font-bold">
-            Total: ${{ pedido.total | number:'1.2-2' }}
-          </p>
+        <!-- Order Total -->
+        <div class="order-total">
+          <span class="total-label">Total:</span>
+          <span class="total-value">${{ pedido.total | number:'1.2-2' }}</span>
         </div>
 
         <!-- Actions -->
-        <div class="flex gap-2 flex-wrap">
-          <ion-button
-            size="small"
-            fill="outline"
+        <div class="order-actions">
+          <button
+            class="action-btn btn-outline"
             (click)="viewOrderDetails(pedido)"
           >
-            <ion-icon name="information-circle" slot="start"></ion-icon>
-            Ver Detalles
-          </ion-button>
+            <ion-icon name="information-circle"></ion-icon>
+            Detalles
+          </button>
 
-          <ion-button
-            *ngIf="canChangeStatus(pedido)"
-            size="small"
-            fill="outline"
-            color="secondary"
+          @if (canChangeStatus(pedido)) {
+          <button
+            class="action-btn btn-outline"
             (click)="updateEstimatedTime(pedido)"
           >
-            <ion-icon name="time" slot="start"></ion-icon>
+            <ion-icon name="time"></ion-icon>
             Tiempo
-          </ion-button>
+          </button>
 
-          <ion-item lines="none" *ngIf="canChangeStatus(pedido)" class="flex-1">
-            <ion-select
-              interface="popover"
-              placeholder="Cambiar estado"
-              [value]="pedido.statusServer"
-              (ionChange)="changeOrderStatus(pedido, $event.detail.value)"
-              [disabled]="changingStatus[pedido.raw?.id || pedido.id]"
-            >
-              <ion-select-option
-                *ngFor="let status of getNextStatusOptions(pedido)"
-                [value]="status"
-              >
-                {{ getStatusLabel(status) }}
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
-
-          <ion-button
-            *ngIf="canCancel(pedido)"
-            size="small"
-            color="danger"
+          <button
+            *ngIf="getNextStatus(pedido)"
+            class="action-btn btn-outline"
+            (click)="changeOrderStatus(pedido, getNextStatus(pedido))"
+            [disabled]="changingStatus[pedido.raw?.id || pedido.id]"
+          >
+            <ion-icon name="arrow-forward-circle"></ion-icon>
+            {{ getNextStatusLabel(pedido) }}
+          </button>
+          } @if (canCancel(pedido)) {
+          <button
+            class="action-btn btn-danger"
             (click)="confirmCancel(pedido)"
             [disabled]="changingStatus[pedido.raw?.id || pedido.id]"
           >
-            <ion-icon name="close" slot="start"></ion-icon>
+            <ion-icon name="close"></ion-icon>
             Cancelar
-          </ion-button>
+          </button>
+          }
         </div>
-      </ion-card-content>
-    </ion-card>
-  </ion-list>
+      </div>
+      }
+    </div>
 
-  <!-- Pagination -->
-  <div
-    *ngIf="!loading && pedidos.length > 0"
-    class="ion-padding"
-    style="
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 16px;
-    "
-  >
-    <ion-button
-      size="small"
-      [disabled]="currentPage === 0"
-      (click)="prevPage()"
-    >
-      Anterior
-    </ion-button>
-
-    <span style="font-size: 14px">
-      Página {{ currentPage + 1 }} de {{ totalPages || 1 }} ({{ totalElements }}
-      pedidos)
-    </span>
-
-    <ion-button
-      size="small"
-      [disabled]="currentPage >= totalPages - 1 || totalPages <= 1"
-      (click)="nextPage()"
-    >
-      Siguiente
-    </ion-button>
+    <!-- Pagination -->
+    <div *ngIf="!loading && pedidos.length > 0" class="pagination">
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === 0"
+        (click)="prevPage()"
+      >
+        Anterior
+      </button>
+      <span class="pagination-info">
+        Página {{ currentPage + 1 }} de {{ totalPages || 1 }} ({{ totalElements
+        }} pedidos)
+      </span>
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage >= totalPages - 1 || totalPages <= 1"
+        (click)="nextPage()"
+      >
+        Siguiente
+      </button>
+    </div>
   </div>
 
   <!-- Order Details Modal -->
   <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
     <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Detalles del Pedido #{{ selectedOrder?.id }}</ion-title>
+      <ion-header class="ion-no-border">
+        <ion-toolbar class="modal-toolbar">
+          <ion-title>Pedido #{{ selectedOrder?.id }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="closeModal()">Cerrar</ion-button>
+            <ion-button (click)="closeModal()">
+              <ion-icon name="close" slot="icon-only"></ion-icon>
+            </ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
-      <ion-content class="ion-padding" *ngIf="selectedOrder">
-        <!-- Customer Info -->
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Cliente</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
+      <ion-content class="modal-content" *ngIf="selectedOrder">
+        <div class="modal-body">
+          <!-- Customer Info -->
+          <div class="info-card">
+            <h3 class="info-title">Cliente</h3>
             <p><strong>Nombre:</strong> {{ selectedOrder.user?.fullName }}</p>
             <p><strong>Email:</strong> {{ selectedOrder.user?.email }}</p>
-          </ion-card-content>
-        </ion-card>
+          </div>
 
-        <!-- Order Info -->
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Información del Pedido</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
+          <!-- Order Info -->
+          <div class="info-card">
+            <h3 class="info-title">Información del Pedido</h3>
             <p><strong>Estado:</strong> {{ selectedOrder.status }}</p>
             <p>
               <strong>Tiempo estimado:</strong> {{ selectedOrder.estimatedTime
               }}
             </p>
             <p>
-              <strong>Creado:</strong> {{ selectedOrder.createdAt | date:'short'
-              }}
+              <strong>Creado:</strong> {{ selectedOrder.createdAt |
+              date:'dd/MM/yyyy HH:mm' }}
             </p>
             <p *ngIf="selectedOrder.deliveredAt">
               <strong>Entregado:</strong> {{ selectedOrder.deliveredAt |
-              date:'short' }}
+              date:'dd/MM/yyyy HH:mm' }}
             </p>
-          </ion-card-content>
-        </ion-card>
+          </div>
 
-        <!-- Items -->
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Productos</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <div
-              *ngFor="let item of selectedOrder.items"
-              class="mb-3 pb-3 border-b"
-            >
-              <div class="flex items-center gap-3">
-                <img
-                  *ngIf="item.imageUrl"
-                  [src]="item.imageUrl"
-                  class="w-16 h-16 rounded object-cover"
-                  alt="item"
-                />
-                <div class="flex-1">
-                  <p class="font-bold">{{ item.itemName }}</p>
-                  <p class="text-sm text-gray-500">
-                    {{ item.type === 'PROMOTION' ? 'Promoción' : 'Producto' }}
-                  </p>
-                  <p class="text-sm">
-                    Cantidad: {{ item.quantity }} × ${{ item.unitPrice |
-                    number:'1.2-2' }}
-                  </p>
-                </div>
-                <div class="text-right">
-                  <p class="font-bold">
-                    ${{ item.lineTotal | number:'1.2-2' }}
-                  </p>
-                </div>
+          <!-- Items -->
+          <div class="info-card">
+            <h3 class="info-title">Productos</h3>
+            @for (item of selectedOrder.items; track $index; let last = $last) {
+            <div class="modal-item" [class.last]="last">
+              <img
+                *ngIf="item.imageUrl"
+                [src]="item.imageUrl"
+                class="modal-item-image"
+                alt="item"
+              />
+              <div class="modal-item-info">
+                <p class="modal-item-name">{{ item.itemName }}</p>
+                <p class="modal-item-type">
+                  {{ item.type === 'PROMOTION' ? '🎁 Promoción' : '🍽️ Producto'
+                  }}
+                </p>
+                <p class="modal-item-quantity">
+                  {{ item.quantity }} × ${{ item.unitPrice | number:'1.2-2' }}
+                </p>
+              </div>
+              <div class="modal-item-total">
+                ${{ item.lineTotal | number:'1.2-2' }}
               </div>
             </div>
+            }
 
-            <div class="mt-4 pt-4 border-t">
-              <div class="flex justify-between mb-2">
+            <!-- Summary -->
+            <div class="modal-summary">
+              <div class="summary-row">
                 <span>Subtotal:</span>
                 <span>${{ selectedOrder.subtotal | number:'1.2-2' }}</span>
               </div>
-              <div class="flex justify-between mb-2">
+              <div class="summary-row">
                 <span>Propina:</span>
                 <span>${{ selectedOrder.tip | number:'1.2-2' }}</span>
               </div>
-              <div class="flex justify-between text-lg font-bold">
+              <div class="summary-row total">
                 <span>Total:</span>
                 <span>${{ selectedOrder.total | number:'1.2-2' }}</span>
               </div>
             </div>
-          </ion-card-content>
-        </ion-card>
+          </div>
+        </div>
       </ion-content>
     </ng-template>
   </ion-modal>

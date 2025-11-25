@@ -1,6 +1,6 @@
 <app-header titulo="Mis Pedidos"></app-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true" class="bg-black">
   <ion-refresher
     slot="fixed"
     (ionRefresh)="doRefresh($event)"
@@ -12,144 +12,199 @@
   </ion-refresher>
   <app-fabbtn></app-fabbtn>
 
-  <div class="pedidos-header mt-20 mb-4">
-    <p>Historial y seguimiento de tus pedidos</p>
+  <!-- Header Section -->
+  <div class="px-6 pb-4">
+    <h2 class="text-2xl font-bold text-white mb-2">Mis Pedidos</h2>
+    <p class="text-gray-400 text-sm">Historial y seguimiento de tus pedidos</p>
   </div>
 
   <!-- Loading Spinner -->
-  <div *ngIf="loading" class="ion-text-center p-4">
-    <ion-spinner name="crescent"></ion-spinner>
+  <div *ngIf="loading" class="flex justify-center items-center py-20">
+    <ion-spinner name="crescent" class="text-blue-500"></ion-spinner>
   </div>
 
   <!-- Orders List -->
-  <div *ngIf="!loading">
-    <div *ngIf="orders.length === 0" class="ion-text-center p-8 text-gray-500">
-      <ion-icon name="receipt" class="text-6xl mb-4"></ion-icon>
-      <p>No tienes pedidos aún</p>
+  <div *ngIf="!loading" class="px-6 pb-6">
+    <!-- Empty State -->
+    <div *ngIf="orders.length === 0" class="text-center py-16">
+      <div class="bg-gray-900 rounded-3xl p-12 border border-gray-800">
+        <div class="text-6xl mb-4">📦</div>
+        <h3 class="text-xl font-bold text-white mb-2">Sin pedidos</h3>
+        <p class="text-gray-400 text-sm">Aún no has realizado ningún pedido</p>
+      </div>
     </div>
 
-    <ion-card *ngFor="let order of orders; trackBy: trackById" class="mb-3">
-      <ion-card-header>
-        <div class="flex justify-between items-center">
-          <div>
-            <ion-card-title>Pedido #{{ order.id }}</ion-card-title>
-            <p class="text-sm text-gray-500">
-              {{ order.createdAt | date:'short' }}
-            </p>
-          </div>
-          <ion-badge [color]="getStatusColor(order.status)">
-            <ion-icon
-              [name]="getStatusIcon(order.status)"
-              class="mr-1"
-            ></ion-icon>
-            {{ getStatusLabel(order.status) }}
-          </ion-badge>
-        </div>
-      </ion-card-header>
-
-      <ion-card-content>
-        <div class="mb-3">
-          <div class="flex justify-between mb-2">
-            <span class="text-gray-600">Items:</span>
-            <span class="font-semibold" *ngIf="order.itemCount > 0">
-              {{ order.itemCount }} producto(s)
-            </span>
-            <span
-              class="text-sm text-gray-400 italic"
-              *ngIf="order.itemCount === 0"
-            >
-              Ver detalles para más info
-            </span>
-          </div>
-          <div class="flex justify-between mb-2">
-            <span class="text-gray-600">Total:</span>
-            <span class="font-bold text-lg"
-              >${{ order.total | number:'1.2-2' }}</span
-            >
-          </div>
-          <div
-            class="flex justify-between mb-2"
-            *ngIf="order.status !== 'ENTREGADO' && order.status !== 'CANCELADO'"
-          >
-            <span class="text-gray-600">Tiempo estimado:</span>
-            <span class="font-semibold text-primary"
-              >{{ order.estimatedTime }}</span
-            >
-          </div>
-          <div class="flex justify-between" *ngIf="order.deliveredAt">
-            <span class="text-gray-600">Entregado:</span>
-            <span class="font-semibold"
-              >{{ order.deliveredAt | date:'short' }}</span
-            >
-          </div>
-        </div>
-
-        <ion-button
-          expand="block"
-          fill="outline"
-          (click)="viewOrderDetails(order)"
+    <!-- Order Cards -->
+    <div *ngFor="let order of orders; trackBy: trackById" class="mb-4">
+      <div
+        class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-lg"
+      >
+        <!-- Card Header -->
+        <div
+          class="p-4 border-b border-gray-800 bg-gradient-to-r from-gray-900 to-gray-800"
         >
-          <ion-icon name="information-circle" slot="start"></ion-icon>
-          Ver Detalles
-        </ion-button>
-      </ion-card-content>
-    </ion-card>
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <h3 class="text-lg font-bold text-white">
+                Pedido #{{ order.id }}
+              </h3>
+              <p class="text-xs text-gray-400 mt-1">
+                {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}
+              </p>
+            </div>
+            <ion-badge
+              [color]="getStatusColor(order.status)"
+              class="px-3 py-1.5"
+            >
+              <ion-icon
+                [name]="getStatusIcon(order.status)"
+                class="mr-1"
+              ></ion-icon>
+              {{ getStatusLabel(order.status) }}
+            </ion-badge>
+          </div>
+        </div>
+
+        <!-- Card Content -->
+        <div class="p-4">
+          <div class="space-y-3 mb-4">
+            <!-- Items Count -->
+            <div class="flex justify-between items-center">
+              <span class="text-gray-400 text-sm flex items-center gap-2">
+                <ion-icon name="restaurant" class="text-orange-400"></ion-icon>
+                Items
+              </span>
+              <span
+                class="font-semibold text-white"
+                *ngIf="order.itemCount > 0"
+              >
+                {{ order.itemCount }} producto(s)
+              </span>
+              <span
+                class="text-xs text-gray-500 italic"
+                *ngIf="order.itemCount === 0"
+              >
+                Ver detalles
+              </span>
+            </div>
+
+            <!-- Total -->
+            <div class="flex justify-between items-center">
+              <span class="text-gray-400 text-sm flex items-center gap-2">
+                <ion-icon name="cash" class="text-green-400"></ion-icon>
+                Total
+              </span>
+              <span class="font-bold text-xl text-white">
+                ${{ order.total | number:'1.2-2' }}
+              </span>
+            </div>
+
+            <!-- Estimated Time -->
+            <div
+              class="flex justify-between items-center"
+              *ngIf="order.status !== 'ENTREGADO' && order.status !== 'CANCELADO'"
+            >
+              <span class="text-gray-400 text-sm flex items-center gap-2">
+                <ion-icon name="time" class="text-blue-400"></ion-icon>
+                Tiempo estimado
+              </span>
+              <span class="font-semibold text-blue-400">
+                {{ order.estimatedTime }}
+              </span>
+            </div>
+
+            <!-- Delivered At -->
+            <div
+              class="flex justify-between items-center"
+              *ngIf="order.deliveredAt"
+            >
+              <span class="text-gray-400 text-sm flex items-center gap-2">
+                <ion-icon
+                  name="checkmark-circle"
+                  class="text-green-400"
+                ></ion-icon>
+                Entregado
+              </span>
+              <span class="font-semibold text-green-400">
+                {{ order.deliveredAt | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- View Details Button -->
+          <button
+            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
+            (click)="viewOrderDetails(order)"
+          >
+            <ion-icon name="information-circle" class="text-lg"></ion-icon>
+            Ver Detalles
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Pagination -->
-  <div
-    *ngIf="!loading && orders.length > 0"
-    class="ion-padding"
-    style="
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 16px;
-    "
-  >
-    <ion-button
-      size="small"
-      [disabled]="currentPage === 0"
-      (click)="prevPage()"
+  <div *ngIf="!loading && orders.length > 0" class="px-6 pb-24">
+    <div
+      class="flex justify-between items-center bg-gray-900 rounded-xl p-3 border border-gray-800"
     >
-      Anterior
-    </ion-button>
+      <button
+        class="px-4 py-2 rounded-lg font-semibold text-sm transition-all"
+        [class]="currentPage === 0 ? 'bg-gray-800 text-gray-600 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95'"
+        [disabled]="currentPage === 0"
+        (click)="prevPage()"
+      >
+        Anterior
+      </button>
 
-    <span style="font-size: 14px">
-      Página {{ currentPage + 1 }} de {{ totalPages || 1 }}
-    </span>
+      <span class="text-sm font-medium text-gray-300">
+        Página {{ currentPage + 1 }} de {{ totalPages || 1 }}
+      </span>
 
-    <ion-button
-      size="small"
-      [disabled]="currentPage >= totalPages - 1 || totalPages <= 1"
-      (click)="nextPage()"
-    >
-      Siguiente
-    </ion-button>
+      <button
+        class="px-4 py-2 rounded-lg font-semibold text-sm transition-all"
+        [class]="currentPage >= totalPages - 1 || totalPages <= 1 ? 'bg-gray-800 text-gray-600 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95'"
+        [disabled]="currentPage >= totalPages - 1 || totalPages <= 1"
+        (click)="nextPage()"
+      >
+        Siguiente
+      </button>
+    </div>
   </div>
 
   <!-- Order Details Modal -->
   <ion-modal [isOpen]="isModalOpen" (didDismiss)="closeModal()">
     <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Detalle del Pedido #{{ selectedOrder?.id }}</ion-title>
+      <ion-header class="ion-no-border">
+        <ion-toolbar class="bg-gray-900">
+          <ion-title class="text-white"
+            >Pedido #{{ selectedOrder?.id }}</ion-title
+          >
           <ion-buttons slot="end">
-            <ion-button (click)="closeModal()">Cerrar</ion-button>
+            <ion-button (click)="closeModal()" class="text-white">
+              <ion-icon name="close" slot="icon-only"></ion-icon>
+            </ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
-      <ion-content class="ion-padding" *ngIf="selectedOrder">
-        <!-- Order Status -->
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Estado del Pedido</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <div class="text-center mb-3">
+      <ion-content *ngIf="selectedOrder">
+        <div class="p-4">
+          <!-- Order Status -->
+          <div class="bg-gray-900 rounded-2xl border border-gray-800 p-5 mb-4">
+            <h3
+              class="text-lg font-bold text-white mb-4 flex items-center gap-2"
+            >
+              <ion-icon
+                name="information-circle"
+                class="text-blue-400"
+              ></ion-icon>
+              Estado del Pedido
+            </h3>
+            <div class="text-center mb-4">
               <ion-badge
                 [color]="getStatusColor(selectedOrder.status)"
-                class="text-lg p-3"
+                class="text-base px-4 py-2"
               >
                 <ion-icon
                   [name]="getStatusIcon(selectedOrder.status)"
@@ -158,51 +213,63 @@
                 {{ getStatusLabel(selectedOrder.status) }}
               </ion-badge>
             </div>
-            <p>
-              <strong>Tiempo estimado:</strong> {{ selectedOrder.estimatedTime
-              }}
-            </p>
-            <p>
-              <strong>Fecha de pedido:</strong> {{ selectedOrder.createdAt |
-              date:'medium' }}
-            </p>
-            <p *ngIf="selectedOrder.deliveredAt">
-              <strong>Fecha de entrega:</strong> {{ selectedOrder.deliveredAt |
-              date:'medium' }}
-            </p>
-          </ion-card-content>
-        </ion-card>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-400">Tiempo estimado:</span>
+                <span class="text-white font-semibold"
+                  >{{ selectedOrder.estimatedTime }}</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Fecha de pedido:</span>
+                <span class="text-white font-semibold"
+                  >{{ selectedOrder.createdAt | date:'dd/MM/yyyy HH:mm' }}</span
+                >
+              </div>
+              <div
+                class="flex justify-between"
+                *ngIf="selectedOrder.deliveredAt"
+              >
+                <span class="text-gray-400">Fecha de entrega:</span>
+                <span class="text-green-400 font-semibold"
+                  >{{ selectedOrder.deliveredAt | date:'dd/MM/yyyy HH:mm'
+                  }}</span
+                >
+              </div>
+            </div>
+          </div>
 
-        <!-- Order Items -->
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Productos</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
+          <!-- Order Items -->
+          <div class="bg-gray-900 rounded-2xl border border-gray-800 p-5 mb-20">
+            <h3
+              class="text-lg font-bold text-white mb-4 flex items-center gap-2"
+            >
+              <ion-icon name="restaurant" class="text-orange-400"></ion-icon>
+              Productos
+            </h3>
             <div
-              *ngFor="let item of selectedOrder.items"
-              class="mb-3 pb-3 border-b"
+              *ngFor="let item of selectedOrder.items; let last = last"
+              [class]="last ? 'mb-0' : 'mb-4 pb-4 border-b border-gray-800'"
             >
               <div class="flex items-center gap-3">
                 <img
                   *ngIf="item.imageUrl"
                   [src]="item.imageUrl"
-                  class="w-16 h-16 rounded object-cover"
+                  class="w-16 h-16 rounded-lg object-cover bg-gray-800"
                   alt="item"
                 />
                 <div class="flex-1">
-                  <p class="font-bold">{{ item.itemName }}</p>
-                  <p class="text-sm text-gray-500">
+                  <p class="font-bold text-white">{{ item.itemName }}</p>
+                  <p class="text-xs text-gray-400 mt-1">
                     {{ item.type === 'PROMOTION' ? '🎁 Promoción' : '🍽️
                     Producto' }}
                   </p>
-                  <p class="text-sm">
-                    Cantidad: {{ item.quantity }} × ${{ item.unitPrice |
-                    number:'1.2-2' }}
+                  <p class="text-sm text-gray-300 mt-1">
+                    {{ item.quantity }} × ${{ item.unitPrice | number:'1.2-2' }}
                   </p>
                 </div>
                 <div class="text-right">
-                  <p class="font-bold">
+                  <p class="font-bold text-white text-lg">
                     ${{ item.lineTotal | number:'1.2-2' }}
                   </p>
                 </div>
@@ -210,22 +277,24 @@
             </div>
 
             <!-- Order Summary -->
-            <div class="mt-4 pt-4 border-t">
-              <div class="flex justify-between mb-2">
+            <div class="mt-4 pt-4 border-t border-gray-800 space-y-2">
+              <div class="flex justify-between text-gray-300">
                 <span>Subtotal:</span>
                 <span>${{ selectedOrder.subtotal | number:'1.2-2' }}</span>
               </div>
-              <div class="flex justify-between mb-2">
+              <div class="flex justify-between text-gray-300">
                 <span>Propina:</span>
                 <span>${{ selectedOrder.tip | number:'1.2-2' }}</span>
               </div>
-              <div class="flex justify-between text-lg font-bold">
+              <div
+                class="flex justify-between text-xl font-bold text-white pt-2 border-t border-gray-700"
+              >
                 <span>Total:</span>
                 <span>${{ selectedOrder.total | number:'1.2-2' }}</span>
               </div>
             </div>
-          </ion-card-content>
-        </ion-card>
+          </div>
+        </div>
       </ion-content>
     </ng-template>
   </ion-modal>

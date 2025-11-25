@@ -8,3 +8,8 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+ion-content {
+  --padding-top: 0;
+  --padding-bottom: 0;
+}

@@ -1,28 +1,28 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar>
-    <ion-title>Detalle de Promoción</ion-title>
+  <ion-toolbar class="bg-gray-900 text-white">
+    <ion-title class="text-white">Detalle de Promoción</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()">
-        <ion-icon name="close" slot="icon-only"></ion-icon>
+        <ion-icon name="close" slot="icon-only" class="text-white"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding-bottom">
+<ion-content class="ion-padding-bottom bg-black">
   <!-- Image Header -->
-  <div class="relative w-full h-64 bg-gray-100 mb-4">
+  <div class="relative w-full h-64 bg-gray-900 mb-4">
     <img
       [src]="promotion.imageUrl"
       [alt]="promotion.name"
       class="w-full h-full object-cover"
     />
     <div
-      class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-12"
+      class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 pt-12"
     >
       <h1 class="text-2xl font-bold text-white mb-1">{{ promotion.name }}</h1>
       <span
-        class="inline-block bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full"
+        class="inline-block bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg"
       >
         ${{ promotion.price }}
       </span>
@@ -32,31 +32,31 @@
   <div class="px-4">
     <!-- Description -->
     <div class="mb-6">
-      <h3 class="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
-        <ion-icon name="information-circle" class="text-blue-600"></ion-icon>
+      <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+        <ion-icon name="information-circle" class="text-blue-400"></ion-icon>
         Descripción
       </h3>
-      <p class="text-gray-600 leading-relaxed">
+      <p class="text-gray-300 leading-relaxed">
         {{ promotion.description || "Sin descripción detallada." }}
       </p>
     </div>
 
     <!-- Validity -->
-    <div class="mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
-      <h3 class="text-md font-bold text-blue-800 mb-2 flex items-center gap-2">
-        <ion-icon name="calendar" class="text-blue-600"></ion-icon>
+    <div class="mb-6 bg-gray-900 p-4 rounded-xl border border-gray-800">
+      <h3 class="text-md font-bold text-blue-400 mb-2 flex items-center gap-2">
+        <ion-icon name="calendar" class="text-blue-400"></ion-icon>
         Vigencia
       </h3>
 
       @if (promotion.type === 'TEMPORARY') {
-      <div class="text-sm text-blue-700">
+      <div class="text-sm text-gray-300">
         <p>
           Del
-          <span class="font-semibold">{{
+          <span class="font-semibold text-white">{{
             promotion.startsAt | date : "dd/MM/yyyy"
           }}</span>
           al
-          <span class="font-semibold">{{
+          <span class="font-semibold text-white">{{
             promotion.endsAt | date : "dd/MM/yyyy"
           }}</span>
         </p>
@@ -65,9 +65,11 @@
       <div class="space-y-1">
         @for (rule of promotion.weeklyRules; track $index) {
         <div
-          class="flex justify-between text-sm text-blue-700 border-b border-blue-200 last:border-0 pb-1 last:pb-0"
+          class="flex justify-between text-sm text-gray-300 border-b border-gray-800 last:border-0 pb-1 last:pb-0"
         >
-          <span class="font-semibold">{{ getDaysLabel(rule.dayOfWeek) }}</span>
+          <span class="font-semibold text-white">{{
+            getDaysLabel(rule.dayOfWeek)
+          }}</span>
           <span>{{ rule.startTime }} - {{ rule.endTime }}</span>
         </div>
         }
@@ -77,24 +79,24 @@
 
     <!-- Products Included -->
     <div class="mb-20">
-      <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
-        <ion-icon name="restaurant" class="text-orange-500"></ion-icon>
+      <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+        <ion-icon name="restaurant" class="text-orange-400"></ion-icon>
         Incluye
       </h3>
 
       <div class="space-y-3">
         @for (product of promotion.products; track $index) {
         <div
-          class="flex items-center gap-3 bg-white p-2 rounded-lg shadow-sm border border-gray-100"
+          class="flex items-center gap-3 bg-gray-900 p-2 rounded-lg shadow-lg border border-gray-800"
         >
           <div
-            class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0"
+            class="w-12 h-12 rounded-lg bg-gray-800 overflow-hidden flex-shrink-0"
           >
             <img [src]="product.imageUrl" class="w-full h-full object-cover" />
           </div>
           <div class="flex-1">
-            <p class="font-medium text-gray-800">{{ product.name }}</p>
-            <p class="text-xs text-gray-500">
+            <p class="font-medium text-white">{{ product.name }}</p>
+            <p class="text-xs text-gray-400">
               Precio original: ${{ product.price }}
             </p>
           </div>
@@ -106,14 +108,27 @@
 </ion-content>
 
 <ion-footer class="ion-no-border">
-  <div class="p-4 bg-white border-t border-gray-100">
+  <div class="p-4 bg-gray-900 border-t border-gray-800">
+    <div
+      *ngIf="!isValid"
+      class="mb-3 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm text-center flex items-center justify-center gap-2"
+    >
+      <ion-icon name="alert-circle" class="text-lg"></ion-icon>
+      {{ validityMessage }}
+    </div>
+
     <ion-button
       expand="block"
       class="font-bold rounded-xl h-12"
       (click)="addToCart()"
+      [disabled]="!isValid"
     >
       <ion-icon name="cart" slot="start"></ion-icon>
-      Agregar al carrito - ${{ promotion.price }}
+      {{
+        isValid
+          ? "Agregar al carrito - $" + promotion.price
+          : "No disponible ahora"
+      }}
     </ion-button>
   </div>
 </ion-footer>

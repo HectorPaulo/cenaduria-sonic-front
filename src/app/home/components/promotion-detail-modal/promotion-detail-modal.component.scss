@@ -1,8 +1,21 @@
 ion-content {
-  --background: #ffffff;
+}
+
+ion-header {
+  ion-toolbar {
+    --background: #111827;
+    --color: #ffffff;
+  }
 }
 
 ion-title {
   font-weight: 600;
   font-size: 1.1rem;
+  color: #ffffff;
+}
+
+ion-footer {
+  ion-toolbar {
+    --background: #111827;
+  }
 }

@@ -1,211 +1,148 @@
 <app-header titulo="Mi Carrito"></app-header>
 
-<ion-content [fullscreen]="true" class="bg-white">
-  <div class="max-w-lg mx-auto p-4">
-    <!-- Carrito vacío -->
+<ion-content [fullscreen]="true" class="cart-content">
+  <div class="cart-container">
+    <!-- Empty Cart State -->
     @if (itemsCarrito.length === 0) {
-    <div class="text-center py-16">
-      <div class="text-6xl mb-4">🛒</div>
-      <h2 class="text-2xl font-bold text-gray-700 mb-2">
-        Tu carrito está vacío
-      </h2>
-      <p class="text-gray-500 mb-6">¡Agrega algunos productos deliciosos!</p>
-      <ion-button routerLink="/menu" color="warning" size="default">
-        <ion-label>Ver Menú</ion-label>
-      </ion-button>
+    <div class="empty-state">
+      <div class="empty-icon">🛒</div>
+      <h2 class="empty-title">Tu carrito está vacío</h2>
+      <p class="empty-subtitle">¡Agrega algunos productos deliciosos!</p>
+      <button class="btn btn-primary" routerLink="/menu">
+        <ion-icon name="restaurant"></ion-icon>
+        Ver Menú
+      </button>
     </div>
     } @else {
 
-    <!-- Header del carrito -->
-    <div class="flex justify-between items-center mb-4 mt-16">
-      <h2 class="text-2xl font-bold text-white">
-        Tu carrito ({{ cantidadItems }} {{ cantidadItems === 1 ? 'producto' :
-        'productos' }})
-      </h2>
-      <ion-button
-        fill="clear"
-        color="danger"
-        size="small"
-        (click)="limpiarCarrito()"
-      >
-        <ion-icon name="trash" slot="icon-only"></ion-icon>
-      </ion-button>
+    <!-- Cart Header -->
+    <div class="cart-header">
+      <div>
+        <h2 class="cart-title">Tu Carrito</h2>
+        <p class="cart-subtitle">
+          {{ cantidadItems }} {{ cantidadItems === 1 ? 'producto' : 'productos'
+          }}
+        </p>
+      </div>
+      <button class="btn-icon btn-danger" (click)="limpiarCarrito()">
+        <ion-icon name="trash"></ion-icon>
+      </button>
     </div>
 
-    <!-- Lista de productos -->
-    <div class="space-y-4 mb-6">
+    <!-- Cart Items -->
+    <div class="cart-items">
       @for (item of itemsCarrito; track item.id) {
-      <ion-card color="light" mode="ios" class="shadow-sm">
-        <ion-card-content class="p-4">
-          <div class="flex gap-4">
-            <!-- Imagen del producto -->
-            <img
-              [src]="item.imagen"
-              [alt]="item.nombre"
-              class="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-            />
+      <div class="cart-item">
+        <!-- Item Image -->
+        <img [src]="item.imagen" [alt]="item.nombre" class="item-image" />
 
-            <!-- Información del producto -->
-            <div class="flex-1 min-w-0">
-              <div class="flex justify-between items-start mb-2">
-                <div>
-                  <h3 class="font-semibold text-gray-800">
-                    {{ item.nombre }}
-                  </h3>
-                  <p class="text-xs text-gray-600 line-clamp-2">
-                    {{ item.descripcion }}
-                  </p>
-                </div>
-                <ion-button
-                  fill="clear"
-                  color="danger"
-                  size="small"
-                  (click)="eliminarItem(item)"
-                >
-                  <ion-icon
-                    name="close"
-                    size="small"
-                    slot="icon-only"
-                    class="text-sm"
-                  ></ion-icon>
-                </ion-button>
-              </div>
+        <!-- Item Info -->
+        <div class="item-info">
+          <div class="item-header">
+            <div>
+              <h3 class="item-name">{{ item.nombre }}</h3>
+              <p class="item-description">{{ item.descripcion }}</p>
+            </div>
+            <button class="btn-remove" (click)="eliminarItem(item)">
+              <ion-icon name="close"></ion-icon>
+            </button>
+          </div>
 
-              <!-- Extras -->
-              @if (item.extras && item.extras.length > 0) {
-              <div class="mb-2">
-                @for (extra of item.extras; track $index) {
-                <ion-chip class="bg-blue-100 text-blue-800 text-xs mr-1 mb-1">
-                  <ion-label>{{ extra }}</ion-label>
-                </ion-chip>
-                }
-              </div>
-              }
+          <!-- Extras -->
+          @if (item.extras && item.extras.length > 0) {
+          <div class="item-extras">
+            @for (extra of item.extras; track $index) {
+            <span class="extra-chip">{{ extra }}</span>
+            }
+          </div>
+          }
 
-              <!-- Precio y controles -->
-              <div class="flex justify-between items-center">
-                <span class="font-bold text-green-300"
-                  >${{ (item.precio * item.cantidad) | number: '1.2-2' }}</span
-                >
-                <div class="flex items-center gap-2">
-                  <ion-button
-                    fill="clear"
-                    size="small"
-                    (click)="disminuirCantidad(item)"
-                    [disabled]="item.cantidad <= 1"
-                  >
-                    <ion-icon
-                      name="remove"
-                      slot="icon-only"
-                      size="small"
-                    ></ion-icon>
-                  </ion-button>
-                  <span
-                    class="px-3 py-1 rounded-full text-sm font-semibold min-w-[40px] text-center"
-                  >
-                    {{ item.cantidad }}
-                  </span>
-                  <ion-button
-                    fill="clear"
-                    size="small"
-                    (click)="aumentarCantidad(item)"
-                  >
-                    <ion-icon
-                      name="add"
-                      slot="icon-only"
-                      class="text-sm"
-                    ></ion-icon>
-                  </ion-button>
-                </div>
-              </div>
+          <!-- Price and Quantity Controls -->
+          <div class="item-footer">
+            <span class="item-price">
+              ${{ (item.precio * item.cantidad) | number: '1.2-2' }}
+            </span>
+            <div class="quantity-controls">
+              <button
+                class="qty-btn"
+                (click)="disminuirCantidad(item)"
+                [disabled]="item.cantidad <= 1"
+              >
+                <ion-icon name="remove"></ion-icon>
+              </button>
+              <span class="qty-value">{{ item.cantidad }}</span>
+              <button class="qty-btn" (click)="aumentarCantidad(item)">
+                <ion-icon name="add"></ion-icon>
+              </button>
             </div>
           </div>
-        </ion-card-content>
-      </ion-card>
+        </div>
+      </div>
       }
     </div>
 
-    <!-- Cupones y Propina -->
-    <div class="space-y-3 mb-6">
-
-      <ion-button
-        mode="ios"
-        fill="outline"
-        color="secondary"
-        expand="block"
-        (click)="agregarPropina()"
-      >
-        <ion-label
-          >Agregar propina (${{ propina | number: '1.2-2' }})</ion-label
-        >
-      </ion-button>
+    <!-- Tip Section -->
+    <div class="tip-section">
+      <button class="btn btn-outline" (click)="agregarPropina()">
+        <ion-icon name="heart"></ion-icon>
+        Agregar propina (${{ propina | number: '1.2-2' }})
+      </button>
     </div>
 
-    <!-- Resumen de precios -->
-    <ion-card color="light" mode="ios" class="shadow-sm mb-6">
-      <ion-card-header>
-        <ion-card-title class="text-lg font-semibold text-gray-800">
-          Resumen del pedido
-        </ion-card-title>
-      </ion-card-header>
-      <ion-card-content class="space-y-2">
-        <div class="flex justify-between">
-          <span class="text-gray-600">Subtotal:</span>
-          <span class="font-semibold">${{ subtotal | number: '1.2-2' }}</span>
-        </div>
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <h3 class="summary-title">Resumen del Pedido</h3>
 
-        @if (descuentoAplicado > 0) {
-        <div class="flex justify-between text-green-600">
-          <span>Descuento:</span>
-          <span>-${{ descuentoAplicado | number: '1.2-2' }}</span>
-        </div>
-        }
+      <div class="summary-row">
+        <span class="summary-label">Subtotal:</span>
+        <span class="summary-value">${{ subtotal | number: '1.2-2' }}</span>
+      </div>
 
-        @if (propina > 0) {
-        <div class="flex justify-between">
-          <span class="text-gray-600">Propina:</span>
-          <span class="font-semibold">${{ propina | number: '1.2-2' }}</span>
-        </div>
-        }
+      @if (descuentoAplicado > 0) {
+      <div class="summary-row discount">
+        <span class="summary-label">Descuento:</span>
+        <span class="summary-value"
+          >-${{ descuentoAplicado | number: '1.2-2' }}</span
+        >
+      </div>
+      } @if (propina > 0) {
+      <div class="summary-row">
+        <span class="summary-label">Propina:</span>
+        <span class="summary-value">${{ propina | number: '1.2-2' }}</span>
+      </div>
+      }
 
-        <hr class="my-2" />
-        <div class="flex justify-between text-lg font-bold text-gray-800">
-          <span>Total:</span>
-          <span class="text-green-700">${{ total | number: '1.2-2' }}</span>
-        </div>
-      </ion-card-content>
-    </ion-card>
+      <div class="summary-divider"></div>
 
-    <!-- Métodos de pago -->
-    <div class="mb-6">
-      <h3 class="text-lg font-semibold text-gray-800 mb-3">Método de pago</h3>
-      <div class="grid grid-cols-3 gap-2">
+      <div class="summary-row total">
+        <span class="summary-label">Total:</span>
+        <span class="summary-value">${{ total | number: '1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- Payment Methods -->
+    <div class="payment-section">
+      <h3 class="payment-title">Método de Pago</h3>
+      <div class="payment-grid">
         @for (metodo of metodosPago; track metodo.id) {
-        <ion-button
-          [fill]="metodoSeleccionado === metodo.id ? 'solid' : 'outline'"
-          [color]="metodoSeleccionado === metodo.id ? 'warning' : 'medium'"
-          size="small"
+        <button
+          class="payment-btn"
+          [class.active]="metodoSeleccionado === metodo.id"
           [disabled]="!metodo.disponible"
           (click)="seleccionarMetodoPago(metodo.id)"
-          class="flex flex-col h-auto py-3"
         >
-          <ion-icon [name]="metodo.icono" class="text-lg mb-1"></ion-icon>
-          <span class="text-xs">{{ metodo.nombre }}</span>
-        </ion-button>
+          <ion-icon [name]="metodo.icono"></ion-icon>
+          <span>{{ metodo.nombre }}</span>
+        </button>
         }
       </div>
     </div>
 
-    <!-- Botón de realizar pedido -->
-    <ion-button
-      expand="block"
-      color="success"
-      size="large"
-      (click)="realizarPedido()"
-      class="font-semibold mb-4"
-    >
-      <ion-label>Realizar Pedido - ${{ total | number: '1.2-2' }}</ion-label>
-    </ion-button>
+    <!-- Checkout Button -->
+    <button class="btn btn-success btn-checkout" (click)="realizarPedido()">
+      <ion-icon name="checkmark-circle"></ion-icon>
+      Realizar Pedido - ${{ total | number: '1.2-2' }}
+    </button>
 
     }
   </div>

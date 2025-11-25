@@ -10,24 +10,19 @@ import { Router } from '@angular/router';
 import { HttpAuthService } from '../services/http-auth.service';
 import {
   IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonItem,
-  IonCardContent,
   IonIcon,
-  IonInput,
-  IonButton,
-  IonText,
   ToastController,
   AlertController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { person, mail, key, personAdd, logIn } from 'ionicons/icons';
+import {
+  person,
+  mail,
+  key,
+  personAdd,
+  logIn,
+  lockClosed,
+} from 'ionicons/icons';
 import { PasswordValidator } from '../validators/password.validator';
 
 @Component({
@@ -35,21 +30,7 @@ import { PasswordValidator } from '../validators/password.validator';
   templateUrl: './registro.page.html',
   styleUrls: ['./registro.page.scss'],
   standalone: true,
-  imports: [
-    IonText,
-    IonButton,
-    IonInput,
-    IonIcon,
-    IonCardContent,
-    IonItem,
-    IonCardSubtitle,
-    IonCardTitle,
-    IonCardHeader,
-    IonCard,
-    IonContent,
-    CommonModule,
-    ReactiveFormsModule,
-  ],
+  imports: [IonIcon, IonContent, CommonModule, ReactiveFormsModule],
 })
 export class RegistroPage implements OnInit {
   registroForm: FormGroup;
@@ -61,7 +42,7 @@ export class RegistroPage implements OnInit {
     private httpAuth: HttpAuthService,
     private alertCtrl: AlertController
   ) {
-    addIcons({ person, mail, key, personAdd, logIn });
+    addIcons({ person, mail, lockClosed, personAdd, logIn, key });
 
     this.registroForm = this.formBuilder.group({
       username: [

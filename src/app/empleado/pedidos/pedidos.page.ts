@@ -2,23 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonContent,
-  IonList,
-  IonItem,
-  IonLabel,
   IonBadge,
   IonButton,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonSelect,
-  IonSelectOption,
   IonIcon,
   IonSpinner,
   IonRefresher,
   IonRefresherContent,
-  IonSegment,
-  IonSegmentButton,
   IonModal,
   IonButtons,
   IonToolbar,
@@ -33,6 +22,7 @@ import {
   restaurant,
   close,
   informationCircle,
+  arrowForwardCircle,
 } from 'ionicons/icons';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { PedidosService } from 'src/app/services/empleados/pedidos-service';
@@ -76,26 +66,15 @@ interface PedidoView {
     IonToolbar,
     IonButtons,
     IonModal,
-    IonSegmentButton,
-    IonSegment,
     IonRefresherContent,
     IonRefresher,
     CommonModule,
     IonContent,
-    IonList,
-    IonItem,
-    IonLabel,
     IonBadge,
     IonButton,
-    IonSelect,
-    IonSelectOption,
     IonIcon,
     IonSpinner,
     HeaderComponent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     FabbtnComponent,
     FormsModule,
   ],
@@ -125,7 +104,14 @@ export class PedidosEmpleadoPage implements OnInit, OnDestroy {
     private readonly modalController: ModalController,
     private readonly notificationService: NotificationService
   ) {
-    addIcons({ close, checkmark, time, restaurant, informationCircle });
+    addIcons({
+      close,
+      checkmark,
+      time,
+      restaurant,
+      informationCircle,
+      arrowForwardCircle,
+    });
   }
 
   ngOnInit() {
@@ -481,6 +467,25 @@ export class PedidosEmpleadoPage implements OnInit, OnDestroy {
         return ['ENTREGADO'];
       default:
         return [];
+    }
+  }
+
+  getNextStatus(pedido: PedidoView): string {
+    const options = this.getNextStatusOptions(pedido);
+    return options.length > 0 ? options[0] : '';
+  }
+
+  getNextStatusLabel(pedido: PedidoView): string {
+    const next = this.getNextStatus(pedido);
+    switch (next) {
+      case 'EN_PREPARACION':
+        return 'Preparar';
+      case 'LISTO':
+        return 'Marcar Listo';
+      case 'ENTREGADO':
+        return 'Entregar';
+      default:
+        return '';
     }
   }
 

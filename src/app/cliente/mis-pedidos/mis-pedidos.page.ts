@@ -2,10 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
   IonSpinner,
   IonRefresher,
   IonRefresherContent,
@@ -32,6 +28,9 @@ import {
   checkmark,
   informationCircle,
   receipt,
+  cash,
+  checkmarkCircle,
+  close,
 } from 'ionicons/icons';
 
 interface OrderView {
@@ -53,10 +52,6 @@ interface OrderView {
   imports: [
     CommonModule,
     IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     IonSpinner,
     IonRefresher,
     IonRefresherContent,
@@ -88,7 +83,16 @@ export class MisPedidosPage implements OnInit, OnDestroy {
     private readonly pedidosService: PedidosService,
     private readonly notificationService: NotificationService
   ) {
-    addIcons({ time, restaurant, checkmark, informationCircle, receipt });
+    addIcons({
+      restaurant,
+      cash,
+      time,
+      checkmarkCircle,
+      informationCircle,
+      close,
+      checkmark,
+      receipt,
+    });
   }
 
   ngOnInit() {
@@ -175,7 +179,9 @@ export class MisPedidosPage implements OnInit, OnDestroy {
       next: (response: any) => {
         const content = response?.content || response?.data || response || [];
         this.orders = Array.isArray(content)
-          ? content.map((o: any) => this.normalizeOrder(o))
+          ? content
+              .map((o: any) => this.normalizeOrder(o))
+              .sort((a, b) => b.id - a.id) // Ordenar por ID descendente (más reciente primero)
           : [];
         this.totalPages = response?.totalPages || 0;
         this.totalElements = response?.totalElements || 0;

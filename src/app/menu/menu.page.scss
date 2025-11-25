@@ -9,6 +9,12 @@
 }
 
 ion-content {
-  --background: #000000; /* Fondo negro puro */
   --color: #ffffff;
+}
+
+/* Barra de categorías fija */
+.categories-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
 }

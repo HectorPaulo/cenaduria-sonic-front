@@ -1,102 +1,78 @@
-<ion-content [fullscreen]="true" class="ion-padding">
-  <div class="registro-container">
+<ion-content [fullscreen]="true" class="auth-content">
+  <div class="auth-container">
+    <!-- Logo Section -->
     <div class="logo-section">
-      <h1>CenaduriaSonic</h1>
-      <p>Inicia sesión en tu cuenta</p>
+      <div class="logo-icon">🌮</div>
+      <h1 class="logo-title">Cenaduría Sonic</h1>
+      <p class="logo-subtitle">La mejor comida sobre ruedas</p>
     </div>
 
-    <div class="form-section">
-      <!-- Card informativo con credenciales de prueba -->
-      <!-- <ion-card class="info-card" color="light">
-        <ion-card-header>
-          <ion-card-title>
-            <ion-icon name="information-circle" color="primary"></ion-icon>
-            Credenciales de Prueba
-          </ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <div class="credentials-info">
-            <p><strong>Cliente:</strong> cliente | Cliente123!</p>
-            <p><strong>Empleado:</strong> empleado | Empleado123!</p>
-            <p><strong>Admin:</strong> admin | Admin123!</p>
+    <!-- Login Card -->
+    <div class="auth-card">
+      <div class="card-header">
+        <h2 class="card-title">Bienvenido</h2>
+        <p class="card-subtitle">Inicia sesión para continuar</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form">
+        <!-- Username Field -->
+        <div class="form-group">
+          <div class="input-wrapper" [class.error]="isFieldInvalid('username')">
+            <ion-icon name="person" class="input-icon"></ion-icon>
+            <input
+              formControlName="username"
+              type="text"
+              placeholder="Nombre de usuario"
+              class="custom-input"
+            />
           </div>
-        </ion-card-content>
-      </ion-card> -->
+          @if (isFieldInvalid('username')) {
+          <span class="error-message"> {{ getUsernameErrorMessage() }} </span>
+          }
+        </div>
 
-      <ion-card class="registro-card">
-        <ion-card-header>
-          <ion-card-title>Iniciar Sesión</ion-card-title>
-          <ion-card-subtitle
-            >Ingresa tus credenciales para acceder</ion-card-subtitle
+        <!-- Password Field -->
+        <div class="form-group">
+          <div class="input-wrapper" [class.error]="isFieldInvalid('password')">
+            <ion-icon name="lock-closed" class="input-icon"></ion-icon>
+            <input
+              formControlName="password"
+              type="password"
+              placeholder="Contraseña"
+              class="custom-input"
+            />
+          </div>
+          @if (isFieldInvalid('password')) {
+          <span class="error-message"> {{ getPasswordErrorMessage() }} </span>
+          }
+        </div>
+
+        <!-- Buttons -->
+        <div class="button-group">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!isFormValid()"
           >
-        </ion-card-header>
+            <ion-icon name="log-in" class="btn-icon"></ion-icon>
+            Iniciar Sesión
+          </button>
 
-        <ion-card-content>
-          <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
-            <ion-item [class.error-item]="isFieldInvalid('username')">
-              <ion-icon name="person" slot="start" color="primary"></ion-icon>
-              <ion-input
-                formControlName="username"
-                label="Nombre de usuario"
-                labelPlacement="floating"
-                placeholder="tu nombre de usuario"
-                type="text"
-              ></ion-input>
-            </ion-item>
-            @if (isFieldInvalid('username')) {
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="goToRegister()"
+          >
+            <ion-icon name="person-add" class="btn-icon"></ion-icon>
+            Crear cuenta nueva
+          </button>
+        </div>
+      </form>
+    </div>
 
-              <ion-text
-              color="danger"
-              class="error-text"
-              >
-              {{ getUsernameErrorMessage() }}
-            </ion-text>
-          }
-            <ion-item [class.error-item]="isFieldInvalid('password')">
-              <ion-icon name="key" slot="start" color="primary"></ion-icon>
-              <ion-input
-                formControlName="password"
-                label="Contraseña"
-                labelPlacement="floating"
-                placeholder="Tu contraseña"
-                type="text"
-              ></ion-input>
-            </ion-item>
-            @if (isFieldInvalid('password')) {
-              <ion-text
-              color="danger"
-              class="error-text"
-              >
-              {{ getPasswordErrorMessage() }}
-            </ion-text>
-          }
-
-            <div class="button-section">
-              <ion-button
-                expand="block"
-                type="submit"
-                class="registro-button"
-                [disabled]="!isFormValid()"
-              >
-                <ion-icon name="log-in" slot="start"></ion-icon>
-                Iniciar Sesión
-              </ion-button>
-
-              <ion-button
-                expand="block"
-                fill="outline"
-                color="medium"
-                class="login-button"
-                type="button"
-                (click)="goToRegister()"
-              >
-                <ion-icon name="person-add" slot="start"></ion-icon>
-                Crear cuenta nueva
-              </ion-button>
-            </div>
-          </form>
-        </ion-card-content>
-      </ion-card>
+    <!-- Footer -->
+    <div class="auth-footer">
+      <p>© 2025 Cenaduría Sonic</p>
     </div>
   </div>
 </ion-content>

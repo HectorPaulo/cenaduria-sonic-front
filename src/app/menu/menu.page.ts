@@ -9,7 +9,14 @@ import {
   IonRefresherContent,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, cart, search, close, heart } from 'ionicons/icons';
+import {
+  add,
+  cart,
+  search,
+  close,
+  heart,
+  checkmarkCircle,
+} from 'ionicons/icons';
 import Recomendacion from '../Types/Recomendacion';
 import { Subscription } from 'rxjs';
 import { ComidasService } from '../services/comidas.service';
@@ -78,7 +85,8 @@ export class MenuPage implements OnInit {
       message: `${title} añadido al carrito`,
       duration: 1500,
       position: 'bottom',
-      color: 'success',
+      cssClass: 'cart-toast',
+      icon: 'checkmark-circle',
     });
     await toast.present();
   }
@@ -88,7 +96,7 @@ export class MenuPage implements OnInit {
     private toastCtrl: ToastController,
     private cartService: CartService
   ) {
-    addIcons({ close, cart, heart, search, add });
+    addIcons({ close, cart, heart, search, add, checkmarkCircle });
   }
 
   ngOnInit() {

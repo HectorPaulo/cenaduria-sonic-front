@@ -3,14 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonButton,
   IonIcon,
-  IonLabel,
-  IonChip,
   AlertController,
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
@@ -23,7 +16,18 @@ import {
 } from '../services/orders.service';
 import { RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { add, remove, trash, card, cash, wallet, close } from 'ionicons/icons';
+import {
+  add,
+  remove,
+  trash,
+  card,
+  cash,
+  wallet,
+  close,
+  restaurant,
+  heart,
+  checkmarkCircle,
+} from 'ionicons/icons';
 
 interface ItemCarrito {
   type: 'PRODUCT' | 'PROMOTION';
@@ -52,14 +56,7 @@ interface MetodoPago {
   styleUrls: ['./carrito.page.scss'],
   standalone: true,
   imports: [
-    IonChip,
-    IonLabel,
     IonIcon,
-    IonButton,
-    IonCardContent,
-    IonCardTitle,
-    IonCardHeader,
-    IonCard,
     IonContent,
     CommonModule,
     FormsModule,
@@ -84,7 +81,18 @@ export class CarritoPage implements OnInit {
     private readonly cartService: CartService,
     private readonly ordersService: OrdersService
   ) {
-    addIcons({ close, trash, remove, add, card, cash, wallet });
+    addIcons({
+      restaurant,
+      trash,
+      close,
+      remove,
+      add,
+      heart,
+      checkmarkCircle,
+      card,
+      cash,
+      wallet,
+    });
   }
 
   ngOnInit() {
@@ -297,106 +305,102 @@ export class CarritoPage implements OnInit {
       const activeKey = this.getActiveOrderStorageKey();
       const existingOrderId = localStorage.getItem(activeKey);
 
+      // Si hay un ID de orden guardado, verificar su estado
       if (existingOrderId) {
-        // Client is not allowed to update orders; inform the user and suggest opening Pedidos
-        console.warn(
-          'Client-side updateOrder disabled; existing active_order_id: ' +
-            existingOrderId +
-            ' (storage key: ' +
-            activeKey +
-            ')'
-        );
-        this.mostrarMensaje(
-          `Ya existe un pedido activo (id: ${existingOrderId}). Ve a Mis Pedidos para gestionarlo.`
-        );
-        return;
-      } else {
-        this.ordersService.createOrder(payload).subscribe({
-          next: (res) => {
-            console.debug('Order created', res);
-            const returnedId =
-              res?.id ||
-              res?.orderId ||
-              (res && res.data && res.data.id) ||
-              null;
-            if (returnedId) {
-              const key = this.getActiveOrderStorageKey();
-              localStorage.setItem(key, String(returnedId));
+        // Verificar el estado de la orden
+        this.ordersService.getMyOrders().subscribe({
+          next: (ordersRes) => {
+            const orders = Array.isArray(ordersRes)
+              ? ordersRes
+              : ordersRes?.data || ordersRes?.orders || [];
+
+            const existingOrder = orders.find(
+              (o: any) => String(o.id || o.orderId) === String(existingOrderId)
+            );
+
+            if (existingOrder) {
+              const estado = (
+                existingOrder.estado ||
+                existingOrder.status ||
+                ''
+              )
+                .toString()
+                .toUpperCase();
+
+              // Si la orden está entregada o cancelada, limpiar localStorage y crear nueva orden
+              if (estado === 'ENTREGADO' || estado === 'CANCELADO') {
+                console.log(
+                  'Orden anterior entregada/cancelada, limpiando localStorage'
+                );
+                localStorage.removeItem(activeKey);
+                // Intentar crear nueva orden
+                this.crearNuevaOrden(payload, activeKey);
+              } else {
+                // La orden sigue activa
+                this.mostrarMensaje(
+                  `Ya tienes un pedido activo (ID: ${existingOrderId}). Ve a Mis Pedidos para gestionarlo.`
+                );
+              }
+            } else {
+              // La orden no existe, limpiar localStorage y crear nueva
+              console.log('Orden no encontrada, limpiando localStorage');
+              localStorage.removeItem(activeKey);
+              this.crearNuevaOrden(payload, activeKey);
             }
-            this.mostrarMensaje('¡Pedido realizado con éxito!');
-            this.cartService.clear();
-            this.descuentoAplicado = 0;
-            this.propina = 0;
           },
           error: (err) => {
-            console.error('Order creation failed', err);
-            const msg =
-              err?.error?.message || err?.message || 'Error al crear el pedido';
-
-            const lower = String(msg).toLowerCase();
-            const looksLikeActiveLimit =
-              lower.includes('3') ||
-              lower.includes('tres') ||
-              lower.includes('activo') ||
-              lower.includes('activos') ||
-              lower.includes('active');
-
-            if (looksLikeActiveLimit) {
-              console.warn(
-                'Server reported active-order limit; fetching my orders to inform the user.'
-              );
-              this.ordersService.getMyOrders().subscribe({
-                next: (ordersRes) => {
-                  console.log('Fallback getMyOrders response:', ordersRes);
-                  const orders = Array.isArray(ordersRes)
-                    ? ordersRes
-                    : ordersRes?.data || ordersRes?.orders || [];
-                  const candidate = orders.find((o: any) => {
-                    const estado = (o.estado || o.status || '')
-                      .toString()
-                      .toLowerCase();
-                    return (
-                      !estado.includes('entregado') &&
-                      !estado.includes('cancelado')
-                    );
-                  });
-
-                  if (
-                    candidate &&
-                    (candidate.id || candidate.orderId || candidate.uuid)
-                  ) {
-                    const cid =
-                      candidate.id || candidate.orderId || candidate.uuid;
-                    console.debug(
-                      'Found existing active order id (will store locally):',
-                      cid
-                    );
-                    const key = this.getActiveOrderStorageKey();
-                    localStorage.setItem(key, String(cid));
-                    this.mostrarMensaje(
-                      `Tienes un pedido activo (id: ${cid}). Ve a Mis Pedidos para gestionarlo.`
-                    );
-                    // Do not attempt to update the order from client-side (no permission)
-                    return;
-                  }
-
-                  this.mostrarMensaje(`No se pudo crear el pedido: ${msg}`);
-                },
-                error: (fetchErr) => {
-                  console.error('Failed to fetch my orders', fetchErr);
-                  this.mostrarMensaje(`No se pudo crear el pedido: ${msg}`);
-                },
-              });
-            } else {
-              this.mostrarMensaje(`No se pudo crear el pedido: ${msg}`);
-            }
+            console.error('Error al verificar órdenes:', err);
+            // Si hay error al verificar, intentar crear la orden de todas formas
+            this.crearNuevaOrden(payload, activeKey);
           },
         });
+      } else {
+        // No hay orden guardada, crear nueva
+        this.crearNuevaOrden(payload, activeKey);
       }
     } catch (e) {
       console.error('procesarPedido unexpected error', e);
       this.mostrarMensaje('Error inesperado al procesar el pedido');
     }
+  }
+
+  private crearNuevaOrden(payload: CreateOrderDto, activeKey: string) {
+    this.ordersService.createOrder(payload).subscribe({
+      next: (res) => {
+        console.debug('Order created', res);
+        const returnedId =
+          res?.id || res?.orderId || (res && res.data && res.data.id) || null;
+        if (returnedId) {
+          localStorage.setItem(activeKey, String(returnedId));
+        }
+        this.mostrarMensaje('¡Pedido realizado con éxito!');
+        this.cartService.clear();
+        this.descuentoAplicado = 0;
+        this.propina = 0;
+      },
+      error: (err) => {
+        console.error('Order creation failed', err);
+
+        // Verificar si es error 409 (límite de órdenes)
+        if (err?.status === 409) {
+          const errorCode = err?.error?.error;
+          const errorMessage = err?.error?.message;
+
+          if (errorCode === 'ORDER_LIMIT_EXCEEDED') {
+            this.mostrarMensaje(
+              errorMessage ||
+                'No puedes tener más de 3 órdenes activas al mismo tiempo. Por favor, espera a que se entreguen tus pedidos anteriores.'
+            );
+            return;
+          }
+        }
+
+        const msg =
+          err?.error?.message || err?.message || 'Error al crear el pedido';
+
+        this.mostrarMensaje(`No se pudo crear el pedido: ${msg}`);
+      },
+    });
   }
 
   async limpiarCarrito() {

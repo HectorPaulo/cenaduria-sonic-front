@@ -13,13 +13,8 @@ import {
   IonSplitPane,
   IonMenu,
   IonContent,
-  IonList,
-  IonListHeader,
-  IonNote,
   IonMenuToggle,
-  IonItem,
   IonIcon,
-  IonLabel,
   IonRouterOutlet,
   IonRouterLink,
 } from '@ionic/angular/standalone';
@@ -37,6 +32,11 @@ import {
   logOut,
   speedometer,
   restaurant,
+  receipt,
+  pricetag,
+  statsChart,
+  personAdd,
+  chevronForward,
 } from 'ionicons/icons';
 import { ThemeService } from './services/theme.service';
 import { AuthService, UserRole } from './services/auth.service';
@@ -57,13 +57,8 @@ import { Subscription } from 'rxjs';
     IonSplitPane,
     IonMenu,
     IonContent,
-    IonList,
-    IonListHeader,
-    IonNote,
     IonMenuToggle,
-    IonItem,
     IonIcon,
-    IonLabel,
     IonRouterLink,
     IonRouterOutlet,
     ConnectionStatusComponent,
@@ -114,6 +109,31 @@ export class AppComponent implements OnInit, OnDestroy {
       icon: 'speedometer',
     },
     {
+      title: 'Gestionar Pedidos',
+      url: '/empleado/pedidos',
+      icon: 'receipt',
+    },
+    {
+      title: 'Editar Menú',
+      url: '/empleado/editar-menu',
+      icon: 'cube',
+    },
+    {
+      title: 'Promociones',
+      url: '/empleado/promociones',
+      icon: 'pricetag',
+    },
+    {
+      title: 'Estadísticas',
+      url: '/empleado/estadisticas',
+      icon: 'stats-chart',
+    },
+    {
+      title: 'Registrar Empleado',
+      url: '/empleado/registro-empleado',
+      icon: 'person-add',
+    },
+    {
       title: 'Menú',
       url: '/cliente/menu',
       icon: 'restaurant',
@@ -157,6 +177,11 @@ export class AppComponent implements OnInit, OnDestroy {
       logOut,
       speedometer,
       restaurant,
+      receipt,
+      pricetag,
+      statsChart,
+      personAdd,
+      chevronForward,
     });
 
     this.router.events.subscribe((event) => {

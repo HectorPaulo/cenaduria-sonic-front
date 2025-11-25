@@ -1,19 +1,10 @@
-import { Component, Inject, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonContent,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonButton,
   IonIcon,
-  IonText,
   RefresherEventDetail,
   ToastController,
-  IonCardSubtitle,
-  IonItem,
-  IonInput,
   LoadingController,
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
@@ -43,21 +34,7 @@ import { HttpAuthService } from '../services/http-auth.service';
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  imports: [
-    CommonModule,
-    IonInput,
-    IonItem,
-    IonCardSubtitle,
-    IonContent,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
-    IonIcon,
-    IonText,
-    IonButton,
-    ReactiveFormsModule,
-  ],
+  imports: [CommonModule, IonContent, IonIcon, ReactiveFormsModule],
 })
 export class LoginPage implements OnInit {
   loginForm: FormGroup;

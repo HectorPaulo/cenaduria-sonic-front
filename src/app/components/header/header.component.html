@@ -1,24 +1,19 @@
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-menu-button class="menu-button"></ion-menu-button>
     </ion-buttons>
-    <ion-grid>
-      <ion-row>
 
-        <!-- Perfil y saludo -->
-        <div class="profile-area flex items-center gap-4 mr-6">
-          <div>
-            <div class="text-lg font-semibold">{{ username }}</div>
-            <div class="text-xs">{{ role }}</div>
-          </div>
-          <img
-            [src]="avatar"
-            alt="Imagen de perfil"
-            class="w-14 h-14 rounded-full bg-gray-200 object-cover"
-          />
-        </div>
-      </ion-row>
-    </ion-grid>
+    <!-- Profile Area -->
+    <div class="profile-area">
+      <div class="profile-info">
+        <div class="username">{{ username }}</div>
+        <div class="role">{{ role }}</div>
+      </div>
+      <div class="avatar-container">
+        <img [src]="avatar" alt="Imagen de perfil" class="avatar" />
+        <div class="avatar-status"></div>
+      </div>
+    </div>
   </ion-toolbar>
 </ion-header>
