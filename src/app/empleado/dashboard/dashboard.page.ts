@@ -5,18 +5,7 @@ import {
   IonContent,
   IonCard,
   IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonButton,
   IonIcon,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonBadge,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonCardSubtitle,
   IonRefresher,
   IonRefresherContent,
   RefresherEventDetail,
@@ -38,10 +27,10 @@ import {
   notifications,
   person,
   pricetag,
+  personAdd,
 } from 'ionicons/icons';
 import { HeaderComponent } from 'src/app/components/header/header.component';
 import { IonRefresherCustomEvent } from '@ionic/core';
-import { FabbtnComponent } from 'src/app/components/fabbtn/fabbtn.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -51,18 +40,11 @@ import { FabbtnComponent } from 'src/app/components/fabbtn/fabbtn.component';
   imports: [
     IonRefresherContent,
     IonRefresher,
-    IonCardTitle,
-    IonList,
     CommonModule,
     IonContent,
     IonCard,
     IonCardContent,
-    IonCardHeader,
-    IonButton,
     IonIcon,
-    IonBadge,
-    IonItem,
-    IonLabel,
     HeaderComponent,
   ],
 })
@@ -97,6 +79,7 @@ export class DashboardPage implements OnInit, OnDestroy {
       logOut,
       notifications,
       pricetag,
+      personAdd,
     });
   }
 

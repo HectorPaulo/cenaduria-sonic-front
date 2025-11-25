@@ -1,13 +1,321 @@
-.muted {
-  color: var(--ion-color-medium);
-  font-size: 0.9rem;
+// Add Product Section
+.add-product-section {
+  margin-bottom: 1rem;
+
+  ion-button {
+    --border-radius: 12px;
+    font-weight: 600;
+    text-transform: none;
+  }
 }
-.price {
-  font-weight: 700;
-  color: var(--ion-color-success);
+
+// Search Bar
+.search-bar {
+  margin-bottom: 1.5rem;
+  --border-radius: 12px;
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
-.actions {
-  margin-top: 1rem;
+
+// Products Grid
+.products-grid {
   display: grid;
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.product-card {
+  margin: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .product-image-container {
+    position: relative;
+    width: 100%;
+    height: 140px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    overflow: hidden;
+
+    .product-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+      ion-icon {
+        font-size: 3rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+    }
+
+    .status-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 16px;
+    }
+  }
+
+  ion-card-content {
+    padding: 1rem;
+
+    .product-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ion-color-dark);
+      margin: 0 0 0.4rem 0;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .product-price {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--ion-color-success);
+      margin: 0 0 0.5rem 0;
+    }
+
+    .product-category {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--ion-color-medium);
+      margin: 0 0 0.75rem 0;
+
+      ion-icon {
+        font-size: 0.9rem;
+      }
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 0.5rem;
+
+      ion-button {
+        flex: 1;
+        --border-radius: 8px;
+        font-size: 0.8rem;
+        text-transform: none;
+        --padding-top: 0.5rem;
+        --padding-bottom: 0.5rem;
+      }
+    }
+  }
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+
+  ion-icon {
+    font-size: 5rem;
+    color: var(--ion-color-medium);
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--ion-color-dark);
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    font-size: 1rem;
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}
+
+// Modal Overlay
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: 0;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+  ion-header {
+    ion-toolbar {
+      --background: var(--ion-color-primary);
+      --color: white;
+      --border-width: 0;
+      --padding-top: 1rem;
+      --padding-bottom: 1rem;
+
+      ion-title {
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        ion-icon {
+          font-size: 1.5rem;
+        }
+      }
+
+      ion-button {
+        --color: white;
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .modal-content {
+    padding: 1.5rem;
+  }
+}
+
+// Form Section
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+
+  .form-item {
+    --background: var(--ion-color-light);
+    --border-radius: 12px;
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+    --padding-top: 0.75rem;
+    --padding-bottom: 0.75rem;
+    margin: 0;
+
+    ion-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+      margin-bottom: 0.5rem;
+
+      ion-icon {
+        font-size: 1.25rem;
+        color: var(--ion-color-primary);
+      }
+    }
+
+    ion-input,
+    ion-select {
+      --padding-start: 0;
+      font-size: 1rem;
+    }
+  }
+
+  .toggle-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    ion-icon {
+      font-size: 1.5rem;
+      color: var(--ion-color-primary);
+    }
+
+    ion-label {
+      flex: 1;
+      margin: 0;
+    }
+  }
+}
+
+// Image Upload Section
+.image-upload-section {
+  margin-top: 1rem;
+
+  .image-upload-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--ion-color-dark);
+    margin-bottom: 0.75rem;
+
+    ion-icon {
+      font-size: 1.25rem;
+      color: var(--ion-color-primary);
+    }
+  }
+
+  ion-button {
+    --border-radius: 12px;
+    text-transform: none;
+    font-weight: 500;
+  }
+}
+
+// Modal Actions
+.modal-actions {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ion-color-light);
+
+  ion-button {
+    --border-radius: 12px;
+    font-weight: 600;
+    text-transform: none;
+    font-size: 1rem;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-card {
+    max-height: 95vh;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

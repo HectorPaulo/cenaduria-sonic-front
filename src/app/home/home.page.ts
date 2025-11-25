@@ -3,14 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
-  IonGrid,
-  IonRow,
-  IonCard,
-  IonCardContent,
-  IonCardTitle,
-  IonCardHeader,
-  IonChip,
-  IonLabel,
   IonRefresher,
   IonRefresherContent,
   IonButton,
@@ -33,7 +25,6 @@ import Recomendacion from '../Types/Recomendacion';
 import {
   PromotionsService,
   PromotionSummaryResponse,
-  PromotionDetailResponse,
 } from '../services/promotions.service';
 import { CartService } from '../services/cart.service';
 import { PromotionDetailModalComponent } from './components/promotion-detail-modal/promotion-detail-modal.component';
@@ -46,14 +37,6 @@ import { PromotionDetailModalComponent } from './components/promotion-detail-mod
   imports: [
     IonRefresherContent,
     IonRefresher,
-    IonLabel,
-    IonChip,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    IonCard,
-    IonRow,
-    IonGrid,
     IonContent,
     IonButton,
     IonIcon,

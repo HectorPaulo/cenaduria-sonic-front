@@ -5,34 +5,36 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
+  FormsModule,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { AuthService, UserRole } from '../../services/auth.service';
 import { AlertController } from '@ionic/angular/standalone';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import {
   IonContent,
-  IonList,
   IonItem,
   IonLabel,
   IonInput,
   IonButton,
   IonCard,
   IonCardContent,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonButtons,
   IonToggle,
   ToastController,
   IonIcon,
   IonSelect,
   IonSelectOption,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonBadge,
+  IonSearchbar,
 } from '@ionic/angular/standalone';
 import { MenuService } from '../../services/menu.service';
 import { Alimento } from '../../Types/Alimento';
 import { Category } from '../../Types/Category';
+import { HeaderComponent } from 'src/app/components/header/header.component';
 
 @Component({
   selector: 'app-editar-menu',
@@ -41,9 +43,9 @@ import { Category } from '../../Types/Category';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     IonContent,
-    IonList,
     IonItem,
     IonLabel,
     IonInput,
@@ -51,14 +53,16 @@ import { Category } from '../../Types/Category';
     IonButton,
     IonCard,
     IonCardContent,
-
+    IonToggle,
+    IonSelect,
+    IonSelectOption,
     IonHeader,
     IonToolbar,
     IonTitle,
     IonButtons,
-    IonToggle,
-    IonSelect,
-    IonSelectOption,
+    IonBadge,
+    IonSearchbar,
+    HeaderComponent,
   ],
 })
 export class EditarMenuPage implements OnInit, OnDestroy {
@@ -69,6 +73,7 @@ export class EditarMenuPage implements OnInit, OnDestroy {
   sub: Subscription | null = null;
   selectedFile: File | null = null;
   isFormOpen = false;
+  searchTerm: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -84,6 +89,19 @@ export class EditarMenuPage implements OnInit, OnDestroy {
       active: [true],
       categoryId: [null, [Validators.required]],
     });
+  }
+
+  get filteredItems(): Alimento[] {
+    if (!this.searchTerm.trim()) {
+      return this.items;
+    }
+
+    const search = this.searchTerm.toLowerCase();
+    return this.items.filter(
+      (item) =>
+        item.name.toLowerCase().includes(search) ||
+        item.category?.name.toLowerCase().includes(search)
+    );
   }
 
   ngOnInit() {

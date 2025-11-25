@@ -1,127 +1,193 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Editar Menú</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="back()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<app-header titulo="Editar Menú"></app-header>
 
 <ion-content class="ion-padding">
-  <div style="display: flex; gap: 8px; flex-direction: column">
-    <ion-button expand="block" color="primary" (click)="openAdd()">
-      <ion-icon name="add" slot="start"></ion-icon>
-      Agregar Producto
-    </ion-button>
-    <ion-button expand="block" color="medium" (click)="back()">
-      Cerrar
+  <!-- Add Product Button -->
+  <div class="add-product-section">
+    <ion-button expand="block" color="primary" size="large" (click)="openAdd()">
+      <ion-icon name="add-circle" slot="start"></ion-icon>
+      Agregar Nuevo Producto
     </ion-button>
   </div>
 
-  <!-- Inline modal (avoid ion-modal display issues) -->
+  <!-- Search Bar -->
+  <ion-searchbar
+    [(ngModel)]="searchTerm"
+    placeholder="Buscar por nombre o categoría..."
+    animated="true"
+    class="search-bar"
+  ></ion-searchbar>
+
+  <!-- Products Grid -->
+  <div class="products-grid" *ngIf="filteredItems.length > 0">
+    <ion-card *ngFor="let item of filteredItems" class="product-card">
+      <div class="product-image-container">
+        <img
+          *ngIf="item.imageUrl"
+          [src]="item.imageUrl"
+          [alt]="item.name"
+          class="product-image"
+        />
+        <div *ngIf="!item.imageUrl" class="product-image-placeholder">
+          <ion-icon name="image-outline"></ion-icon>
+        </div>
+        <ion-badge
+          [color]="item.active ? 'success' : 'medium'"
+          class="status-badge"
+        >
+          {{ item.active ? 'Activo' : 'Inactivo' }}
+        </ion-badge>
+      </div>
+
+      <ion-card-content>
+        <h3 class="product-name">{{ item.name }}</h3>
+        <p class="product-price">${{ item.price | number: '1.2-2' }}</p>
+        <p class="product-category" *ngIf="item.category">
+          <ion-icon name="pricetag-outline"></ion-icon>
+          {{ item.category.name }}
+        </p>
+
+        <div class="product-actions">
+          <ion-button fill="outline" size="small" (click)="edit(item)">
+            <ion-icon name="create-outline" slot="start"></ion-icon>
+            Editar
+          </ion-button>
+          <ion-button
+            fill="outline"
+            size="small"
+            color="danger"
+            (click)="remove(item)"
+          >
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Eliminar
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredItems.length === 0" class="empty-state">
+    <ion-icon name="restaurant-outline"></ion-icon>
+    <h3>No hay productos</h3>
+    <p>
+      {{ searchTerm ? 'No se encontraron productos con "' + searchTerm + '"' :
+      'Comienza agregando tu primer producto al menú' }}
+    </p>
+  </div>
+
+  <!-- Product Form Modal -->
   <div
     *ngIf="isFormOpen"
-    style="
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      background: rgba(0, 0, 0, 0.45);
-      padding: 16px;
-    "
+    class="modal-overlay"
+    (click)="cancelEdit(); isFormOpen = false"
   >
-    <ion-card style="width: 100%; max-width: 640px">
+    <ion-card class="modal-card" (click)="$event.stopPropagation()">
       <ion-header>
         <ion-toolbar>
-          <ion-title
-            >{{ editingId ? 'Editar Plato' : 'Nuevo Plato' }}</ion-title
-          >
+          <ion-title>
+            <ion-icon [name]="editingId ? 'create' : 'add-circle'"></ion-icon>
+            {{ editingId ? 'Editar Producto' : 'Nuevo Producto' }}
+          </ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="cancelEdit(); isFormOpen = false"
-              >Cerrar</ion-button
-            >
+            <ion-button (click)="cancelEdit(); isFormOpen = false">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
-      <ion-card-content>
+
+      <ion-card-content class="modal-content">
         <form [formGroup]="form" (ngSubmit)="save()">
-          <ion-item>
-            <ion-label position="floating">Nombre</ion-label>
-            <ion-input formControlName="name"></ion-input>
-          </ion-item>
+          <div class="form-section">
+            <ion-item lines="none" class="form-item">
+              <ion-label position="floating">
+                <ion-icon name="text-outline"></ion-icon>
+                Nombre del Producto
+              </ion-label>
+              <ion-input
+                formControlName="name"
+                placeholder="Ej: Tacos al Pastor"
+              ></ion-input>
+            </ion-item>
 
-          <ion-item>
-            <ion-label position="floating">Precio</ion-label>
-            <ion-input type="number" formControlName="price"></ion-input>
-          </ion-item>
+            <ion-item lines="none" class="form-item">
+              <ion-label position="floating">
+                <ion-icon name="cash-outline"></ion-icon>
+                Precio
+              </ion-label>
+              <ion-input
+                type="number"
+                formControlName="price"
+                placeholder="0.00"
+                step="0.01"
+              ></ion-input>
+            </ion-item>
 
-          <ion-item>
-            <ion-label>Disponible</ion-label>
-            <ion-toggle slot="end" formControlName="active"></ion-toggle>
-          </ion-item>
-
-          <ion-item>
-            <ion-select
-              label="Categoría"
-              label-placement="floating"
-              formControlName="categoryId"
-              interface="popover"
-            >
-              <ion-select-option
-                *ngFor="let cat of categories"
-                [value]="cat.id"
+            <ion-item lines="none" class="form-item">
+              <ion-label>
+                <ion-icon name="pricetag-outline"></ion-icon>
+                Categoría
+              </ion-label>
+              <ion-select
+                formControlName="categoryId"
+                interface="popover"
+                placeholder="Selecciona una categoría"
               >
-                {{ cat.name }}
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
+                <ion-select-option
+                  *ngFor="let cat of categories"
+                  [value]="cat.id"
+                >
+                  {{ cat.name }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
 
-          <ion-item>
-            <ion-label position="stacked">Imagen (opcional)</ion-label>
-            <input
-              type="file"
-              accept="image/*"
-              (change)="onFileSelected($event)"
-            />
-          </ion-item>
+            <ion-item lines="none" class="form-item toggle-item">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <ion-label>Producto Disponible</ion-label>
+              <ion-toggle slot="end" formControlName="active"></ion-toggle>
+            </ion-item>
 
-          <div class="actions" style="margin: 16px 0">
-            <ion-button expand="block" type="submit" color="primary"
-              >{{ editingId ? 'Guardar cambios' : 'Agregar' }}</ion-button
-            >
+            <div class="image-upload-section">
+              <label class="image-upload-label">
+                <ion-icon name="image-outline"></ion-icon>
+                Imagen del Producto (Opcional)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                (change)="onFileSelected($event)"
+                #fileInput
+                style="display: none"
+              />
+              <ion-button
+                expand="block"
+                fill="outline"
+                (click)="fileInput.click()"
+              >
+                <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+                {{ selectedFile ? selectedFile.name : 'Seleccionar Imagen' }}
+              </ion-button>
+            </div>
+          </div>
+
+          <div class="modal-actions">
             <ion-button
               expand="block"
-              color="medium"
-              (click)="cancelEdit(); isFormOpen = false"
-              >Cancelar</ion-button
+              type="submit"
+              color="primary"
+              size="large"
+              [disabled]="form.invalid"
             >
+              <ion-icon
+                [name]="editingId ? 'save-outline' : 'add-circle-outline'"
+                slot="start"
+              ></ion-icon>
+              {{ editingId ? 'Guardar Cambios' : 'Agregar Producto' }}
+            </ion-button>
           </div>
         </form>
       </ion-card-content>
     </ion-card>
   </div>
-
-  <ion-list>
-    <ion-item *ngFor="let it of items">
-      <ion-label>
-        <h3>{{ it.name }}</h3>
-        <p *ngIf="it.imageUrl">
-          <img
-            [src]="it.imageUrl"
-            alt="{{it.name}}"
-            style="height: 40px; border-radius: 4px; object-fit: cover"
-          />
-        </p>
-        <p class="price">${{ it.price | number: '1.2-2' }}</p>
-      </ion-label>
-      <ion-button fill="clear" color="primary" (click)="edit(it)">
-        Editar
-      </ion-button>
-      <ion-button fill="clear" color="danger" (click)="remove(it)">
-        Eliminar
-      </ion-button>
-    </ion-item>
-  </ion-list>
 </ion-content>

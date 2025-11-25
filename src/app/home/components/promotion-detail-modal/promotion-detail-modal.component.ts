@@ -8,11 +8,6 @@ import {
   IonButtons,
   IonButton,
   IonIcon,
-  IonImg,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonThumbnail,
   IonFooter,
   ModalController,
 } from '@ionic/angular/standalone';
@@ -42,11 +37,6 @@ import { CartService } from '../../../services/cart.service';
     IonButtons,
     IonButton,
     IonIcon,
-    IonImg,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonThumbnail,
     IonFooter,
   ],
 })

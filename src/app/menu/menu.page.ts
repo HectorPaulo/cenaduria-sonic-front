@@ -3,20 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
-  IonGrid,
-  IonRow,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
   IonButton,
   IonIcon,
-  IonLabel,
   IonRefresher,
   IonRefresherContent,
-  IonChip,
-  IonHeader,
-  IonToolbar,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, cart, search, close, heart } from 'ionicons/icons';
@@ -36,20 +26,10 @@ import { ToastController } from '@ionic/angular';
   styleUrls: ['./menu.page.scss'],
   standalone: true,
   imports: [
-    IonChip,
     IonRefresherContent,
     IonRefresher,
-    IonLabel,
     IonIcon,
     IonButton,
-    IonCardContent,
-    IonCardTitle,
-    IonCardHeader,
-    IonCard,
-    IonHeader,
-    IonToolbar,
-    IonRow,
-    IonGrid,
     IonContent,
     CommonModule,
     FormsModule,

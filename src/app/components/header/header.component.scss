@@ -2,18 +2,12 @@
   display: block;
 }
 
-/* Make the header fixed/absolute so long titles don't push its height */
-ion-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 9999;
-}
-
 ion-toolbar {
-  height: 64px; /* fixed height to avoid growing */
-  min-height: 64px;
+  /* Add safe area padding for iOS notch/status bar */
+  --padding-top: env(safe-area-inset-top);
+  --min-height: calc(56px + env(safe-area-inset-top));
+  height: auto;
+  min-height: var(--min-height);
   display: flex;
   align-items: center;
   padding: 0 12px;
@@ -41,8 +35,8 @@ ion-toolbar {
 
 /* Ensure the avatar doesn't change the toolbar height */
 .profile-area img {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
 }
 

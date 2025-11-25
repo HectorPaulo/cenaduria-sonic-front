@@ -1,4 +1,4 @@
-<app-header titulo="Inicio"></app-header>
+<app-header titulo="Dashboard"></app-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
@@ -7,105 +7,84 @@
 
   <div class="welcome-section">
     <h2>Hola, {{ user?.nombre }}</h2>
-    <p class="muted">Panel de empleado</p>
+    <p class="subtitle">Panel de Control de Empleado</p>
   </div>
 
-  <div class="actions mt-4">
-    <div
-      class="action-row"
-      style="display: flex; gap: 8px; margin-bottom: 12px"
-    >
-      <ion-button
-        expand="block"
-        color="primary"
+  <!-- Statistics Cards -->
+  <div class="stats-container">
+    <ion-card class="stat-card">
+      <ion-card-content>
+        <div class="stat-content">
+          <ion-icon name="cube" color="primary"></ion-icon>
+          <div class="stat-info">
+            <h3>{{ activeProductsCount }}</h3>
+            <p>Productos Activos</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="stat-card">
+      <ion-card-content>
+        <div class="stat-content">
+          <ion-icon name="receipt" color="warning"></ion-icon>
+          <div class="stat-info">
+            <h3>{{ pendingOrders }}</h3>
+            <p>Pedidos Pendientes</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="actions-section">
+    <h3 class="section-title">Acciones Rápidas</h3>
+
+    <div class="actions-grid">
+      <ion-card class="action-card" button (click)="navigateTo('pedidos')">
+        <ion-card-content>
+          <ion-icon name="receipt" color="warning"></ion-icon>
+          <h4>Gestionar Pedidos</h4>
+          <p>Ver y actualizar pedidos</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="action-card" button (click)="editarMenu()">
+        <ion-card-content>
+          <ion-icon name="cube" color="tertiary"></ion-icon>
+          <h4>Editar Menú</h4>
+          <p>Administrar productos</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="action-card" button (click)="navigateTo('promociones')">
+        <ion-card-content>
+          <ion-icon name="pricetag" color="secondary"></ion-icon>
+          <h4>Promociones</h4>
+          <p>Gestionar ofertas</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="action-card" button (click)="navigateTo('estadisticas')">
+        <ion-card-content>
+          <ion-icon name="stats-chart" color="success"></ion-icon>
+          <h4>Estadísticas</h4>
+          <p>Ver reportes</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card
+        class="action-card"
+        button
         (click)="navigateTo('registro-empleado')"
       >
-        <ion-icon name="person" slot="start"></ion-icon>
-        Registrar Empleado
-      </ion-button>
-      <ion-button
-        expand="block"
-        color="warning"
-        (click)="navigateTo('pedidos')"
-      >
-        <ion-icon name="receipt" slot="start"></ion-icon>
-        Pedidos Pendientes
-      </ion-button>
+        <ion-card-content>
+          <ion-icon name="person-add" color="primary"></ion-icon>
+          <h4>Registrar Empleado</h4>
+          <p>Agregar nuevo empleado</p>
+        </ion-card-content>
+      </ion-card>
     </div>
-
-    <ion-button expand="block" color="tertiary" (click)="editarMenu()">
-      <ion-icon name="cube" slot="start"></ion-icon>
-      Editar Menú
-    </ion-button>
-
-    <ion-button
-      expand="block"
-      color="secondary"
-      (click)="navigateTo('promociones')"
-    >
-      <ion-icon name="pricetag" slot="start"></ion-icon>
-      Gestionar Promociones
-    </ion-button>
-
-    <ion-button
-      expand="block"
-      color="success"
-      (click)="navigateTo('estadisticas')"
-    >
-      <ion-icon name="stats-chart" slot="start"></ion-icon>
-      Ver Estadísticas
-    </ion-button>
   </div>
-
-  <!-- Real quick-stats (no invented data) -->
-  <div style="display: flex; gap: 12px; margin: 12px 0; flex-wrap: wrap">
-    <ion-card style="flex: 1; min-width: 180px">
-      <ion-card-content>
-        <h3>Productos activos</h3>
-        <p style="font-size: 24px; margin: 6px 0">{{ activeProductsCount }}</p>
-        <p class="muted">Contador real de productos visibles en el menú</p>
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card style="flex: 1; min-width: 180px">
-      <ion-card-content>
-        <h3>Pedidos pendientes</h3>
-        <p style="font-size: 24px; margin: 6px 0">{{ pendingOrders }}</p>
-        <p class="muted">Órdenes con estado pendiente</p>
-      </ion-card-content>
-    </ion-card>
-  </div>
-
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Productos Activos</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item *ngFor="let p of products">
-          <img
-            *ngIf="p.imageUrl"
-            [src]="p.imageUrl"
-            slot="start"
-            alt="{{p.name}}"
-            style="
-              width: 56px;
-              height: 56px;
-              object-fit: cover;
-              border-radius: 6px;
-              margin-right: 12px;
-            "
-          />
-          <ion-label>
-            <h3>{{ p.name }}</h3>
-            <p class="price">${{ p.price | number:'1.2-2' }}</p>
-          </ion-label>
-          <ion-badge slot="end" color="success">Activo</ion-badge>
-        </ion-item>
-        <ion-item *ngIf="products.length === 0">
-          <ion-label>No hay productos activos.</ion-label>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
 </ion-content>

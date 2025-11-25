@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonBadge, IonIcon } from '@ionic/angular/standalone';
 import { WebSocketService } from 'src/app/services/websocket.service';
+import { AuthService } from 'src/app/services/auth.service';
 import { WebSocketConnectionStatus } from 'src/app/Types/websocket.types';
 import { Subscription } from 'rxjs';
 import { addIcons } from 'ionicons';
@@ -17,16 +18,32 @@ import { wifi, wifiOutline } from 'ionicons/icons';
 export class ConnectionStatusComponent implements OnInit, OnDestroy {
   connectionStatus: WebSocketConnectionStatus =
     WebSocketConnectionStatus.DISCONNECTED;
+  isUserLoggedIn = false;
   private subscription?: Subscription;
+  private authSubscription?: Subscription;
 
-  constructor(private wsService: WebSocketService) {
+  constructor(
+    private wsService: WebSocketService,
+    private authService: AuthService
+  ) {
     addIcons({ wifi, wifiOutline });
   }
 
   ngOnInit() {
+    // Subscribe to authentication state
+    this.authSubscription = this.authService.currentUser$.subscribe((user) => {
+      this.isUserLoggedIn = user !== null;
+      console.log(
+        '[ConnectionStatus Component] User logged in:',
+        this.isUserLoggedIn
+      );
+    });
+
+    // Subscribe to connection status
     this.subscription = this.wsService
       .getConnectionStatus()
       .subscribe((status) => {
+        console.log('[ConnectionStatus Component] Status changed to:', status);
         this.connectionStatus = status;
       });
   }
@@ -34,6 +51,9 @@ export class ConnectionStatusComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe();
+    }
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
     }
   }
 
@@ -67,7 +87,10 @@ export class ConnectionStatusComponent implements OnInit, OnDestroy {
   }
 
   get shouldShow(): boolean {
-    // Only show when there are connection issues
-    return this.connectionStatus !== WebSocketConnectionStatus.CONNECTED;
+    // Only show when user is logged in AND there are connection issues
+    return (
+      this.isUserLoggedIn &&
+      this.connectionStatus !== WebSocketConnectionStatus.CONNECTED
+    );
   }
 }
