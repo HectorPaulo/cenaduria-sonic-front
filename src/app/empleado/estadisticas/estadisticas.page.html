@@ -1,6 +1,6 @@
 <app-header titulo="Estadísticas"></app-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true" class="ion-padding bg-black">
   <ion-refresher
     slot="fixed"
     (ionRefresh)="doRefresh($event)"
@@ -12,136 +12,260 @@
   </ion-refresher>
   <app-fabbtn></app-fabbtn>
 
-  <div class="estadisticas-header mb-4">
-    <p>Resumen de ventas y productos más populares</p>
-  </div>
-
   <!-- Loading Spinner -->
-  <div *ngIf="loading" class="ion-text-center p-4">
-    <ion-spinner name="crescent"></ion-spinner>
+  <div *ngIf="loading" class="ion-text-center p-8">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p class="text-gray-400 mt-4">Cargando estadísticas...</p>
   </div>
 
-  <div *ngIf="!loading && statistics">
-    <!-- General Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+  <div *ngIf="!loading && statistics" class="max-w-4xl mx-auto">
+    <!-- General Statistics Cards - Dark Mode -->
+    <div class="grid grid-cols-3 gap-3 mb-4">
       <!-- Total Orders -->
-      <ion-card>
-        <ion-card-content class="text-center">
-          <ion-icon name="cart" class="text-4xl text-primary mb-2"></ion-icon>
-          <h2 class="text-3xl font-bold">{{ statistics.totalOrders }}</h2>
-          <p class="text-gray-500">Total de Órdenes</p>
-        </ion-card-content>
-      </ion-card>
+      <div class="bg-gray-900 rounded-2xl p-4 shadow-lg border border-gray-800">
+        <ion-icon name="cart" class="text-3xl mb-2 text-blue-400"></ion-icon>
+        <h2 class="text-2xl font-bold text-white">
+          {{ statistics.totalOrders }}
+        </h2>
+        <p class="text-xs text-gray-400">Total Órdenes</p>
+      </div>
 
       <!-- Total Revenue -->
-      <ion-card>
-        <ion-card-content class="text-center">
-          <ion-icon name="cash" class="text-4xl text-success mb-2"></ion-icon>
-          <h2 class="text-3xl font-bold">
-            ${{ statistics.totalRevenue | number:'1.2-2' }}
-          </h2>
-          <p class="text-gray-500">Ingresos Totales</p>
-        </ion-card-content>
-      </ion-card>
+      <div class="bg-gray-900 rounded-2xl p-4 shadow-lg border border-gray-800">
+        <ion-icon name="cash" class="text-3xl mb-2 text-green-400"></ion-icon>
+        <h2 class="text-2xl font-bold text-white">
+          ${{ statistics.totalRevenue | number:'1.0-0' }}
+        </h2>
+        <p class="text-xs text-gray-400">Ingresos Totales</p>
+      </div>
 
       <!-- Average Order Value -->
-      <ion-card>
-        <ion-card-content class="text-center">
-          <ion-icon
-            name="trending-up"
-            class="text-4xl text-warning mb-2"
-          ></ion-icon>
-          <h2 class="text-3xl font-bold">
-            ${{ statistics.averageOrderValue | number:'1.2-2' }}
-          </h2>
-          <p class="text-gray-500">Promedio por Orden</p>
-        </ion-card-content>
-      </ion-card>
+      <div class="bg-gray-900 rounded-2xl p-4 shadow-lg border border-gray-800">
+        <ion-icon
+          name="trending-up"
+          class="text-3xl mb-2 text-yellow-400"
+        ></ion-icon>
+        <h2 class="text-2xl font-bold text-white">
+          <span *ngIf="statistics.averageOrderValue">
+            ${{ statistics.averageOrderValue | number:'1.0-0' }}
+          </span>
+          <span *ngIf="!statistics.averageOrderValue" class="text-gray-500"
+            >--</span
+          >
+        </h2>
+        <p class="text-xs text-gray-400">Promedio/Orden</p>
+      </div>
     </div>
 
     <!-- Orders by Status -->
-    <ion-card class="mb-4">
-      <ion-card-header>
-        <ion-card-title>
-          <ion-icon name="stats-chart" class="mr-2"></ion-icon>
+    <ion-card
+      class="mb-4 bg-gray-900 shadow-md border border-gray-800"
+      *ngIf="getStatusKeys().length > 0"
+    >
+      <ion-card-header class="border-b border-gray-800">
+        <ion-card-title class="text-lg font-bold text-white">
+          <ion-icon name="stats-chart" class="mr-2 text-blue-400"></ion-icon>
           Órdenes por Estado
         </ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-list>
-          <ion-item *ngFor="let status of getStatusKeys()">
-            <ion-label>
-              <h3>{{ getStatusLabel(status) }}</h3>
-            </ion-label>
-            <ion-badge [color]="getStatusColor(status)" slot="end">
+        <div class="grid grid-cols-2 gap-3">
+          <div
+            *ngFor="let status of getStatusKeys()"
+            class="flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700"
+          >
+            <span class="text-sm font-medium text-gray-300"
+              >{{ getStatusLabel(status) }}</span
+            >
+            <ion-badge
+              [color]="getStatusColor(status)"
+              class="text-sm px-3 py-1"
+            >
               {{ getStatusCount(status) }}
             </ion-badge>
-          </ion-item>
-        </ion-list>
+          </div>
+        </div>
       </ion-card-content>
     </ion-card>
 
-    <!-- Top Selling Products -->
-    <ion-card class="mb-4">
-      <ion-card-header>
-        <ion-card-title>
-          <ion-icon name="star" class="mr-2"></ion-icon>
-          Productos Más Vendidos
+    <!-- Top 3 Products -->
+    <ion-card class="mb-4 bg-gray-900 shadow-md border border-gray-800">
+      <ion-card-header class="border-b border-gray-800">
+        <ion-card-title class="text-lg font-bold text-white">
+          <ion-icon name="star" class="mr-2 text-yellow-400"></ion-icon>
+          Top 3 Productos
         </ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <div
           *ngIf="topProducts.length === 0"
-          class="text-center p-4 text-gray-500"
+          class="text-center p-6 text-gray-500"
         >
-          No hay datos disponibles
+          <ion-icon name="cube-outline" class="text-4xl mb-2"></ion-icon>
+          <p class="text-sm">No hay datos disponibles</p>
         </div>
-        <ion-list *ngIf="topProducts.length > 0">
-          <ion-item *ngFor="let product of topProducts; let i = index">
-            <ion-label>
-              <h3>
-                <span class="font-bold text-primary mr-2">#{{ i + 1 }}</span>
+        <div *ngIf="topProducts.length > 0" class="space-y-3">
+          <div
+            *ngFor="let product of topProducts.slice(0, 3); let i = index"
+            class="flex items-center gap-3 p-3 bg-gray-800 rounded-xl border border-gray-700 hover:border-gray-600 transition-colors"
+          >
+            <div
+              class="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow-md"
+            >
+              #{{ i + 1 }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="font-semibold text-white truncate">
                 {{ product.name }}
-              </h3>
-              <p class="text-sm text-gray-500">
-                Cantidad vendida: {{ product.totalQuantity }} | Ingresos: ${{
-                product.totalRevenue | number:'1.2-2' }}
-              </p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
+              </h4>
+              <div class="flex items-center gap-3 text-xs text-gray-400 mt-1">
+                <span class="flex items-center gap-1">
+                  <ion-icon name="cube" class="text-blue-400"></ion-icon>
+                  {{ product.totalQuantity }} vendidos
+                </span>
+                <span class="flex items-center gap-1">
+                  <ion-icon name="cash" class="text-green-400"></ion-icon>
+                  ${{ (product.totalRevenue || 0) | number:'1.0-0' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </ion-card-content>
     </ion-card>
 
-    <!-- Top Selling Promotions -->
-    <ion-card class="mb-4">
-      <ion-card-header>
-        <ion-card-title>
-          <ion-icon name="star" class="mr-2"></ion-icon>
-          Promociones Más Vendidas
+    <!-- Top 3 Promotions -->
+    <ion-card
+      class="mb-4 bg-gray-900 shadow-md border border-gray-800"
+      *ngIf="topPromotions.length > 0"
+    >
+      <ion-card-header class="border-b border-gray-800">
+        <ion-card-title class="text-lg font-bold text-white">
+          <ion-icon name="gift" class="mr-2 text-pink-400"></ion-icon>
+          Top 3 Promociones
         </ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <div
-          *ngIf="topPromotions.length === 0"
-          class="text-center p-4 text-gray-500"
-        >
-          No hay datos disponibles
-        </div>
-        <ion-list *ngIf="topPromotions.length > 0">
-          <ion-item *ngFor="let promo of topPromotions; let i = index">
-            <ion-label>
-              <h3>
-                <span class="font-bold text-purple-500 mr-2">#{{ i + 1 }}</span>
+        <div class="space-y-3">
+          <div
+            *ngFor="let promo of topPromotions.slice(0, 3); let i = index"
+            class="flex items-center gap-3 p-3 bg-gray-800 rounded-xl border border-gray-700 hover:border-gray-600 transition-colors"
+          >
+            <div
+              class="flex-shrink-0 w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold shadow-md"
+            >
+              #{{ i + 1 }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="font-semibold text-white truncate">
                 {{ promo.name }}
-              </h3>
-              <p class="text-sm text-gray-500">
-                Cantidad vendida: {{ promo.totalQuantity }} | Ingresos: ${{
-                promo.totalRevenue | number:'1.2-2' }}
-              </p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
+              </h4>
+              <div class="flex items-center gap-3 text-xs text-gray-400 mt-1">
+                <span class="flex items-center gap-1">
+                  <ion-icon name="gift" class="text-purple-400"></ion-icon>
+                  {{ promo.totalQuantity }} vendidas
+                </span>
+                <span class="flex items-center gap-1">
+                  <ion-icon name="cash" class="text-green-400"></ion-icon>
+                  ${{ (promo.totalRevenue || 0) | number:'1.0-0' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Products by Category -->
+    <ion-card class="mb-4 bg-gray-900 shadow-md border border-gray-800">
+      <ion-card-header class="border-b border-gray-800">
+        <ion-card-title class="text-lg font-bold text-white">
+          <ion-icon name="cube-outline" class="mr-2 text-blue-400"></ion-icon>
+          Productos por Categoría
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div *ngIf="loadingCategories" class="text-center p-6">
+          <ion-spinner name="crescent" color="primary"></ion-spinner>
+        </div>
+
+        <div
+          *ngIf="!loadingCategories && categories.length === 0"
+          class="text-center p-6 text-gray-500"
+        >
+          <ion-icon name="folder-open-outline" class="text-4xl mb-2"></ion-icon>
+          <p class="text-sm">No hay categorías disponibles</p>
+        </div>
+
+        <div
+          *ngIf="!loadingCategories && categories.length > 0"
+          class="space-y-3"
+        >
+          <div
+            *ngFor="let category of categories"
+            class="p-4 bg-gray-800 rounded-xl border border-gray-700"
+          >
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-bold text-white">{{ category.name }}</h3>
+              <span
+                class="text-xs font-semibold px-3 py-1 rounded-full"
+                [ngClass]="{
+                      'bg-green-900 text-green-300 border border-green-700': getProgressColor(category.id) === 'success',
+                      'bg-yellow-900 text-yellow-300 border border-yellow-700': getProgressColor(category.id) === 'warning',
+                      'bg-red-900 text-red-300 border border-red-700': getProgressColor(category.id) === 'danger'
+                    }"
+              >
+                {{ (getAvailabilityRatio(category.id) * 100).toFixed(0) }}%
+                disponible
+              </span>
+            </div>
+
+            <div class="flex items-center gap-4 text-sm mb-3">
+              <div class="flex items-center gap-2 text-gray-300">
+                <div
+                  class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center"
+                >
+                  <ion-icon
+                    name="checkmark-circle"
+                    class="text-white"
+                  ></ion-icon>
+                </div>
+                <span
+                  ><strong class="text-white"
+                    >{{ categoryActiveCounts[category.id] || 0 }}</strong
+                  >
+                  activos</span
+                >
+              </div>
+              <div class="flex items-center gap-2 text-gray-300">
+                <div
+                  class="w-8 h-8 bg-gray-600 rounded-lg flex items-center justify-center"
+                >
+                  <ion-icon name="cube-outline" class="text-white"></ion-icon>
+                </div>
+                <span
+                  ><strong class="text-white"
+                    >{{ categoryTotalCounts[category.id] || 0 }}</strong
+                  >
+                  total</span
+                >
+              </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="w-full bg-gray-700 rounded-full h-2 shadow-inner">
+              <div
+                class="h-2 rounded-full transition-all"
+                [style.width.%]="getAvailabilityRatio(category.id) * 100"
+                [ngClass]="{
+                  'bg-green-500': getProgressColor(category.id) === 'success',
+                  'bg-yellow-500': getProgressColor(category.id) === 'warning',
+                  'bg-red-500': getProgressColor(category.id) === 'danger'
+                }"
+              ></div>
+            </div>
+          </div>
+        </div>
       </ion-card-content>
     </ion-card>
   </div>
@@ -149,9 +273,10 @@
   <!-- Empty State -->
   <div
     *ngIf="!loading && !statistics"
-    class="ion-text-center p-8 text-gray-500"
+    class="ion-text-center p-12 text-gray-500"
   >
-    <ion-icon name="stats-chart" class="text-6xl mb-4"></ion-icon>
-    <p>No hay estadísticas disponibles</p>
+    <ion-icon name="stats-chart-outline" class="text-6xl mb-4"></ion-icon>
+    <h3 class="text-xl font-bold text-gray-400 mb-2">Sin estadísticas</h3>
+    <p class="text-sm">No hay datos disponibles en este momento</p>
   </div>
 </ion-content>

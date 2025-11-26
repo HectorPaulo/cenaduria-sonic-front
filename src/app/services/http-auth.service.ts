@@ -59,6 +59,19 @@ export class HttpAuthService {
     return this.http.post<any>(url, payload, { headers });
   }
 
+  logout(token: string): Observable<{ message: string; timestamp: string }> {
+    const url = `${environment.BASE_URL}/api/auth/logout`;
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    console.debug('[HttpAuthService] POST logout', url);
+    return this.http.post<{ message: string; timestamp: string }>(
+      url,
+      {},
+      { headers }
+    );
+  }
+
   getDiagnostics(): { baseUrl: string; platform?: string } {
     const baseUrl = String(environment.BASE_URL);
     let platform: string | undefined;

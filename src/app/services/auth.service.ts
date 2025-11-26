@@ -6,6 +6,7 @@ import {
   of,
   map,
   catchError,
+  firstValueFrom,
 } from 'rxjs';
 import {
   HttpAuthService,
@@ -163,13 +164,84 @@ export class AuthService {
     });
   }
 
-  logout(): void {
+  logout(): Promise<void> {
+    return new Promise((resolve) => {
+      const token = localStorage.getItem('access_token');
+
+      // If we have a token, try to invalidate it on the server
+      if (token) {
+        console.log(
+          '[AuthService] Attempting to invalidate token on server...'
+        );
+
+        // Set a timeout to ensure logout completes even if server is slow/unreachable
+        const timeoutId = setTimeout(() => {
+          console.warn(
+            '[AuthService] Server logout timeout - proceeding with local logout'
+          );
+          this.performLocalLogout();
+          resolve();
+        }, 5000); // 5 second timeout
+
+        this.httpAuth.logout(token).subscribe({
+          next: (response) => {
+            clearTimeout(timeoutId);
+            console.log(
+              '[AuthService] ✅ Token invalidated on server:',
+              response.message
+            );
+            this.performLocalLogout();
+            resolve();
+          },
+          error: (error) => {
+            clearTimeout(timeoutId);
+            console.error(
+              '[AuthService] ⚠️ Error invalidating token on server:',
+              error
+            );
+
+            // Log specific error types for debugging
+            if (error.status === 0) {
+              console.warn(
+                '[AuthService] Network error - server may be unreachable'
+              );
+            } else if (error.status === 401) {
+              console.warn('[AuthService] Token already invalid or expired');
+            } else {
+              console.warn(
+                `[AuthService] Server returned error ${error.status}`
+              );
+            }
+
+            // Always perform local logout even if server call fails
+            console.log(
+              '[AuthService] Proceeding with local logout despite server error'
+            );
+            this.performLocalLogout();
+            resolve();
+          },
+        });
+      } else {
+        // No token to invalidate, just clear local data
+        console.log('[AuthService] No token found - performing local logout');
+        this.performLocalLogout();
+        resolve();
+      }
+    });
+  }
+
+  /**
+   * Performs local logout by clearing all stored data
+   * This is separated into its own method to ensure consistency
+   */
+  private performLocalLogout(): void {
+    console.log('[AuthService] Clearing local storage and user session...');
     localStorage.removeItem('currentUser');
-    this.currentUserSubject.next(null);
-    // remove tokens and stop auto refresh
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    this.currentUserSubject.next(null);
     this.stopAutoRefresh();
+    console.log('[AuthService] ✅ Local logout completed');
   }
 
   getCurrentUser(): User | null {

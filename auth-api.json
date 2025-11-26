@@ -1,0 +1,318 @@
+{
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Autenticaci\u00f3n"
+        ],
+        "summary": "Registrar un nuevo usuario",
+        "description": "Crea un nuevo usuario con las credenciales proporcionadas.\nDevuelve un token de acceso JWT si el registro es exitoso.\nSi el usuario o email ya existen, o si la validaci\u00f3n de datos falla, devuelve un error detallado.\n",
+        "operationId": "register",
+        "requestBody": {
+          "description": "Datos de registro del usuario",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              },
+              "examples": {
+                "Ejemplo de registro": {
+                  "description": "Ejemplo de registro",
+                  "value": {
+                    "username": "daniel",
+                    "email": "daniel@example.com",
+                    "password": "Abc123$%",
+                    "roles": [
+                      "ROLE_USER"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Usuario registrado correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                },
+                "examples": {
+                  "Registro exitoso": {
+                    "description": "Registro exitoso",
+                    "value": {
+                      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                      "tokenType": "Bearer",
+                      "expiresIn": 3600000
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "El usuario o email ya existen",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Usuario duplicado": {
+                    "description": "Usuario duplicado",
+                    "value": {
+                      "timestamp": "2025-10-05T19:15:41.740694500",
+                      "error": "El usuario o email ya existe"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inv\u00e1lidos o fallos de validaci\u00f3n",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Error de validaci\u00f3n": {
+                    "description": "Error de validaci\u00f3n",
+                    "value": {
+                      "error": "Datos de entrada inv\u00e1lidos",
+                      "validationErrors": {
+                        "username": "El nombre de usuario debe tener entre 3 y 20 caracteres"
+                      },
+                      "timestamp": "2025-10-05T19:17:53.673924500"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": [
+          "Autenticaci\u00f3n"
+        ],
+        "summary": "Refrescar token JWT",
+        "description": "Genera un nuevo token de acceso usando el token de refresco v\u00e1lido.",
+        "operationId": "refresh",
+        "requestBody": {
+          "description": "Token de refresco",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              },
+              "examples": {
+                "Ejemplo de refresh": {
+                  "description": "Ejemplo de refresh",
+                  "value": {
+                    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Token refrescado correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token de refresco inv\u00e1lido o expirado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Autenticaci\u00f3n"
+        ],
+        "summary": "Cerrar sesi\u00f3n",
+        "description": "Invalida el token JWT actual agreg\u00e1ndolo a una lista negra.\n\n**Autenticaci\u00f3n requerida:** Este endpoint requiere un token JWT v\u00e1lido en el header Authorization.\n\n**Formato del header:**\n```\nAuthorization: Bearer <token-jwt>\n```\n",
+        "operationId": "logout",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sesi\u00f3n cerrada correctamente",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Logout exitoso": {
+                    "description": "Logout exitoso",
+                    "value": {
+                      "message": "Sesi\u00f3n cerrada correctamente",
+                      "timestamp": "2025-10-09T15:30:45.123"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token JWT inv\u00e1lido, expirado o no proporcionado",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Sin autorizaci\u00f3n": {
+                    "description": "Sin autorizaci\u00f3n",
+                    "value": {
+                      "error": "Unauthorized",
+                      "message": "Token JWT requerido o inv\u00e1lido",
+                      "timestamp": "2025-10-18T15:30:45.123"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Autenticaci\u00f3n"
+        ],
+        "summary": "Iniciar sesi\u00f3n",
+        "description": "Autentica al usuario con sus credenciales y devuelve un token de acceso y uno de refresco.",
+        "operationId": "login",
+        "requestBody": {
+          "description": "Credenciales del usuario",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequest"
+              },
+              "examples": {
+                "Ejemplo de login": {
+                  "description": "Ejemplo de login",
+                  "value": {
+                    "username": "daniel",
+                    "password": "123456"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Inicio de sesi\u00f3n exitoso",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inv\u00e1lidas",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Error de autenticaci\u00f3n": {
+                    "description": "Error de autenticaci\u00f3n",
+                    "value": {
+                      "error": "Credenciales inv\u00e1lidas"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/verify-roles": {
+      "get": {
+        "tags": [
+          "Autenticaci\u00f3n"
+        ],
+        "summary": "Verificar roles del usuario",
+        "description": "Obtiene los roles del usuario autenticado basado en el token JWT.\n\n**Autenticaci\u00f3n requerida:** Este endpoint requiere un token JWT v\u00e1lido en el header Authorization.\n\n**Formato del header:**\n```\nAuthorization: Bearer <token-jwt>\n```\n",
+        "operationId": "verifyRoles",
+        "responses": {
+          "200": {
+            "description": "Roles obtenidos correctamente",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Roles del usuario": {
+                    "description": "Roles del usuario",
+                    "value": {
+                      "username": "daniel",
+                      "roles": [
+                        "ROLE_USER",
+                        "ROLE_ADMIN"
+                      ],
+                      "timestamp": "2025-10-09T15:30:45.123"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token JWT inv\u00e1lido, expirado o no proporcionado",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Sin autorizaci\u00f3n": {
+                    "description": "Sin autorizaci\u00f3n",
+                    "value": {
+                      "error": "Unauthorized",
+                      "message": "Token JWT requerido o inv\u00e1lido",
+                      "timestamp": "2025-10-18T15:30:45.123"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  }
+}

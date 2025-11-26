@@ -1,72 +1,179 @@
 <app-header titulo="Registro Empleado"></app-header>
 
-<ion-content [fullscreen]="true">
-  <div class="mt-20">
-    <ion-card mode="ios">
-      <ion-card-header>
-        <ion-card-subtitle
-          >Completa los datos del nuevo empleado</ion-card-subtitle
-        >
-        <ion-card-title>Registrar Empleado</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <form [formGroup]="empleadoForm" (ngSubmit)="onSubmit()">
-          <ion-item>
-            <ion-label position="floating">Usuario (username)</ion-label>
-            <ion-input formControlName="username"></ion-input>
-          </ion-item>
-          <ion-text color="danger" *ngIf="isFieldInvalid('username')"
-            >{{ getError('username') }}</ion-text
-          >
+<ion-content [fullscreen]="true" class="bg-black">
+  <div class="max-w-lg mx-auto p-4 pt-6">
+    <!-- Header Section -->
+    <div class="mb-6 text-center">
+      <div
+        class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg"
+      >
+        <ion-icon name="person-add" class="text-4xl text-white"></ion-icon>
+      </div>
+      <h2 class="text-2xl font-bold text-white mb-2">Nuevo Empleado</h2>
+      <p class="text-gray-400 text-sm">
+        Completa los datos para registrar un nuevo empleado
+      </p>
+    </div>
 
-          <ion-item>
-            <ion-label position="floating">Email</ion-label>
-            <ion-input type="email" formControlName="email"></ion-input>
-          </ion-item>
-          <ion-text color="danger" *ngIf="isFieldInvalid('email')"
-            >{{ getError('email') }}</ion-text
+    <!-- Form Card -->
+    <div class="bg-gray-900 rounded-2xl p-6 shadow-lg border border-gray-800">
+      <form [formGroup]="empleadoForm" (ngSubmit)="onSubmit()">
+        <!-- Username Field -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-300 mb-2">
+            <ion-icon
+              name="person-circle"
+              class="mr-1 text-blue-400"
+            ></ion-icon>
+            Usuario (username)
+          </label>
+          <input
+            type="text"
+            formControlName="username"
+            placeholder="Ej: juan_perez"
+            class="w-full bg-gray-800 text-white rounded-lg px-4 py-3 border transition-colors"
+            [class.border-gray-700]="!isFieldInvalid('username')"
+            [class.border-red-500]="isFieldInvalid('username')"
+            [class.focus:border-blue-500]="!isFieldInvalid('username')"
+          />
+          <p
+            *ngIf="isFieldInvalid('username')"
+            class="text-red-400 text-xs mt-1"
           >
-
-          <ion-item>
-            <ion-label position="floating">Contraseña</ion-label>
-            <ion-input type="password" formControlName="password"></ion-input>
-          </ion-item>
-          <ion-text color="danger" *ngIf="isFieldInvalid('password')"
-            >{{ getError('password') }}</ion-text
+            {{ getError('username') }}
+          </p>
+          <p
+            *ngIf="!isFieldInvalid('username')"
+            class="text-gray-500 text-xs mt-1"
           >
+            Solo letras, números y guiones bajos
+          </p>
+        </div>
 
-          <ion-item>
-            <ion-label position="floating">Confirmar contraseña</ion-label>
-            <ion-input
-              type="password"
-              formControlName="confirmPassword"
-            ></ion-input>
-          </ion-item>
-          <ion-text color="danger" *ngIf="isFieldInvalid('confirmPassword')"
-            >{{ getError('confirmPassword') }}</ion-text
+        <!-- Email Field -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-300 mb-2">
+            <ion-icon name="mail" class="mr-1 text-blue-400"></ion-icon>
+            Correo Electrónico
+          </label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="empleado@example.com"
+            class="w-full bg-gray-800 text-white rounded-lg px-4 py-3 border transition-colors"
+            [class.border-gray-700]="!isFieldInvalid('email')"
+            [class.border-red-500]="isFieldInvalid('email')"
+            [class.focus:border-blue-500]="!isFieldInvalid('email')"
+          />
+          <p *ngIf="isFieldInvalid('email')" class="text-red-400 text-xs mt-1">
+            {{ getError('email') }}
+          </p>
+        </div>
+
+        <!-- Password Field -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-300 mb-2">
+            <ion-icon name="lock-closed" class="mr-1 text-blue-400"></ion-icon>
+            Contraseña
+          </label>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="••••••••"
+            class="w-full bg-gray-800 text-white rounded-lg px-4 py-3 border transition-colors"
+            [class.border-gray-700]="!isFieldInvalid('password')"
+            [class.border-red-500]="isFieldInvalid('password')"
+            [class.focus:border-blue-500]="!isFieldInvalid('password')"
+          />
+          <p
+            *ngIf="isFieldInvalid('password')"
+            class="text-red-400 text-xs mt-1"
           >
-
-          <div class="ion-margin-top">
-            <ion-button
-              expand="block"
-              type="submit"
-              [disabled]="!empleadoForm.valid || submitting"
-            >
-              <ng-container *ngIf="!submitting"
-                >Registrar Empleado</ng-container
-              >
-              <ng-container *ngIf="submitting">Registrando...</ng-container>
-            </ion-button>
-            <ion-button
-              expand="block"
-              fill="outline"
-              color="medium"
-              (click)="cancel()"
-              >Cancelar</ion-button
-            >
+            {{ getError('password') }}
+          </p>
+          <div
+            *ngIf="!isFieldInvalid('password')"
+            class="text-gray-500 text-xs mt-1 space-y-1"
+          >
+            <p>• Mínimo 8 caracteres</p>
+            <p>• Al menos una mayúscula</p>
+            <p>• Al menos un carácter especial</p>
           </div>
-        </form>
-      </ion-card-content>
-    </ion-card>
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-300 mb-2">
+            <ion-icon name="lock-closed" class="mr-1 text-blue-400"></ion-icon>
+            Confirmar Contraseña
+          </label>
+          <input
+            type="password"
+            formControlName="confirmPassword"
+            placeholder="••••••••"
+            class="w-full bg-gray-800 text-white rounded-lg px-4 py-3 border transition-colors"
+            [class.border-gray-700]="!isFieldInvalid('confirmPassword')"
+            [class.border-red-500]="isFieldInvalid('confirmPassword')"
+            [class.focus:border-blue-500]="!isFieldInvalid('confirmPassword')"
+          />
+          <p
+            *ngIf="isFieldInvalid('confirmPassword')"
+            class="text-red-400 text-xs mt-1"
+          >
+            {{ getError('confirmPassword') }}
+          </p>
+        </div>
+
+        <!-- Role Info Badge -->
+        <div
+          class="mb-6 p-3 bg-blue-900 bg-opacity-30 border border-blue-700 rounded-lg"
+        >
+          <div class="flex items-center gap-2 text-blue-300 text-sm">
+            <ion-icon name="shield-checkmark" class="text-lg"></ion-icon>
+            <span>Se asignará el rol: <strong>EMPLEADO</strong></span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-3">
+          <button
+            type="submit"
+            [disabled]="!empleadoForm.valid || submitting"
+            class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg transition-all shadow-lg"
+            [class.opacity-50]="!empleadoForm.valid || submitting"
+            [class.cursor-not-allowed]="!empleadoForm.valid || submitting"
+            [class.hover:bg-blue-700]="empleadoForm.valid && !submitting"
+          >
+            <span
+              *ngIf="!submitting"
+              class="flex items-center justify-center gap-2"
+            >
+              <ion-icon name="person-add"></ion-icon>
+              Registrar Empleado
+            </span>
+            <span
+              *ngIf="submitting"
+              class="flex items-center justify-center gap-2"
+            >
+              <ion-spinner name="crescent" class="w-5 h-5"></ion-spinner>
+              Registrando...
+            </span>
+          </button>
+
+          <button
+            type="button"
+            (click)="cancel()"
+            class="w-full bg-gray-800 text-gray-300 font-semibold py-3 rounded-lg border border-gray-700 hover:bg-gray-700 transition-colors"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Help Text -->
+    <div class="mt-6 text-center text-gray-500 text-xs">
+      <p>El empleado podrá acceder al sistema con estas credenciales</p>
+    </div>
   </div>
 </ion-content>

@@ -16,9 +16,11 @@ import {
   close,
   heart,
   checkmarkCircle,
+  closeCircle,
 } from 'ionicons/icons';
 import Recomendacion from '../Types/Recomendacion';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ComidasService } from '../services/comidas.service';
 import { CartService } from '../services/cart.service';
 import { RefresherCustomEvent } from '@ionic/core';
@@ -26,6 +28,7 @@ import { HeaderComponent } from '../components/header/header.component';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
 import { Alimento } from '../Types/Alimento';
 import { ToastController } from '@ionic/angular';
+import { MenuService } from '../services/menu.service';
 
 @Component({
   selector: 'app-menu',
@@ -55,6 +58,7 @@ export class MenuPage implements OnInit {
     setTimeout(() => {
       // TODO: Implementar lógica para mandar a llamar la información actualizada
       this.resetearFiltros();
+      this.clearSearch();
       event.target.complete();
     }, 2000);
   }
@@ -65,6 +69,13 @@ export class MenuPage implements OnInit {
   todasCategorias: Recomendacion[] = [];
   listaComidas: Alimento[] = [];
   bebidas: Alimento[] = [];
+
+  // Search functionality
+  searchTerm: string = '';
+  isSearching: boolean = false;
+  showSearchBar: boolean = false; // Toggle for search bar visibility
+  private searchSubject = new Subject<string>();
+  private searchSub?: Subscription;
 
   addToList(listaItem: Alimento) {
     this.listaComidas.push(listaItem);
@@ -94,9 +105,10 @@ export class MenuPage implements OnInit {
   constructor(
     private comidasService: ComidasService,
     private toastCtrl: ToastController,
-    private cartService: CartService
+    private cartService: CartService,
+    private menuService: MenuService
   ) {
-    addIcons({ close, cart, heart, search, add, checkmarkCircle });
+    addIcons({ search, closeCircle, add, close, cart, heart, checkmarkCircle });
   }
 
   ngOnInit() {
@@ -119,11 +131,19 @@ export class MenuPage implements OnInit {
     this.cargarDesdeApi();
     this.cargarCategoriasDesdeApi();
     this.cargarBebidasDesdeApi();
+
+    // Setup search with debouncing
+    this.searchSub = this.searchSubject
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .subscribe((term) => {
+        this.performSearch(term);
+      });
   }
 
   ngOnDestroy() {
     this.itemsSub?.unsubscribe();
     this.categoriesSub?.unsubscribe();
+    this.searchSub?.unsubscribe();
   }
 
   cargarDesdeApi() {
@@ -250,5 +270,51 @@ export class MenuPage implements OnInit {
 
   hayElementosFiltrados(): boolean {
     return this.comidasFiltradas.length > 0 || this.bebidasFiltradas.length > 0;
+  }
+
+  // Search methods
+  onSearchInput() {
+    const term = this.searchTerm.trim();
+    if (!term) {
+      this.clearSearch();
+      return;
+    }
+    this.searchSubject.next(term);
+  }
+
+  private performSearch(term: string) {
+    if (!term) {
+      this.clearSearch();
+      return;
+    }
+
+    this.isSearching = true;
+    this.filtroActivo = ''; // Clear category filter when searching
+
+    this.menuService.searchProducts(term).subscribe({
+      next: (results) => {
+        this.comidasFiltradas = results;
+        console.log(`Search results for "${term}":`, results.length);
+      },
+      error: (error) => {
+        console.error('Search failed:', error);
+        this.comidasFiltradas = [];
+      },
+    });
+  }
+
+  clearSearch() {
+    this.searchTerm = '';
+    this.isSearching = false;
+    this.showSearchBar = false; // Hide search bar when clearing
+    this.resetearFiltros();
+  }
+
+  toggleSearchBar() {
+    this.showSearchBar = !this.showSearchBar;
+    if (!this.showSearchBar) {
+      // Clear search when hiding
+      this.clearSearch();
+    }
   }
 }

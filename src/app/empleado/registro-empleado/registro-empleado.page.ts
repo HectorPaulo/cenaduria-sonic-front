@@ -22,10 +22,20 @@ import {
   IonInput,
   IonButton,
   IonText,
+  IonIcon,
+  IonSpinner,
   ToastController,
   AlertController,
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/components/header/header.component';
+import { addIcons } from 'ionicons';
+import {
+  personAdd,
+  personCircle,
+  mail,
+  lockClosed,
+  shieldCheckmark,
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-registro-empleado',
@@ -46,6 +56,8 @@ import { HeaderComponent } from 'src/app/components/header/header.component';
     IonInput,
     IonButton,
     IonText,
+    IonIcon,
+    IonSpinner,
     HeaderComponent,
   ],
 })
@@ -61,6 +73,8 @@ export class RegistroEmpleadoPage {
     private authService: AuthService,
     private alertCtrl: AlertController
   ) {
+    addIcons({ personAdd, personCircle, mail, lockClosed, shieldCheckmark });
+
     this.empleadoForm = this.fb.group(
       {
         username: [
@@ -94,7 +108,7 @@ export class RegistroEmpleadoPage {
 
   hasSpecialChar(control: AbstractControl) {
     const value = control.value || '';
-    return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)
+    return /[!@#$%^\u0026*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)
       ? null
       : { requiresSpecialChar: true };
   }
@@ -147,7 +161,7 @@ export class RegistroEmpleadoPage {
 
     const payload = {
       username: sanitizedUsername,
-      name: sanitizedUsername, 
+      name: sanitizedUsername,
       email: values.email,
       password: values.password,
       roles: ['ROLE_EMPLOYEE'],

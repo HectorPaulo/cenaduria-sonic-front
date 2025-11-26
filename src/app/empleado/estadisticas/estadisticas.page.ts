@@ -9,9 +9,6 @@ import {
   IonSpinner,
   IonRefresher,
   IonRefresherContent,
-  IonList,
-  IonItem,
-  IonLabel,
   IonBadge,
   IonIcon,
 } from '@ionic/angular/standalone';
@@ -24,7 +21,21 @@ import {
 } from 'src/app/services/empleados/pedidos-service';
 import { RefresherCustomEvent } from '@ionic/core';
 import { addIcons } from 'ionicons';
-import { statsChart, trendingUp, cash, cart, star } from 'ionicons/icons';
+import {
+  statsChart,
+  trendingUp,
+  cash,
+  cart,
+  star,
+  cubeOutline,
+  cube,
+  checkmarkCircle,
+  gift,
+  folderOpenOutline,
+  statsChartOutline,
+} from 'ionicons/icons';
+import { MenuService } from 'src/app/services/menu.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-estadisticas',
@@ -41,9 +52,6 @@ import { statsChart, trendingUp, cash, cart, star } from 'ionicons/icons';
     IonSpinner,
     IonRefresher,
     IonRefresherContent,
-    IonList,
-    IonItem,
-    IonLabel,
     IonBadge,
     IonIcon,
     HeaderComponent,
@@ -56,16 +64,40 @@ export class EstadisticasPage implements OnInit {
   topProducts: TopSellingItem[] = [];
   topPromotions: TopSellingItem[] = [];
 
-  constructor(private readonly pedidosService: PedidosService) {
-    addIcons({ statsChart, trendingUp, cash, cart, star });
+  // Category statistics
+  categories: any[] = [];
+  categoryTotalCounts: { [key: number]: number } = {};
+  categoryActiveCounts: { [key: number]: number } = {};
+  loadingCategories = false;
+
+  constructor(
+    private readonly pedidosService: PedidosService,
+    private readonly menuService: MenuService
+  ) {
+    addIcons({
+      cart,
+      cash,
+      trendingUp,
+      statsChart,
+      star,
+      cubeOutline,
+      cube,
+      gift,
+      folderOpenOutline,
+      checkmarkCircle,
+      statsChartOutline,
+    });
   }
 
   ngOnInit() {
     this.loadStatistics();
+    this.loadCategoryStatistics();
   }
 
   doRefresh(event: RefresherCustomEvent) {
-    this.loadStatistics(() => event.target.complete());
+    this.loadStatistics(() => {
+      this.loadCategoryStatistics(() => event.target.complete());
+    });
   }
 
   loadStatistics(cb?: () => void) {
@@ -151,5 +183,63 @@ export class EstadisticasPage implements OnInit {
       default:
         return status;
     }
+  }
+
+  // Category statistics methods
+  loadCategoryStatistics(cb?: () => void) {
+    this.loadingCategories = true;
+
+    this.menuService.getCategories().subscribe({
+      next: (cats) => {
+        this.categories = cats;
+        if (cats && cats.length > 0) {
+          this.loadCategoryCounts(cats, cb);
+        } else {
+          this.loadingCategories = false;
+          if (cb) cb();
+        }
+      },
+      error: (err) => {
+        console.error('[Estadisticas] Failed to load categories', err);
+        this.loadingCategories = false;
+        if (cb) cb();
+      },
+    });
+  }
+
+  private loadCategoryCounts(categories: any[], cb?: () => void) {
+    const requests = categories.flatMap((cat) => [
+      this.menuService.countProductsByCategory(cat.id),
+      this.menuService.countActiveProductsByCategory(cat.id),
+    ]);
+
+    forkJoin(requests).subscribe({
+      next: (results) => {
+        categories.forEach((cat, index) => {
+          this.categoryTotalCounts[cat.id] = results[index * 2] as number;
+          this.categoryActiveCounts[cat.id] = results[index * 2 + 1] as number;
+        });
+        this.loadingCategories = false;
+        if (cb) cb();
+      },
+      error: (err) => {
+        console.error('[Estadisticas] Failed to load category counts', err);
+        this.loadingCategories = false;
+        if (cb) cb();
+      },
+    });
+  }
+
+  getAvailabilityRatio(categoryId: number): number {
+    const total = this.categoryTotalCounts[categoryId] || 0;
+    const active = this.categoryActiveCounts[categoryId] || 0;
+    return total > 0 ? active / total : 0;
+  }
+
+  getProgressColor(categoryId: number): string {
+    const ratio = this.getAvailabilityRatio(categoryId);
+    if (ratio >= 0.8) return 'success';
+    if (ratio >= 0.5) return 'warning';
+    return 'danger';
   }
 }
