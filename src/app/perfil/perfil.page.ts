@@ -24,9 +24,15 @@ import {
   logOutOutline,
   image,
   cube,
+  camera,
+  shieldCheckmarkOutline,
+  keyOutline,
+  imageOutline,
+  helpCircleOutline,
+  calendarOutline,
+  informationCircleOutline,
 } from 'ionicons/icons';
 import User from '../Types/User';
-import { Capacitor } from '@capacitor/core';
 import { RefresherCustomEvent } from '@ionic/core';
 import { FabbtnComponent } from '../components/fabbtn/fabbtn.component';
 import { Usuarios } from '../services/usuarios.service';
@@ -87,6 +93,13 @@ export class PerfilPage implements OnInit {
       cube,
       createOutline,
       logOutOutline,
+      camera,
+      shieldCheckmarkOutline,
+      keyOutline,
+      imageOutline,
+      helpCircleOutline,
+      calendarOutline,
+      informationCircleOutline,
     });
   }
 
@@ -129,12 +142,6 @@ export class PerfilPage implements OnInit {
       header: 'Cambiar foto',
       message: 'Selecciona una opción para cambiar tu foto de perfil',
       buttons: [
-        // {
-        //   text: 'Cámara',
-        //   handler: () => {
-        //     this.tomarFotoConCamara();
-        //   },
-        // },
         {
           text: 'Galería',
           handler: () => {
@@ -150,39 +157,6 @@ export class PerfilPage implements OnInit {
     await alert.present();
   }
 
-  // TODO: Desimplementar la funcionalidad para abrir la camara.
-  // Da problemas con el emulador
-  // async tomarFotoConCamara() {
-  //   try {
-  //     // Verificar si estamos en un dispositivo con cámara
-  //     if (!Capacitor.isPluginAvailable('Camera')) {
-  //       this.mostrarError('La cámara no está disponible en este dispositivo');
-  //       return;
-  //     }
-
-  //     const image = await Camera.getPhoto({
-  //       quality: 90,
-  //       allowEditing: true,
-  //       resultType: CameraResultType.DataUrl,
-  //       source: CameraSource.Camera,
-  //       width: 300,
-  //       height: 300,
-  //     });
-
-  //     if (image.dataUrl) {
-  //       // Actualizar la foto del usuario
-  //       this.usuario.avatar = image.dataUrl;
-
-  //       // Aquí guardarías la imagen en el servidor
-  //       console.log('Nueva foto capturada y establecida');
-  //       this.mostrarExito('Foto de perfil actualizada correctamente');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error al tomar foto:', error);
-  //     this.mostrarError('Error al acceder a la cámara');
-  //   }
-  // }
-
   async seleccionarDeGaleria() {
     // Abrir selector de archivos oculto
     try {
@@ -197,7 +171,7 @@ export class PerfilPage implements OnInit {
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    const file = input.files && input.files[0];
+    const file = input.files?.[0];
     if (!file) return;
 
     const form = new FormData();
@@ -209,7 +183,10 @@ export class PerfilPage implements OnInit {
         const newUrl =
           res?.avatarUrl || res?.data?.avatarUrl || res?.url || null;
         if (newUrl) {
+          // Update local UI
           this.usuario.avatar = newUrl;
+          // Update globally in AuthService so it persists across the app
+          this.authService.updateUserAvatar(newUrl);
         }
         this.mostrarExito('Foto de perfil actualizada correctamente');
       },
@@ -220,103 +197,6 @@ export class PerfilPage implements OnInit {
     });
     // limpiar el input
     input.value = '';
-  }
-
-  async editarNombre() {
-    const alert = await this.alertController.create({
-      header: 'Editar nombre',
-      inputs: [
-        {
-          name: 'nombre',
-          type: 'text',
-          placeholder: 'Nombre completo',
-          value: this.usuario.nombre,
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Guardar',
-          handler: (data) => {
-            if (data.nombre && data.nombre.trim()) {
-              this.usuario.nombre = data.nombre.trim();
-              console.log('Nombre actualizado:', this.usuario.nombre);
-            }
-          },
-        },
-      ],
-    });
-    await alert.present();
-  }
-
-  async editarTelefono() {
-    const alert = await this.alertController.create({
-      header: 'Editar teléfono',
-      inputs: [
-        {
-          name: 'telefono',
-          type: 'tel',
-          placeholder: 'Número de teléfono',
-          value: this.usuario.telefono || '',
-        },
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-        },
-        {
-          text: 'Guardar',
-          handler: (data) => {
-            this.usuario.telefono = data.telefono;
-            console.log('Teléfono actualizado:', this.usuario.telefono);
-          },
-        },
-      ],
-    });
-    await alert.present();
-  }
-
-  // async editarDireccion() {
-  //   const alert = await this.alertController.create({
-  //     header: 'Editar dirección',
-  //     inputs: [
-  //       {
-  //         name: 'direccion',
-  //         type: 'text',
-  //         placeholder: 'Dirección completa',
-  //         value: this.usuario.direccion || '',
-  //       },
-  //     ],
-  //     buttons: [
-  //       {
-  //         text: 'Cancelar',
-  //         role: 'cancel',
-  //       },
-  //       {
-  //         text: 'Guardar',
-  //         handler: (data) => {
-  //           this.usuario.direccion = data.direccion;
-  //           console.log('Dirección actualizada:', this.usuario.direccion);
-  //         },
-  //       },
-  //     ],
-  //   });
-  //   await alert.present();
-  // }
-
-  // * Métodos de navegación
-  verFavoritos() {
-    console.log('Navegando a favoritos...');
-    // TODO: Implementar navegación a página de favoritos
-  }
-
-  configurarNotificaciones() {
-    console.log('Configurando notificaciones...');
-    // TODO: Implementar configuración de notificaciones
   }
 
   async cambiarPassword() {
@@ -379,11 +259,6 @@ export class PerfilPage implements OnInit {
   acercaDe() {
     console.log('Navegando a Acerca de...');
     this.router.navigate(['/about']);
-  }
-
-  editarPerfil() {
-    console.log('Navegando a edición completa del perfil...');
-    // TODO: Implementar navegación a formulario completo de perfil
   }
 
   async cerrarSesion() {

@@ -298,6 +298,20 @@ export class AuthService {
     this.startAutoRefresh();
   }
 
+  /**
+   * Update only the avatar of the current user
+   * This persists the change in localStorage and updates the observable
+   */
+  public updateUserAvatar(avatarUrl: string): void {
+    const currentUser = this.getCurrentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, avatar: avatarUrl };
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      this.currentUserSubject.next(updatedUser);
+      console.log('[AuthService] Avatar updated globally:', avatarUrl);
+    }
+  }
+
   public getCurrentToken(): string | null {
     return localStorage.getItem('access_token');
   }
